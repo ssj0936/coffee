@@ -36,6 +36,7 @@ dependencies {
     def retrofit_version = "2.7.1"
     def dagger2_version = "2.25.4"
     def room_version = "2.2.4"
+    def gms_location_version = "17.0.0"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -46,6 +47,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    implementation "com.google.android.gms:play-services-location:$gms_location_version"
     //life cycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
