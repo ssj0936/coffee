@@ -1,6 +1,7 @@
 package com.timothy.coffee.api
 
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitManager private constructor(){
@@ -9,27 +10,17 @@ class RetrofitManager private constructor(){
         private const val baseUrlCafenomad = "https://cafenomad.tw/"
         private const val baseUrlLocationiq = "https://us1.locationiq.com/"
 
-        val apiCafenomad by lazy { invoke(baseUrlCafenomad) as CafenomadApiService }
-        val apiLocationiq by lazy { invoke(baseUrlLocationiq) as LocationiqApiService}
+        val apiCafenomad by lazy { getApi<CafenomadApiService>(baseUrlCafenomad)}
+        val apiLocationiq by lazy { getApi<LocationiqApiService>(baseUrlLocationiq)}
 
-//        operator fun invoke(baseUrl: String): ApiService {
-//            return Retrofit.Builder()
-//                .baseUrl(baseUrl)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build()
-//                .create(ApiService::class.java)
-//        }
-
-
-        fun <T> getApi(baseURL:String) : T{
+        private inline fun <reified T> getApi(baseURL:String) : T{
             return Retrofit.Builder()
                 .baseUrl(baseURL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(T::class.java)
         }
-//
-////        cafenomadService = retrofit.create(CafenomadService::class.java)
     }
 
 
