@@ -21,6 +21,7 @@ import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.databinding.ActivityMainBinding
 import com.timothy.coffee.ui.CafeAdapter
 import com.timothy.coffee.util.LonAndLat
+import com.timothy.coffee.util.Util
 import com.timothy.coffee.viewmodel.DataViewModel
 import io.reactivex.ObservableSource
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -49,65 +50,16 @@ class MainActivity : AppCompatActivity() {
         mViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         binding.fetchBtn.setOnClickListener {
-            Log.d(TAG,"click")
-//            mViewModel.fetchLocation(++count)
-            mViewModel.getLocationObservable()
-                .observeOn(Schedulers.newThread())
-                .flatMap(object :Function<LonAndLat, ObservableSource<Locationiq>>{
-                    override fun apply(t: LonAndLat): ObservableSource<Locationiq> {
-                        Log.d(TAG,"first flatmap : ${Thread.currentThread().name}")
-
-                        Log.d(TAG,"longitude:${t.longitude},latitude:${t.latitude}")
-                        return mViewModel.getLocationiqObservable(t.latitude!!,t.longitude!!)
-                    }
-                },false)
-                .flatMap {
-                    Log.d(TAG,"second flatmap : ${Thread.currentThread().name}")
-
-                    mViewModel.getCafenomadObservable(it.address!!.state!!)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object:io.reactivex.Observer<List<Cafenomad>>{
-                    override fun onComplete() {
-                            Log.d(TAG,"subscribe onComplete: ${Thread.currentThread().name}")
-                            Toast.makeText(this@MainActivity, "download OK", Toast.LENGTH_SHORT).show();
-                        }
-
-                        override fun onSubscribe(d: Disposable?) {
-                        }
-
-                        override fun onNext(t: List<Cafenomad>) {
-                            Log.d(TAG,"subscribe onNext: ${Thread.currentThread().name}")
-
-                            Log.d(TAG,"cafe list Changed")
-                            binding.recyclerViewCafeList.swapAdapter(CafeAdapter(t),false)
-                        }
-
-                        override fun onError(e: Throwable?) {
-                            Log.e(TAG, "Exception: "+Log.getStackTraceString(e))
-                            Toast.makeText(this@MainActivity,e.toString(), Toast.LENGTH_SHORT).show()
-                        }
-                })
+            mViewModel.getCafeList(this@MainActivity)
         }
 
-//        mViewModel.loc.observe(this, Observer<LonAndLat> {loc ->
-//            Log.d(TAG,"Changed")
-//            if(loc != null) {
-//                Log.d(TAG,"loc != null")
-//                if (loc.latitude != null && loc.longitude != null) {
-//                    binding.loc.text = "longitude:${loc.longitude},latitude:${loc.latitude}"
-//                }
-//            }else{
-//                Log.d(TAG,"loc == null")
-//            }
-//        })
         binding.recyclerViewCafeList.layoutManager=LinearLayoutManager(this)
         binding.recyclerViewCafeList.adapter = adapter
         binding.recyclerViewCafeList.addItemDecoration(DividerItemDecoration(this,DividerItemDecoration.VERTICAL))
 
-//        mViewModel.cafeList.observe(this, Observer {
-//            Log.d(TAG,"cafe list Changed")
-//            binding.recyclerViewCafeList.swapAdapter(CafeAdapter(it),false)
-//        })
+        mViewModel.cafeList.observe(this, Observer {
+            Log.d(TAG,"cafe list Changed")
+            binding.recyclerViewCafeList.swapAdapter(CafeAdapter(it),false)
+        })
     }
 }
