@@ -24,7 +24,6 @@ class DataModel {
 
     fun getLocationObservable(context: Context): Observable<LonAndLat> {
         return Observable.create { emitter ->
-//            Util.isLocationPermissionGet(context)
 
             val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
             val locationRequest = LocationRequest()

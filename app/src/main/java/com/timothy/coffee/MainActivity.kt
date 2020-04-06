@@ -49,13 +49,15 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
         mViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
+        Util.isLocationPermissionGet(this@MainActivity)
+
         binding.fetchBtn.setOnClickListener {
             mViewModel.getCafeList(this@MainActivity)
         }
 
         binding.recyclerViewCafeList.layoutManager=LinearLayoutManager(this)
         binding.recyclerViewCafeList.adapter = adapter
-        binding.recyclerViewCafeList.addItemDecoration(DividerItemDecoration(this,DividerItemDecoration.VERTICAL))
+//        binding.recyclerViewCafeList.addItemDecoration(DividerItemDecoration(this,DividerItemDecoration.VERTICAL))
 
         mViewModel.cafeList.observe(this, Observer {
             Log.d(TAG,"cafe list Changed")
