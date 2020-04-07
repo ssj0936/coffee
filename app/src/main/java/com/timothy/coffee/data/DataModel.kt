@@ -1,26 +1,34 @@
 package com.timothy.coffee.data
 
-import android.app.Activity
 import android.content.Context
 import android.os.Looper
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.timothy.coffee.api.CafenomadApiService
+import com.timothy.coffee.api.LocationiqApiService
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
-import com.timothy.coffee.util.Util
 import io.reactivex.Observable
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DataModel {
+@Singleton
+class DataModel
+@Inject constructor(
+    private val locationiqApiService:LocationiqApiService,
+    private val cafenomadApiService:CafenomadApiService
+){
     val TAG = "[coffee] DataModel"
 
-    val locationiqDataModel = LocationiqDataModel()
-    val cafenomadDataModel = CafenomadDataModel()
+//    @Inject
+//    lateinit var locationiqApiService:LocationiqApiService
+//
+//    @Inject
+//    lateinit var cafenomadApiService:CafenomadApiService
 
     fun getLocationObservable(context: Context): Observable<LonAndLat> {
         return Observable.create { emitter ->
@@ -28,9 +36,6 @@ class DataModel {
             val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
             val locationRequest = LocationRequest()
             locationRequest.priority=LocationRequest.PRIORITY_HIGH_ACCURACY
-
-//            locationRequest.interval = 1000
-//            locationRequest.numUpdates = 1
 
             val locationCallback = object :LocationCallback() {
                 override fun onLocationResult(p0: LocationResult?) {
@@ -57,7 +62,7 @@ class DataModel {
         }
     }
 
-    fun getLocationiqObservable(lat:Double, lon: Double):Observable<Locationiq> = locationiqDataModel.getLocationiqData(lat,lon)
+    fun getLocationiqObservable(lat:Double, lon: Double):Observable<Locationiq> = locationiqApiService.reverseGeocoding(lat,lon)
 
-    fun getCafenomadObservable(city:String):Observable<List<Cafenomad>> = cafenomadDataModel.getCafedata(city)
+    fun getCafenomadObservable(city:String):Observable<List<Cafenomad>> = cafenomadApiService.searchCafes(city)
 }
