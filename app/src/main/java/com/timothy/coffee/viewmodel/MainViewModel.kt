@@ -9,10 +9,12 @@ import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
+import com.timothy.coffee.util.Util
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.lang.Exception
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -32,32 +34,38 @@ class MainViewModel @Inject constructor(
                     Log.d(TAG,"first flatmap : ${Thread.currentThread().name}")
                     Log.d(TAG,"longitude:${it.longitude},latitude:${it.latitude}")
                     loc.postValue(it)
+
+                    Log.d(TAG,if(!Util.isNetworkConnected(context)) "is no NetworkConnected" else "isNetworkConnected")
+
                     getLocationiqObservable(it.latitude!!,it.longitude!!)
-                }
-            }
+                        .flatMap {
+                            it?.let {
+                                Log.d(TAG,"second flatmap : ${Thread.currentThread().name}")
+                                cityName.postValue(it.address?.state)
+                                getCafenomadObservable(it.address!!.state!!)
+                            }
 
-            .flatMap {
-                it?.let {
-                    Log.d(TAG,"second flatmap : ${Thread.currentThread().name}")
-                    cityName.postValue(it.address?.state)
-                    getCafenomadObservable(it.address!!.state!!)
+                        }
                 }
-
             }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object:io.reactivex.Observer<List<Cafenomad>>{
-                override fun onComplete() {}
+                override fun onComplete() {
+                    Log.d(TAG,"onComplete")
+                }
 
-                override fun onSubscribe(d: Disposable?) {}
+                override fun onSubscribe(d: Disposable) {}
 
                 override fun onNext(t: List<Cafenomad>) {
                     Log.d(TAG,"subscribe onNext: ${Thread.currentThread().name}")
                     cafeList.value = t
-                    Log.d(TAG,"cafe list Changed")
+//                    Log.d(TAG,"cafe list Changed")
                 }
 
-                override fun onError(e: Throwable?) {
-                    Log.e(TAG, "Exception: "+Log.getStackTraceString(e))
+                override fun onError(e: Throwable) {
+                    Log.e(TAG, "Exception")
+                    e.printStackTrace()
+
                 }
             })
     }

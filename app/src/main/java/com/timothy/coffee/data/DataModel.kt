@@ -1,12 +1,16 @@
 package com.timothy.coffee.data
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
+import android.os.Bundle
 import android.os.Looper
 import android.util.Log
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.api.LocationiqApiService
 import com.timothy.coffee.data.model.Cafenomad
@@ -33,31 +37,71 @@ class DataModel
     fun getLocationObservable(context: Context): Observable<LonAndLat> {
         return Observable.create { emitter ->
 
-            val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-            val locationRequest = LocationRequest()
-            locationRequest.priority=LocationRequest.PRIORITY_HIGH_ACCURACY
+//            val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+//            val locationRequest = LocationRequest()
+//            locationRequest.priority=LocationRequest.PRIORITY_HIGH_ACCURACY
+//
+//            val locationCallback = object :LocationCallback() {
+//                override fun onLocationResult(p0: LocationResult?) {
+//                    if (p0 == null) {
+//                        Log.d(TAG, "null")
+//                        emitter.onError(Throwable("Location fetch Error"))
+//                    } else {
+//                        Toast.makeText(context,"${p0.lastLocation.longitude},${p0.lastLocation.latitude}",Toast.LENGTH_SHORT).show()
+//                        Log.d(TAG, "${p0.lastLocation.longitude},${p0.lastLocation.latitude}")
+//                        emitter.onNext(
+//                            LonAndLat(
+//                                p0.lastLocation.longitude,
+//                                p0.lastLocation.latitude
+//                            )
+//                        )
+////                        emitter.onComplete()
+//                    }
+//                }
+//            }
+//
+//            //Exception: Can't create handler inside thread that has not called Looper.prepare()
+//            //https://www.jianshu.com/p/c9a6c73ed5ce
+//            mLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+            // Acquire a reference to the system Location Manager
+            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-            val locationCallback = object :LocationCallback() {
-                override fun onLocationResult(p0: LocationResult?) {
-                    if (p0 == null) {
+            // Define a listener that responds to location updates
+            val locationListener = object : LocationListener {
+
+                override fun onLocationChanged(location: Location) {
+                    // Called when a new location is found by the network location provider.
+                    if (location == null) {
                         Log.d(TAG, "null")
                         emitter.onError(Throwable("Location fetch Error"))
                     } else {
-                        Log.d(TAG, "${p0.lastLocation.longitude},${p0.lastLocation.latitude}")
+                        Toast.makeText(
+                            context,
+                            "${location.longitude},${location.latitude}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        Log.d(TAG, "${location.longitude},${location.latitude}")
                         emitter.onNext(
                             LonAndLat(
-                                p0.lastLocation.longitude,
-                                p0.lastLocation.latitude
+                                location.longitude,
+                                location.latitude
                             )
                         )
-                        emitter.onComplete()
                     }
+                }
+
+                override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+                }
+
+                override fun onProviderEnabled(provider: String) {
+                }
+
+                override fun onProviderDisabled(provider: String) {
                 }
             }
 
-            //Exception: Can't create handler inside thread that has not called Looper.prepare()
-            //https://www.jianshu.com/p/c9a6c73ed5ce
-            mLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5f,locationListener)
+
             Log.d(TAG,"requestLocationUpdates")
         }
     }
