@@ -1,7 +1,10 @@
 package com.timothy.coffee.data.model
 
+import androidx.room.Entity
+import androidx.room.Index
 import com.google.gson.annotations.SerializedName
 
+@Entity(indices = [Index("id")],primaryKeys = ["id","name"])
 data class Cafenomad (
     @field:SerializedName("id")
     val id:String,
