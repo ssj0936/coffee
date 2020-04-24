@@ -1,22 +1,21 @@
 package com.timothy.coffee.data
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
 import android.location.LocationManager
-import android.os.Bundle
+import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.api.LocationiqApiService
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
 import io.reactivex.Observable
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,82 +27,52 @@ class DataModel
 ){
     val TAG = "[coffee] DataModel"
 
-//    @Inject
-//    lateinit var locationiqApiService:LocationiqApiService
-//
-//    @Inject
-//    lateinit var cafenomadApiService:CafenomadApiService
-
     fun getLocationObservable(context: Context): Observable<LonAndLat> {
         return Observable.create { emitter ->
+            val mLocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val isGPSEnabled = mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+            val isNetworkEnabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-//            val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-//            val locationRequest = LocationRequest()
-//            locationRequest.priority=LocationRequest.PRIORITY_HIGH_ACCURACY
-//
-//            val locationCallback = object :LocationCallback() {
-//                override fun onLocationResult(p0: LocationResult?) {
-//                    if (p0 == null) {
-//                        Log.d(TAG, "null")
-//                        emitter.onError(Throwable("Location fetch Error"))
-//                    } else {
-//                        Toast.makeText(context,"${p0.lastLocation.longitude},${p0.lastLocation.latitude}",Toast.LENGTH_SHORT).show()
-//                        Log.d(TAG, "${p0.lastLocation.longitude},${p0.lastLocation.latitude}")
-//                        emitter.onNext(
-//                            LonAndLat(
-//                                p0.lastLocation.longitude,
-//                                p0.lastLocation.latitude
-//                            )
-//                        )
-////                        emitter.onComplete()
-//                    }
-//                }
-//            }
-//
-//            //Exception: Can't create handler inside thread that has not called Looper.prepare()
-//            //https://www.jianshu.com/p/c9a6c73ed5ce
-//            mLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-            // Acquire a reference to the system Location Manager
-            val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            val mLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+            val locationRequest = LocationRequest()
+            locationRequest.priority=LocationRequest.PRIORITY_HIGH_ACCURACY
 
-            // Define a listener that responds to location updates
-            val locationListener = object : LocationListener {
-
-                override fun onLocationChanged(location: Location) {
-                    // Called when a new location is found by the network location provider.
-                    if (location == null) {
+            val locationCallback = object :LocationCallback() {
+                override fun onLocationResult(p0: LocationResult?) {
+                    if (p0 == null) {
                         Log.d(TAG, "null")
                         emitter.onError(Throwable("Location fetch Error"))
                     } else {
-                        Toast.makeText(
-                            context,
-                            "${location.longitude},${location.latitude}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        Log.d(TAG, "${location.longitude},${location.latitude}")
+                        Log.d(TAG, "${p0.lastLocation.longitude},${p0.lastLocation.latitude}")
                         emitter.onNext(
                             LonAndLat(
-                                location.longitude,
-                                location.latitude
+                                p0.lastLocation.longitude,
+                                p0.lastLocation.latitude
                             )
                         )
+                        emitter.onComplete()
                     }
-                }
-
-                override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-                }
-
-                override fun onProviderEnabled(provider: String) {
-                }
-
-                override fun onProviderDisabled(provider: String) {
                 }
             }
 
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5f,locationListener)
-
+            //Exception: Can't create handler inside thread that has not called Looper.prepare()
+            //https://www.jianshu.com/p/c9a6c73ed5ce
+            mLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
             Log.d(TAG,"requestLocationUpdates")
         }
+    }
+
+    private val testLonLat = listOf(LonAndLat(121.525,25.0392),//Taipei
+        LonAndLat(120.675679,24.123206)//TaiChung
+//        LonAndLat(120.4605903,22.6924778)
+        )
+
+    fun getLocationObservableTest(context: Context): Observable<LonAndLat> {
+        return Observable.interval(10, TimeUnit.SECONDS)
+            .flatMap {
+                Log.d(TAG,""+testLonLat[it.toInt() % testLonLat.size].toString())
+                Observable.just(testLonLat[it.toInt() % testLonLat.size])
+            }
     }
 
     fun getLocationiqObservable(lat:Double, lon: Double):Observable<Locationiq> = locationiqApiService.reverseGeocoding(lat,lon)

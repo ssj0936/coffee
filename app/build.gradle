@@ -38,7 +38,8 @@ dependencies {
     def room_version = "2.2.3"
     def gms_location_version = "17.0.0"
     def rxjava_version = "3.0.1"
-    def rxandroid_version = "2.0.1"
+    def rxandroid_version = "3.0.0"
+    def timber_version= "4.7.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -48,6 +49,8 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation "com.jakewharton.timber:timber:$timber_version"
 
     implementation "com.google.android.gms:play-services-location:$gms_location_version"
     //life cycle
@@ -69,7 +72,7 @@ dependencies {
 
     implementation "io.reactivex.rxjava3:rxjava:$rxjava_version"
 //    implementation "io.reactivex.rxjava3:rxandroid:$rxandroid_version"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    implementation "io.reactivex.rxjava2:rxandroid:2.0.1"
 
     // Dagger core
     implementation "com.google.dagger:dagger:$dagger2_version"
@@ -82,10 +85,8 @@ dependencies {
 
     //room
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
-    // optional - Kotlin Extensions and Coroutines support for Room
+    kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
-    // optional - RxJava support for Room
     implementation "androidx.room:room-rxjava2:$room_version"
 
 }

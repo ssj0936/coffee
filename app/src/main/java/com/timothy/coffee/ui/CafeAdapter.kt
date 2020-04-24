@@ -1,5 +1,6 @@
 package com.timothy.coffee.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import com.timothy.coffee.databinding.CafeRecyclerviewItemLayoutBinding
 
 class CafeAdapter(private val cafes:List<Cafenomad>): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
 
+    val TAG = "[coffee] CafeAdapter"
     //hold item view's reference
     class ViewHolder(val binding: CafeRecyclerviewItemLayoutBinding) :RecyclerView.ViewHolder(binding.root)
 
@@ -19,7 +21,10 @@ class CafeAdapter(private val cafes:List<Cafenomad>): RecyclerView.Adapter<CafeA
         return ViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = cafes.size
+    override fun getItemCount(): Int {
+//        Log.d(TAG,"cafes.size:${cafes.size}")
+        return cafes.size
+    }
 
     //replacing content of view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

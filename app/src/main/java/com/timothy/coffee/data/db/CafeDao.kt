@@ -6,19 +6,28 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.timothy.coffee.data.model.CafeSearchResult
 import com.timothy.coffee.data.model.Cafenomad
+import io.reactivex.Observable
+import io.reactivex.Single
 
 @Dao
 abstract class CafeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertResultCafeIdList(result: CafeSearchResult)
+    abstract fun insertCafe(cafe:List<Cafenomad>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertCafeData(cafe:List<Cafenomad>)
+    abstract fun insertSearchResult(result: CafeSearchResult)
 
-    @Query("SELECT * FROM CafeSearchResult WHERE city=:city")
-    abstract fun queryCafeListByCity(city:String):CafeSearchResult
+    @Query("Select * From Cafenomad Where id in (:cafeIds) LIMIT 30")
+    abstract fun queryCafeByIds(cafeIds:List<String>):Observable<List<Cafenomad>>
 
-    @Query("SELECT * FROM Cafenomad WHERE id in (:ids)")
-    abstract fun queryCafeById(ids:List<String>):List<Cafenomad>
+    @Query("Select * From Cafenomad Where cityname = (:cityname) LIMIT 30")
+    abstract fun queryCafeByCity(cityname:String):Observable<List<Cafenomad>>
+
+    @Query("Select * From CafeSearchResult Where city = (:city) LIMIT 1")
+    abstract fun queryCafeSearchResultObservable(city:String): Observable<List<CafeSearchResult>>
+
+    @Query("Select * From CafeSearchResult Where city = (:city) LIMIT 1")
+    abstract fun queryCafeSearchResult(city:String): Single<List<CafeSearchResult>>
+
 }
