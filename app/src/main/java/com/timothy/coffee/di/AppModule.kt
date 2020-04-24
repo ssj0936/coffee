@@ -1,11 +1,7 @@
 package com.timothy.coffee.di
 
-import androidx.room.Room
-import com.timothy.coffee.CafeApp
 import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.api.LocationiqApiService
-import com.timothy.coffee.data.db.CafeDao
-import com.timothy.coffee.data.db.CafeDb
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -20,13 +16,13 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideCafenomadApiService(): CafenomadApiService{
+    fun getCafenomadApiService(): CafenomadApiService{
         return getApi(baseUrlCafenomad)
     }
 
     @Provides
     @Singleton
-    fun provideLocationiqApiService(): LocationiqApiService {
+    fun getLocationiqApiService(): LocationiqApiService {
         return getApi(baseUrlLocationiq)
     }
 
@@ -37,13 +33,5 @@ class AppModule {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .build()
             .create(T::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideCafeDao(app:CafeApp): CafeDao {
-        val dbName = "cafeapp_db"
-        val db = Room.databaseBuilder(app,CafeDb::class.java,dbName).build()
-        return db.cafeDao()
     }
 }

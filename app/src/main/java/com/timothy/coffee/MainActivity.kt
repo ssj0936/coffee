@@ -13,8 +13,6 @@ import com.timothy.coffee.util.Util
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.AndroidInjection
-import io.reactivex.Observable
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -41,19 +39,12 @@ class MainActivity : AppCompatActivity() {
             mMainViewModel.getCafeList(this@MainActivity)
         }
 
-
-
         binding.recyclerViewCafeList.layoutManager=LinearLayoutManager(this)
         binding.recyclerViewCafeList.adapter = adapter
 
         mMainViewModel.cafeList.observe(this, Observer {
-//            Log.d(TAG,"cafe list Changed:${it[0].name}")
+            Log.d(TAG,"cafe list Changed")
             binding.recyclerViewCafeList.swapAdapter(CafeAdapter(it),false)
-            Log.d(TAG,"------------------------------------")
-        })
-
-        mMainViewModel.cityName.observe(this, Observer {
-            it?.let { Log.d(TAG,"cityName:${it}") }
         })
     }
 }
