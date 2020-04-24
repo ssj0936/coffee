@@ -1,13 +1,20 @@
 package com.timothy.coffee.data.model
 
+import androidx.room.Entity
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(indices = [Index("id"), Index("name")])
 data class Cafenomad (
+    @PrimaryKey
     @field:SerializedName("id")
     val id:String,
 
     @field:SerializedName("name")
     val name:String,
+
+    var cityname:String,
 
     @field:SerializedName("wifi")
     val wifiStabilityLevel:Double,
