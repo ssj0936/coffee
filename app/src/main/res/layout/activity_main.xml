@@ -8,22 +8,22 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <Button
-            android:id="@+id/fetch_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="get loc"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+<!--        <Button-->
+<!--            android:id="@+id/fetch_btn"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="get loc"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"/>-->
 
-        <TextView
-            android:id="@+id/loc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/fetch_btn"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/fetch_btn"
-            app:layout_constraintTop_toTopOf="@+id/fetch_btn" />
+<!--        <TextView-->
+<!--            android:id="@+id/loc"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/fetch_btn"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/fetch_btn"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/fetch_btn" />-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_cafe_list"
@@ -33,7 +33,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fetch_btn" />
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

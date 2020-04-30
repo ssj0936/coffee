@@ -7,8 +7,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.CafeRecyclerviewItemLayoutBinding
+import com.timothy.coffee.util.LonAndLat
+import com.timothy.coffee.util.Util
 
-class CafeAdapter(private val cafes:List<Cafenomad>): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
+class CafeAdapter(
+    private val cafes:List<Cafenomad>,
+    private val currentLocation:LonAndLat?
+): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
 
     val TAG = "[coffee] CafeAdapter"
     //hold item view's reference
@@ -22,7 +27,6 @@ class CafeAdapter(private val cafes:List<Cafenomad>): RecyclerView.Adapter<CafeA
     }
 
     override fun getItemCount(): Int {
-//        Log.d(TAG,"cafes.size:${cafes.size}")
         return cafes.size
     }
 
@@ -30,7 +34,12 @@ class CafeAdapter(private val cafes:List<Cafenomad>): RecyclerView.Adapter<CafeA
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val cafe:Cafenomad = cafes[position]
 
-        holder.binding.cafeAddress.text = cafe.address
         holder.binding.cafeName.text = cafe.name
+        holder.binding.cafeAddress.text =
+            if(currentLocation!=null)
+                "${Util.distance(currentLocation.latitude,cafe.latitude.toDouble(),currentLocation.longitude,cafe.longitude.toDouble()).toInt()} M"
+            else
+                ""
+        holder.binding.tastyRating.rating = cafe.tastyLevel.toFloat()
     }
 }

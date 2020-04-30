@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
+import kotlin.math.*
 
 class Util {
     companion object{
@@ -26,5 +27,29 @@ class Util {
             ActivityCompat.requestPermissions(context as Activity, permissionMissingList.toTypedArray(), PERMISSION_REQUEST_CODE)
             return false
         }
+
+        fun distance(
+            lat1: Double, lat2: Double, lon1: Double,
+            lon2: Double
+        ): Double = distance(lat1,lat2,lon1,lon2,0.0,0.0)
+
+        private fun distance(
+            lat1: Double, lat2: Double, lon1: Double,
+            lon2: Double, el1: Double, el2: Double
+        ): Double {
+            val R = 6371 // Radius of the earth
+            val latDistance = Math.toRadians(lat2 - lat1)
+            val lonDistance = Math.toRadians(lon2 - lon1)
+            val a =(sin(latDistance / 2) * sin(latDistance / 2)
+                        + (cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2))
+                            * sin(lonDistance / 2) * sin(lonDistance / 2))
+                    )
+            val c =2 * atan2(sqrt(a), sqrt(1 - a))
+            var distance = R * c * 1000 // convert to meters
+            val height = el1 - el2
+            distance = distance.pow(2.0) + height.pow(2.0)
+            return sqrt(distance)
+        }
+
     }
 }

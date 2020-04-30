@@ -18,8 +18,6 @@ class DataSource @Inject constructor(
    private val cafeDao: CafeDao,
    private val cafenomadApiService: CafenomadApiService
 ) {
-    private val TAG = "[coffee] DataSource"
-
     fun query(city:String):Observable<List<Cafenomad>>{
         return Observable.concatArray(
             queryFromDB(city),
@@ -42,7 +40,6 @@ class DataSource @Inject constructor(
             .filter { it.isNotEmpty() }
             .toObservable()
             .flatMap {result->
-                    Timber.d("result.isNotEmpty")
                     cafeDao.queryCafeByIds(result[0].idList)
             }
             .subscribeOn(Schedulers.io())
@@ -94,9 +91,9 @@ class DataSource @Inject constructor(
 
     private fun queryFromApi(city: String):Observable<List<Cafenomad>>{
         return Observable.just("")
-            .doOnNext {
-                Timber.d("queryFromApi")
-            }
+//            .doOnNext {
+//                Timber.d("queryFromApi")
+//            }
             .flatMap {
             cafenomadApiService.searchCafes(city)
                 .doOnNext {list->
