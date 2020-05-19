@@ -1,0 +1,44 @@
+<resources>
+    <style name="CommonTitleStyle">
+        <item name="android:textColor">@color/common_content_text_color</item>
+        <item name="android:textSize">@dimen/common_title_text_size</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="CommonSubtitleStyle">
+        <item name="android:textColor">@color/common_content_text_color</item>
+        <item name="android:textSize">@dimen/common_subtitle_text_size</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="CommonListViewTitleTextStyle">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/app_color</item>
+        <item name="android:textSize">@dimen/common_context_text_size</item>
+    </style>
+
+    <style name="CommonPrimaryContextTextStyle">
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:textColor">@color/common_primary_context_text_color</item>
+        <item name="android:textSize">@dimen/common_context_text_size</item>
+    </style>
+
+    <style name="CommonSecondaryContextTextStyle" parent="CommonPrimaryContextTextStyle">
+        <item name="android:textColor">@color/common_secondary_context_text_color</item>
+        <item name="android:textSize">@dimen/common_context_text_size</item>
+    </style>
+
+    <style name="RateNumberStyle" parent="CommonPrimaryContextTextStyle">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/rate_number_text_color</item>
+        <item name="android:textSize">@dimen/rate_number_text_size</item>
+    </style>
+
+    <style name="RateTotalNumberStyle" parent="CommonPrimaryContextTextStyle">
+        <item name="android:textColor">@color/common_secondary_context_text_color</item>
+        <item name="android:textSize">@dimen/rate_total_number_text_size</item>
+    </style>
+
+</resources>

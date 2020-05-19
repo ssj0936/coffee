@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="indicator_size">5dp</dimen>
+    <dimen name="common_context_text_size">16sp</dimen>
+    <dimen name="common_context_text_size_min">5sp</dimen>
+    <dimen name="common_title_text_size">24sp</dimen>
+    <dimen name="common_title_text_size_min">5sp</dimen>
+    <dimen name="common_subtitle_text_size">17sp</dimen>
+    <dimen name="common_context_padding">24dp</dimen>
+
+    <dimen name="rate_number_text_size">20sp</dimen>
+    <dimen name="rate_total_number_text_size">14sp</dimen>
+
+</resources>

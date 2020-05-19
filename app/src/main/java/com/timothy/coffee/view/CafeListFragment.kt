@@ -1,13 +1,16 @@
-package com.timothy.coffee
+package com.timothy.coffee.view
 
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.timothy.coffee.R
+import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.CafelistFragmentBinding
 import com.timothy.coffee.ui.CafeAdapter
 import com.timothy.coffee.util.Util
@@ -20,18 +23,29 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
 
-class CafeListFragment :Fragment(){
-    private lateinit var mMainViewModel: MainViewModel
-
+class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     lateinit var binding:CafelistFragmentBinding
-    private val adapter:CafeAdapter = CafeAdapter(listOf(),null)
+    private var adapter:CafeAdapter = CafeAdapter(listOf(),null,this)
     private val compositeDisposable = CompositeDisposable()
+    private lateinit var mMainViewModel: MainViewModel
 
     companion object{
-        const val TAG:String = "CafeListFragment"
-        val NEW_INSTANCE:CafeListFragment = CafeListFragment()
+        private lateinit var INSTANCE: CafeListFragment
+        fun getInstance():CafeListFragment{
+            if(!::INSTANCE.isInitialized)
+                INSTANCE =CafeListFragment()
+            return INSTANCE
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        mMainViewModel = activity?.run {
+            ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
+
     }
 
     override fun onAttach(context: Context) {
@@ -41,7 +55,6 @@ class CafeListFragment :Fragment(){
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        mMainViewModel = ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
         Util.isLocationPermissionGet(context!!)
         mMainViewModel.getCafeList(context!!)
     }
@@ -66,8 +79,9 @@ class CafeListFragment :Fragment(){
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    adapter = CafeAdapter(it,mMainViewModel.loc.value,this)
                     binding.recyclerViewCafeList.swapAdapter(
-                        CafeAdapter(it,mMainViewModel.loc.value),
+                        adapter,
                         false)
                 },{error-> Timber.d(error)})
         )
@@ -77,4 +91,10 @@ class CafeListFragment :Fragment(){
         super.onStop()
         compositeDisposable.clear()
     }
+
+    override fun onItemClick(cafe: Cafenomad) {
+        mMainViewModel.chosenCafe.value = cafe
+        Timber.d(cafe.name)
+    }
+
 }

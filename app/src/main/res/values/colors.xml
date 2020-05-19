@@ -7,4 +7,13 @@
     <color name="ratingStarActive">#de6231</color>
     <color name="ratingStarNonActive">#B3ffffff</color>
 
+    <color name="app_color">#1a73eb</color>
+    <color name="common_primary_context_text_color">#212121</color>
+    <color name="common_secondary_context_text_color">#797979</color>
+    <color name="common_content_text_color">#212121</color>
+
+    <color name="lighter_gray">#797979</color>
+
+    <color name="rate_number_text_color">@color/app_color</color>
+
 </resources>

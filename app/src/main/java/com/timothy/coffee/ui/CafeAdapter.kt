@@ -9,13 +9,14 @@ import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.CafeRecyclerviewItemLayoutBinding
 import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.util.Util
+import timber.log.Timber
 
 class CafeAdapter(
     private val cafes:List<Cafenomad>,
-    private val currentLocation:LonAndLat?
+    private val currentLocation:LonAndLat?,
+    private val listener:OnCafeAdapterClickListener
 ): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
 
-    val TAG = "[coffee] CafeAdapter"
     //hold item view's reference
     class ViewHolder(val binding: CafeRecyclerviewItemLayoutBinding) :RecyclerView.ViewHolder(binding.root)
 
@@ -35,11 +36,14 @@ class CafeAdapter(
         val cafe:Cafenomad = cafes[position]
 
         holder.binding.cafeName.text = cafe.name
-        holder.binding.cafeAddress.text =
-            if(currentLocation!=null)
-                "${Util.distance(currentLocation.latitude,cafe.latitude.toDouble(),currentLocation.longitude,cafe.longitude.toDouble()).toInt()} M"
-            else
-                ""
+        holder.binding.cafeAddress.text = if(cafe.distance==null) "" else "${cafe.distance} M"
         holder.binding.tastyRating.rating = cafe.tastyLevel.toFloat()
+        holder.binding.root.setOnClickListener{
+            listener.onItemClick(cafe)
+        }
+    }
+
+    interface OnCafeAdapterClickListener{
+        fun onItemClick(cafe:Cafenomad)
     }
 }

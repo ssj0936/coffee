@@ -8,33 +8,6 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <View
-            android:id="@+id/test"
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="@color/ratingStarNonActive"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/recycler_view_cafe_list"/>
-
-<!--        <androidx.viewpager2.widget.ViewPager2-->
-<!--            android:id="@+id/viewpager"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:scrollbars="vertical"-->
-<!--            app:layout_constraintBottom_toTopOf="@id/indicator"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/test"/>-->
-<!--        <com.google.android.material.tabs.TabLayout-->
-<!--            android:id="@+id/indicator"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/viewpager"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"/>-->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view_cafe_list"
             android:layout_width="match_parent"
@@ -43,7 +16,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/test"/>
+            app:layout_constraintTop_toTopOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

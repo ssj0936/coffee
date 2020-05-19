@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">coffee</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="btn_text_navigate">Navigate</string>
+
+    <string name="no_data">No data</string>
+
+    <string name="label_wifi_stability">Wifi Stability</string>
+    <string name="label_seat_availability">Seat Availability</string>
+    <string name="label_tasty_level">Tasty</string>
+    <string name="label_quiet_level">Quiet</string>
+    <string name="label_price_level">Price</string>
+    <string name="label_good_music_level">Music Taste</string>
+    <string name="label_url">URL</string>
+    <string name="label_is_socket_provide">Socket providing</string>
+    <string name="label_is_standing_desk_available">Standing working desk</string>
+    <string name="label_is_time_limited">Time limited</string>
+    <string name="label_open_time">Standing working desk</string>
+    <string name="label_mrt">Standing working desk</string>
+
+
 </resources>

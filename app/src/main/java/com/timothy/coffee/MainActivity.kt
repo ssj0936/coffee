@@ -1,71 +1,82 @@
 package com.timothy.coffee
 
-import androidx.appcompat.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-
-import com.timothy.coffee.ui.CafeAdapter
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.tabs.TabLayoutMediator
+import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.databinding.MainActivityBinding
+import com.timothy.coffee.util.reduceDragSensitivity
+import com.timothy.coffee.view.CafeViewPager2Adapter
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.main_activity.*
 import timber.log.Timber
 import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
-    private lateinit var mMainViewModel:MainViewModel
-
     @Inject
     lateinit var dispatchingAndroidInjector:DispatchingAndroidInjector<Any>
 
+    private lateinit var mMainViewModel: MainViewModel
     @Inject
-    lateinit var mViewModelFactory:ViewModelFactory
-//    private lateinit var binding : ActivityMainBinding
-    private val adapter:CafeAdapter = CafeAdapter(listOf(),null)
-    private val compositeDisposable = CompositeDisposable()
+    lateinit var mViewModelFactory: ViewModelFactory
+    private val mPageNum = 2
+    private lateinit var cafeAdapter2:CafeViewPager2Adapter
+    private lateinit var binding:MainActivityBinding
 
-    val TAG = "[coffee] MainActivity"
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("Activity onCreate")
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.main_activity);
+        binding = DataBindingUtil.setContentView(this,R.layout.main_activity)
 
-        val tag = CafeListFragment.TAG
+        mMainViewModel = ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
+        //viewpager2
+        cafeAdapter2 = CafeViewPager2Adapter(this, mPageNum,mMainViewModel)
+        viewpager.adapter = cafeAdapter2
+        viewpager.reduceDragSensitivity()
+//        binding.secondpagehide = cafeAdapter2.isInfoPageHide
+        binding.viewmodel = mMainViewModel
+        binding.lifecycleOwner=this
+        TabLayoutMediator(indicator,viewpager){tab,position ->
+            Timber.d(""+tab.text)
+            Timber.d(""+position)
+        }.attach()
 
-        //單純產生一個fragment instance 並以fragmentManager加入
-        if(supportFragmentManager.findFragmentByTag(tag) == null) {
-            Timber.d("fragment == NULL, create a new fragment instance")
-            val fragment: CafeListFragment = CafeListFragment.NEW_INSTANCE
-            supportFragmentManager.beginTransaction()
-                .add(R.id.container,fragment,tag)
-                .commit()
+        mMainViewModel.chosenCafe.observe (this,
+            Observer<Cafenomad> {
+                //unhidden second page
+                if(cafeAdapter2.isInfoPageHide.value!!){
+                    cafeAdapter2.setHideInfoPage(false)
+                }
+
+                //nav to second page
+                viewpager.currentItem = mPageNum-1
+            })
+    }
+
+    override fun onBackPressed() {
+        if(viewpager.currentItem == 0) {
+            viewpager.currentItem = -1
+            super.onBackPressed()
         }
+        else
+            viewpager.currentItem = viewpager.currentItem - 1;
+
     }
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
-
-    //    override fun onStart() {
-//        super.onStart()
-//        compositeDisposable.add(
-//            mMainViewModel.getCafeList(this@MainActivity)
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({
-//                    binding.recyclerViewCafeList.swapAdapter(
-//                        CafeAdapter(it,mMainViewModel.loc.value),
-//                        false)
-//                },{error->Timber.d(error)})
-//        )
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        compositeDisposable.clear()
-//    }
 }

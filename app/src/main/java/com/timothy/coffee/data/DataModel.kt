@@ -42,14 +42,14 @@ class DataModel
             val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
             fusedLocationClient.lastLocation
                 .addOnSuccessListener {
-                    Timber.d("getLastKnownLocation success")
+//                    Timber.d("getLastKnownLocation success")
                     emitter.onSuccess(LonAndLat(
                         it.longitude,
                         it.latitude
                     ))
                 }
                 .addOnFailureListener {
-                    Timber.d("getLastKnownLocation error")
+//                    Timber.d("getLastKnownLocation error")
                     emitter.onComplete()
                 }
         }.toObservable()
@@ -65,7 +65,7 @@ class DataModel
             // Define a listener that responds to location updates
             val locationListener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
-                    Timber.d( "${location.longitude},${location.latitude}")
+//                    Timber.d( "${location.longitude},${location.latitude}")
                     emitter.onNext(
                         LonAndLat(
                             location.longitude,
@@ -84,7 +84,7 @@ class DataModel
 
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 5f,locationListener,Looper.getMainLooper())
 
-            Timber.d("requestLocationUpdates")
+//            Timber.d("requestLocationUpdates")
 
         }
     }
