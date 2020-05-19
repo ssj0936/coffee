@@ -29,8 +29,7 @@ class MainViewModel @Inject constructor(
 ): ViewModel(){
 
     var loc : MutableLiveData<LonAndLat> = MutableLiveData()
-    var cityName: MutableLiveData<String> = MutableLiveData()
-    var cafeList: MutableLiveData<List<Cafenomad>> = MutableLiveData()
+    private var cityName: MutableLiveData<String> = MutableLiveData()
     open val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
 
     fun getCafeList(context: Context):Observable<List<Cafenomad>> {

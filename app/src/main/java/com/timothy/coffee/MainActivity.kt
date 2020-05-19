@@ -1,10 +1,7 @@
 package com.timothy.coffee
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -12,7 +9,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.MainActivityBinding
 import com.timothy.coffee.util.reduceDragSensitivity
-import com.timothy.coffee.view.CafeViewPager2Adapter
+import com.timothy.coffee.ui.CafeViewPager2Adapter
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.AndroidInjection
@@ -33,7 +30,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     private val mPageNum = 2
-    private lateinit var cafeAdapter2:CafeViewPager2Adapter
+    private lateinit var cafeAdapter2: CafeViewPager2Adapter
     private lateinit var binding:MainActivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,10 +42,13 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
         mMainViewModel = ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
         //viewpager2
-        cafeAdapter2 = CafeViewPager2Adapter(this, mPageNum,mMainViewModel)
+        cafeAdapter2 = CafeViewPager2Adapter(
+            this,
+            mPageNum
+        )
         viewpager.adapter = cafeAdapter2
         viewpager.reduceDragSensitivity()
-//        binding.secondpagehide = cafeAdapter2.isInfoPageHide
+
         binding.viewmodel = mMainViewModel
         binding.lifecycleOwner=this
         TabLayoutMediator(indicator,viewpager){tab,position ->

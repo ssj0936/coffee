@@ -262,7 +262,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="@{viewmodel.chosenCafe.priceLevel==0 ? View.GONE : View.VISIBLE}"
-                app:constraint_referenced_ids="total_score_price,rate_price_level"/>
+                app:constraint_referenced_ids="label_price_level,total_score_price,rate_price_level"/>
 
             <!--music-->
             <androidx.appcompat.widget.AppCompatTextView

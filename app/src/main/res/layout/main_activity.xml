@@ -18,12 +18,12 @@
             android:layout_height="match_parent"/>
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/indicator"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:tabBackground="@drawable/tab_pager_selector"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp"
-            android:layout_gravity="bottom"
+            android:layout_gravity="bottom|center_horizontal"
             android:visibility="@{viewmodel.chosenCafe!=null ? View.VISIBLE : View.GONE}"/>
     </FrameLayout>
 </layout>

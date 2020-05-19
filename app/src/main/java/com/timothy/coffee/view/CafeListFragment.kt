@@ -27,7 +27,7 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     lateinit var binding:CafelistFragmentBinding
-    private var adapter:CafeAdapter = CafeAdapter(listOf(),null,this)
+    private var adapter:CafeAdapter = CafeAdapter(listOf(),this)
     private val compositeDisposable = CompositeDisposable()
     private lateinit var mMainViewModel: MainViewModel
 
@@ -79,7 +79,7 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    adapter = CafeAdapter(it,mMainViewModel.loc.value,this)
+                    adapter = CafeAdapter(it,this)
                     binding.recyclerViewCafeList.swapAdapter(
                         adapter,
                         false)

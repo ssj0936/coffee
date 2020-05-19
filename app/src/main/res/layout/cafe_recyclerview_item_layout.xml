@@ -2,6 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <import type="android.view.View"></import>
+        <variable
+            name="cafeinfo"
+            type="com.timothy.coffee.data.model.Cafenomad" />
+    </data>
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="64dp"
@@ -22,17 +29,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textAlignment="viewStart"
+                android:text="@{cafeinfo.name}"
                 app:layout_constraintHorizontal_bias="0"
-                app:layout_constraintBottom_toTopOf="@id/cafe_address"
+                app:layout_constraintBottom_toTopOf="@id/cafe_distance"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/tasty_rating"/>
 
 
             <TextView
-                android:id="@+id/cafe_address"
+                android:id="@+id/cafe_distance"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:text="@{cafeinfo.distance+` M`}"
                 app:layout_constraintHorizontal_bias="0"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -44,6 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:isIndicator="true"
+                android:rating="@{Float.parseFloat(String.valueOf(cafeinfo.tastyLevel))}"
                 android:max="5"
                 android:numStars="5"
                 android:stepSize=".5"
@@ -51,7 +61,8 @@
                 style="@style/TastyRatingBarStyle"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:visibility="@{cafeinfo.tastyLevel==0 ? View.GONE : View.VISIBLE}"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
