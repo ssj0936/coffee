@@ -5,15 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.CafelistFragmentBinding
 import com.timothy.coffee.ui.CafeAdapter
-import com.timothy.coffee.util.Util
+import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
@@ -55,7 +53,7 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Util.isLocationPermissionGet(context!!)
+        Utils.isLocationPermissionGet(context!!)
         mMainViewModel.getCafeList(context!!)
     }
 

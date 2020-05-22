@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingStart="@dimen/common_context_padding"
-            android:paddingEnd="@dimen/common_context_padding">
+            android:paddingEnd="@dimen/common_context_padding"
+            android:paddingBottom="@dimen/common_context_padding">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline_vertical"
@@ -361,14 +362,17 @@
                 app:layout_constraintStart_toStartOf="@id/guideline_vertical"
                 app:layout_constraintTop_toBottomOf="@+id/label_standing_desk" />
 
-            <!--        <Button-->
-            <!--            android:id="@+id/btn_navigate"-->
-            <!--            android:layout_width="wrap_content"-->
-            <!--            android:layout_height="wrap_content"-->
-            <!--            android:text="@string/btn_text_navigate"-->
-            <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--            app:layout_constraintEnd_toEndOf="parent"-->
-            <!--            app:layout_constraintStart_toStartOf="parent" />-->
+            <Button
+                android:id="@+id/btn_navigate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_text_navigate"
+                app:layout_constraintTop_toBottomOf="@id/content_standing_desk"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="@dimen/common_title_text_size"
+                android:layout_marginBottom="@dimen/common_context_padding"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 

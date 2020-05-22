@@ -3,7 +3,9 @@ package com.timothy.coffee.util
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -20,7 +22,7 @@ fun ViewPager2.reduceDragSensitivity() {
     touchSlopField.set(recyclerView, touchSlop*4)       // "8" was obtained experimentally
 }
 
-class Util {
+class Utils {
     companion object{
         fun isLocationPermissionGet(context : Context):Boolean{
             val needPermissions =
@@ -62,6 +64,13 @@ class Util {
             val height = el1 - el2
             distance = distance.pow(2.0) + height.pow(2.0)
             return sqrt(distance)
+        }
+
+        fun getGoogleMapDirectionIntent(startLat:Double, startLon:Double, destName:String):Intent{
+            return Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLon&destination=$destName")
+            )
         }
 
     }

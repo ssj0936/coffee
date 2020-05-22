@@ -1,26 +1,17 @@
 package com.timothy.coffee.viewmodel
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
-import com.timothy.coffee.data.db.CafeDao
-import com.timothy.coffee.data.model.CafeSearchResult
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
-import com.timothy.coffee.util.Util
+import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
-import io.reactivex.Observer
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
-import java.util.stream.Collectors
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -61,7 +52,7 @@ class MainViewModel @Inject constructor(
             .map { cafes ->
                 cafes.stream().forEach {cafe->
                     loc.value?.let{
-                        cafe.distance = Util.distance(it.latitude,cafe.latitude.toDouble(),
+                        cafe.distance = Utils.distance(it.latitude,cafe.latitude.toDouble(),
                             it.longitude,cafe.longitude.toDouble()).toInt()
                     }
                 }
