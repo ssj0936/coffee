@@ -7,9 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
-import com.timothy.coffee.databinding.CafelistFragmentBinding
 import com.timothy.coffee.ui.CafeAdapter
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
@@ -18,13 +17,13 @@ import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_cafe_list.*
 import timber.log.Timber
 import javax.inject.Inject
 
 class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
-    lateinit var binding:CafelistFragmentBinding
     private var adapter:CafeAdapter = CafeAdapter(listOf(),this)
     private val compositeDisposable = CompositeDisposable()
     private lateinit var mMainViewModel: MainViewModel
@@ -62,12 +61,12 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = CafelistFragmentBinding.inflate(inflater,container,false)
+        return inflater.inflate(R.layout.fragment_cafe_list,container, false)
+    }
 
-        binding.recyclerViewCafeList.layoutManager= LinearLayoutManager(context!!)
-        binding.recyclerViewCafeList.adapter = adapter
-
-        return binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recyclerViewCafeList.adapter = adapter
     }
 
     override fun onStart() {
@@ -78,7 +77,7 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     adapter = CafeAdapter(it,this)
-                    binding.recyclerViewCafeList.swapAdapter(
+                    recyclerViewCafeList.swapAdapter(
                         adapter,
                         false)
                 },{error-> Timber.d(error)})

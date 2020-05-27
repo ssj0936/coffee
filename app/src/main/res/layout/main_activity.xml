@@ -9,21 +9,47 @@
             type="com.timothy.coffee.viewmodel.MainViewModel" />
     </data>
 
-    <FrameLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <androidx.viewpager2.widget.ViewPager2
+        android:layout_height="match_parent"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gray_bg3"
+            android:text="@string/lorem_map"
+            android:gravity="center_horizontal"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:paddingTop="50dp">
+        </TextView>
+
+        <androidx.viewpager.widget.ViewPager
             android:id="@+id/viewpager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/indicator"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:tabBackground="@drawable/tab_pager_selector"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="0dp"
-            android:layout_gravity="bottom|center_horizontal"
-            android:visibility="@{viewmodel.chosenCafe!=null ? View.VISIBLE : View.GONE}"/>
-    </FrameLayout>
+            app:layout_behavior="com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior"
+            app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
+            app:behavior_hideable="false"
+            app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"
+            app:behavior_defaultState="collapsed"
+            android:background="@color/gray_bg"
+            app:behavior_expandable = "false"
+        />
+<!--        <com.google.android.material.tabs.TabLayout-->
+<!--            android:id="@+id/indicator"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            app:tabBackground="@drawable/tab_pager_selector"-->
+<!--            app:tabGravity="center"-->
+<!--            app:tabIndicatorHeight="0dp"-->
+<!--            android:layout_gravity="bottom|center_horizontal"-->
+<!--            android:visibility="@{viewmodel.chosenCafe!=null ? View.VISIBLE : View.GONE}"/>-->
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+<!--    <FrameLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent">-->
+<!--    </FrameLayout>-->
 </layout>

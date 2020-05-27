@@ -42,6 +42,8 @@ dependencies {
     def timber_version = "4.7.1"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(":anchor-bottom-sheet-behavior")
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
@@ -89,5 +91,8 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
+
+//    implementation 'com.trafi:anchor-bottom-sheet-behavior:0.13-alpha'
+
 
 }

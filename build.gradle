@@ -20,10 +20,20 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        maven { url 'https://jitpack.io' }
     }
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    app_version = '2.0.1'
+
+    // settings
+    compile_sdk_version = 28
+    target_sdk_version = 28
+    min_sdk_version = 21
+    gms_version = '16.0.0'
 }

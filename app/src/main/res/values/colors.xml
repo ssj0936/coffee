@@ -12,6 +12,11 @@
     <color name="common_secondary_context_text_color">#797979</color>
     <color name="common_content_text_color">#212121</color>
 
+    <color name="gray_bg">#CCCCCC</color>
+    <color name="gray_bg2">#BBBBBB</color>
+    <color name="gray_bg3">#777777</color>
+    <color name="background_color">#FAFAFA</color>
+
     <color name="lighter_gray">#797979</color>
 
     <color name="rate_number_text_color">@color/app_color</color>
