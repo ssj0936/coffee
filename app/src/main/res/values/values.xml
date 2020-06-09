@@ -11,7 +11,7 @@
     <dimen name="rate_number_text_size">20sp</dimen>
     <dimen name="rate_total_number_text_size">14sp</dimen>
 
-    <dimen name="bottom_sheet_anchor_offset">220dp</dimen>
+    <dimen name="bottom_sheet_anchor_offset">100dp</dimen>
     <dimen name="bottom_sheet_peek_height">170dp</dimen>
 
 </resources>

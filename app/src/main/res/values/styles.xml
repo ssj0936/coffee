@@ -2,23 +2,22 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
+        <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
+        <item name="android:textColorPrimary">@color/gray</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">false</item>
-
-        <!--        <item name="android:statusBarColor">@android:color/transparent</item>-->
-
     </style>
 
-<!--    <style name="MainActivityTheme" parent="AppTheme">-->
-<!--        <item name="android:navigationBarColor">@android:color/transparent</item>-->
-<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-<!--        <item name="android:windowTranslucentNavigation">false</item>-->
 
-<!--    </style>-->
+    <style name="MainTheme" >
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
     <style name="TastyRatingBarTheme" parent="Theme.AppCompat">
         <item name="colorControlNormal">@color/colorAccent</item>

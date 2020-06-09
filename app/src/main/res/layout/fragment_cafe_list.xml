@@ -5,16 +5,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
-    android:paddingBottom="@dimen/bottom_sheet_anchor_offset"
+    android:orientation="vertical"
     tools:context=".MainActivity">
-
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCafeList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        android:scrollbarStyle="outsideOverlay"
         app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/cafe_recyclerview_item_layout"/>
-
+        tools:listitem="@layout/cafe_recyclerview_item_layout"
+        android:background="@color/background_color"
+        android:visibility="gone"/>
+</androidx.core.widget.NestedScrollView>
 </FrameLayout>

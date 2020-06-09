@@ -35,9 +35,9 @@
             app:behavior_hideable="false"
             app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"
             app:behavior_defaultState="collapsed"
-            android:background="@color/gray_bg"
             app:behavior_expandable = "false"
-        />
+            android:background="@color/gray_bg"
+            />
 <!--        <com.google.android.material.tabs.TabLayout-->
 <!--            android:id="@+id/indicator"-->
 <!--            android:layout_width="wrap_content"-->

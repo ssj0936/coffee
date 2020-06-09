@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 //        )
         viewpager.adapter = cafeAdapter
 //        viewpager.reduceDragSensitivity()
+        val behavior = AnchorBottomSheetBehavior.from(viewpager)
 
         binding.viewmodel = mMainViewModel
         binding.lifecycleOwner=this
@@ -73,11 +74,10 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
                 //nav to second page
                 viewpager.currentItem = mPageNum-1
+
+                if(behavior.state!=AnchorBottomSheetBehavior.STATE_ANCHORED)
+                    behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
             })
-
-//        val behavior = AnchorBottomSheetBehavior.from(viewpager)
-//        behavior.isDisableExpanded = true
-
     }
 
     override fun onBackPressed() {

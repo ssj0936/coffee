@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProviders
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
@@ -21,7 +22,7 @@ import kotlinx.android.synthetic.main.fragment_cafe_list.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
+class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClickListener{
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     private var adapter:CafeAdapter = CafeAdapter(listOf(),this)
@@ -67,6 +68,10 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewCafeList.adapter = adapter
+
+        val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
+        view.setPadding(0, 0, 0, anchorOffset)
+
     }
 
     override fun onStart() {
@@ -80,6 +85,7 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
                     recyclerViewCafeList.swapAdapter(
                         adapter,
                         false)
+                    recyclerViewCafeList.visibility = View.VISIBLE
                 },{error-> Timber.d(error)})
         )
     }
@@ -92,6 +98,12 @@ class CafeListFragment:Fragment(),CafeAdapter.OnCafeAdapterClickListener{
     override fun onItemClick(cafe: Cafenomad) {
         mMainViewModel.chosenCafe.value = cafe
         Timber.d(cafe.name)
+    }
+
+    override fun setNestScrollingEnable(enable:Boolean){
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+            recyclerViewCafeList.isNestedScrollingEnabled = enable
+        }
     }
 
 }

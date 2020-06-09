@@ -8,16 +8,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProviders
+import com.timothy.coffee.R
 import com.timothy.coffee.databinding.FragmentCafeInfoBinding
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.android.synthetic.main.fragment_cafe_list.*
 import javax.inject.Inject
 
 
-class CafeInfoFragment: Fragment() ,View.OnClickListener{
+class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
     lateinit var binding:FragmentCafeInfoBinding
     private lateinit var mMainViewModel: MainViewModel
     @Inject
@@ -57,6 +60,12 @@ class CafeInfoFragment: Fragment() ,View.OnClickListener{
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
+        view.setPadding(0, 0, 0, anchorOffset)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.viewmodel = mMainViewModel
@@ -70,6 +79,13 @@ class CafeInfoFragment: Fragment() ,View.OnClickListener{
             mMainViewModel.loc.value!!.longitude,
             mMainViewModel.chosenCafe.value!!.name)
         startActivity(intent)
-
     }
+
+    override fun setNestScrollingEnable(enable:Boolean){
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+            binding.nestedScrollView.isSmoothScrollingEnabled = enable
+        }
+    }
+
+
 }
