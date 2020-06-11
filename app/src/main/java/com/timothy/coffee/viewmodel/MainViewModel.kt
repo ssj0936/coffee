@@ -12,6 +12,7 @@ import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -21,7 +22,8 @@ class MainViewModel @Inject constructor(
 
     var loc : MutableLiveData<LonAndLat> = MutableLiveData()
     private var cityName: MutableLiveData<String> = MutableLiveData()
-    open val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
+    val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
+    val cafeList:MutableLiveData<List<Cafenomad>> = MutableLiveData()
 
     fun getCafeList(context: Context):Observable<List<Cafenomad>> {
         return getLocationObservable(context)
@@ -41,6 +43,7 @@ class MainViewModel @Inject constructor(
             }
             .flatMap {locationiq ->
 //                Timber.d("second flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
+
                 if(locationiq.address?.state != cityName.value){
                     cityName.postValue(locationiq.address?.state)
                     dataSource.query(locationiq.address!!.state!!)

@@ -19,13 +19,11 @@ class CafeViewPagerAdapter constructor(
     val list:List<Fragment> = listOf(CafeListFragment.getInstance(),CafeInfoFragment.getInstance())
 
     override fun getItem(position: Int): Fragment {
-        Timber.d("getItem")
         return list[position]
     }
     override fun getCount(): Int = if(isInfoPageHide.value!!) list.size-1 else list.size
 
     override fun setPrimaryItem(container: ViewGroup, position: Int, obj: Any) {
-        Timber.d("setPrimaryItem")
         super.setPrimaryItem(container, position, obj)
 
         obj?.let {
@@ -35,7 +33,6 @@ class CafeViewPagerAdapter constructor(
                 if(fragment is CafeBaseFragment){
                     fragment.setNestScrollingEnable(shouldNestedScroll)
                 }
-//                Timber.d("index:$index, shouldNestedScroll:$shouldNestedScroll")
             }
             container.requestLayout()
         }
@@ -44,7 +41,6 @@ class CafeViewPagerAdapter constructor(
 
     fun setHideInfoPage(isHide:Boolean){
         isInfoPageHide.value = isHide
-//        notifyItemRangeChanged(1,1)
         notifyDataSetChanged()
     }
 }

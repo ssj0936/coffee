@@ -21,6 +21,11 @@
     <string name="label_open_time">Standing working desk</string>
     <string name="label_mrt">Standing working desk</string>
 
+    <string name="dialog_network_require_message">Network is required for get Cafes information.</string>
+    <string name="dialog_network_require_pos_btn">go to Wifi settings!</string>
+
+    <string name="dialog_permission_require_message">We need your location to get cafes near by.</string>
+
     <string name="lorem_map">MAP View</string>
 
 </resources>

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
@@ -37,24 +38,16 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
             return INSTANCE
         }
     }
+    override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainViewModel = activity?.run {
             ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
-
-    }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this);
-        super.onAttach(context)
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        Utils.isLocationPermissionGet(context!!)
-        mMainViewModel.getCafeList(context!!)
     }
 
     override fun onCreateView(
@@ -72,28 +65,42 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
         view.setPadding(0, 0, 0, anchorOffset)
 
+        mMainViewModel.cafeList.observe(this,
+            Observer<List<Cafenomad>>{
+                adapter = CafeAdapter(it,this)
+                recyclerViewCafeList.swapAdapter(
+                    adapter,
+                    false)
+                recyclerViewCafeList.visibility = View.VISIBLE
+            })
     }
 
-    override fun onStart() {
-        super.onStart()
-        compositeDisposable.add(
-            mMainViewModel.getCafeList(context!!)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    adapter = CafeAdapter(it,this)
-                    recyclerViewCafeList.swapAdapter(
-                        adapter,
-                        false)
-                    recyclerViewCafeList.visibility = View.VISIBLE
-                },{error-> Timber.d(error)})
-        )
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+//        Utils.isLocationPermissionGet(context!!)
+//        mMainViewModel.getCafeList(context!!)
     }
 
-    override fun onStop() {
-        super.onStop()
-        compositeDisposable.clear()
-    }
+//    override fun onStart() {
+//        super.onStart()
+//        compositeDisposable.add(
+//            mMainViewModel.getCafeList(context!!)
+//                .subscribeOn(Schedulers.newThread())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe({
+//                    adapter = CafeAdapter(it,this)
+//                    recyclerViewCafeList.swapAdapter(
+//                        adapter,
+//                        false)
+//                    recyclerViewCafeList.visibility = View.VISIBLE
+//                },{error-> Timber.d(error)})
+//        )
+//    }
+//
+//    override fun onStop() {
+//        super.onStop()
+//        compositeDisposable.clear()
+//    }
 
     override fun onItemClick(cafe: Cafenomad) {
         mMainViewModel.chosenCafe.value = cafe
@@ -105,5 +112,4 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
             recyclerViewCafeList.isNestedScrollingEnabled = enable
         }
     }
-
 }
