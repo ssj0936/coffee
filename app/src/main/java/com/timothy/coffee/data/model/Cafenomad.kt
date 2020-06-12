@@ -62,7 +62,7 @@ data class Cafenomad (
     @field:SerializedName("open_time")
     val openTime:String,
 
-    @Ignore var distance:Int?
+    @Ignore var distance:Int
 ){
     constructor(
         id:String,
@@ -84,6 +84,6 @@ data class Cafenomad (
         mrtName:String,
         openTime:String
     ) : this(
-        id,name,cityname, wifiStabilityLevel, seatLevel, quietLevel, tastyLevel, priceLevel, goodMusicLevel, address, latitude, longitude, url, isTimeLimited, isSocketProvided, isStandingDeskAvailable, mrtName, openTime, null
+        id,name,cityname, wifiStabilityLevel, seatLevel, quietLevel, tastyLevel, priceLevel, goodMusicLevel, address, latitude, longitude, url, isTimeLimited, isSocketProvided, isStandingDeskAvailable, mrtName, openTime, Int.MAX_VALUE
         )
 }

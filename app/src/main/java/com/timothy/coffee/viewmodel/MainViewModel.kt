@@ -13,6 +13,8 @@ import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import java.util.*
+import java.util.stream.Collectors
 import javax.inject.Inject
 
 class MainViewModel @Inject constructor(
@@ -59,7 +61,15 @@ class MainViewModel @Inject constructor(
                             it.longitude,cafe.longitude.toDouble()).toInt()
                     }
                 }
-                cafes
+
+                cafes.stream()
+                    .filter{cafe->
+                        cafe.distance<6*1000
+                    }
+                    .sorted{
+                        cafe1,cafe2->cafe1.distance.compareTo(cafe2.distance)
+                    }
+                    .collect(Collectors.toList())
             }
     }
 

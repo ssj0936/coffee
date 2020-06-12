@@ -18,10 +18,10 @@ abstract class CafeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertSearchResult(result: CafeSearchResult)
 
-    @Query("Select * From Cafenomad Where id in (:cafeIds) LIMIT 30")
+    @Query("Select * From Cafenomad Where id in (:cafeIds)")
     abstract fun queryCafeByIds(cafeIds:List<String>):Observable<List<Cafenomad>>
 
-    @Query("Select * From Cafenomad Where cityname = (:cityname) LIMIT 30")
+    @Query("Select * From Cafenomad Where cityname = (:cityname)")
     abstract fun queryCafeByCity(cityname:String):Observable<List<Cafenomad>>
 
     @Query("Select * From CafeSearchResult Where city = (:city) LIMIT 1")

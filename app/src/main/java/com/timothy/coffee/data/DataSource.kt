@@ -78,7 +78,7 @@ class DataSource @Inject constructor(
 
 
     private fun insertToDB(list: List<Cafenomad>, city: String){
-        var tmpList = if (list.size<500) list else list.subList(0,499)
+        var tmpList = list
         tmpList.forEach {it.cityname = city}
         val searchResult = CafeSearchResult(city,
             tmpList.stream().map { item->item.id }.collect(Collectors.toList()),
