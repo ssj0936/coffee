@@ -3,6 +3,7 @@ package com.timothy.coffee.di
 import com.timothy.coffee.view.CafeInfoFragment
 import com.timothy.coffee.view.CafeListFragment
 import com.timothy.coffee.MainActivity
+import com.timothy.coffee.view.MapFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -16,4 +17,8 @@ abstract class BuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeCafeInfoFragment(): CafeInfoFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeMapFragment(): MapFragment
+
 }

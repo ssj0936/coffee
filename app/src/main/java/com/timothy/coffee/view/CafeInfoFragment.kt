@@ -77,7 +77,7 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         val intent = Utils.getGoogleMapDirectionIntent(
             mMainViewModel.loc.value!!.latitude,
             mMainViewModel.loc.value!!.longitude,
-            mMainViewModel.chosenCafe.value!!.name)
+            "${mMainViewModel.chosenCafe.value!!.name} ${getString(R.string.postfix_navigation_keyword)}")
         startActivity(intent)
     }
 
@@ -86,6 +86,4 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
             binding.nestedScrollView.isSmoothScrollingEnabled = enable
         }
     }
-
-
 }

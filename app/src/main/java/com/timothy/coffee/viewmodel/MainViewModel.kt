@@ -1,8 +1,10 @@
 package com.timothy.coffee.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.timothy.coffee.R
 
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
@@ -27,6 +29,7 @@ class MainViewModel @Inject constructor(
     val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
     val cafeList:MutableLiveData<List<Cafenomad>> = MutableLiveData()
 
+    @SuppressLint("ResourceType")
     fun getCafeList(context: Context):Observable<List<Cafenomad>> {
         return getLocationObservable(context)
             .subscribeOn(Schedulers.newThread())
@@ -64,7 +67,8 @@ class MainViewModel @Inject constructor(
 
                 cafes.stream()
                     .filter{cafe->
-                        cafe.distance<6*1000
+                        val range = context.resources.getInteger(R.dimen.range_cafe_nearby)
+                        cafe.distance < range
                     }
                     .sorted{
                         cafe1,cafe2->cafe1.distance.compareTo(cafe2.distance)

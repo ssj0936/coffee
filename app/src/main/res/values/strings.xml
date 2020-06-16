@@ -1,8 +1,7 @@
 <resources>
-    <string name="app_name">coffee</string>
+    <string name="app_name" translatable="false">coffee</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 
     <string name="btn_text_navigate">Navigate</string>
 
@@ -18,14 +17,16 @@
     <string name="label_is_socket_provide">Socket providing</string>
     <string name="label_is_standing_desk_available">Standing working desk</string>
     <string name="label_is_time_limited">Time limited</string>
-    <string name="label_open_time">Standing working desk</string>
-    <string name="label_mrt">Standing working desk</string>
+    <string name="label_open_time">Open time</string>
+    <string name="label_mrt">MRT station nearby</string>
 
+    <string name="button_text_research">Research this field</string>
     <string name="dialog_network_require_message">Network is required for get Cafes information.</string>
     <string name="dialog_network_require_pos_btn">go to Wifi settings!</string>
 
     <string name="dialog_permission_require_message">We need your location to get cafes near by.</string>
 
+    <string name="postfix_navigation_keyword" translatable="false">Cafe</string>
     <string name="lorem_map">MAP View</string>
 
 </resources>

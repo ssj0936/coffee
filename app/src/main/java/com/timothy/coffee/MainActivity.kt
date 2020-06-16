@@ -28,6 +28,7 @@ import com.timothy.coffee.util.reduceDragSensitivity
 import com.timothy.coffee.ui.CafeViewPager2Adapter
 import com.timothy.coffee.ui.CafeViewPagerAdapter
 import com.timothy.coffee.util.Utils
+import com.timothy.coffee.view.MapFragment
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
@@ -106,6 +107,12 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
             Timber.d("need to request")
             permissionRequest()
         }
+    }
+
+    private fun initMap(){
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.mapContainer, MapFragment.getInstance(), MapFragment.TAG)
+            .commit()
     }
 
     override fun onRequestPermissionsResult(
@@ -202,8 +209,10 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
         super.onStart()
 
         //get Cafe info when network available && permission granted
-        if(Utils.isNetworkAvailable(this) && isPermissionGranted())
+        if(Utils.isNetworkAvailable(this) && isPermissionGranted()) {
+            initMap()
             requestCafe()
+        }
     }
 
     override fun onStop() {

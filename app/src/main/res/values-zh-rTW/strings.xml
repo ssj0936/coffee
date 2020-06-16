@@ -1,0 +1,27 @@
+<resources>
+    <string name="btn_text_navigate">帶我去</string>
+
+    <string name="no_data">No data</string>
+
+    <string name="label_wifi_stability">WIFI穩定</string>
+    <string name="label_seat_availability">通常有位</string>
+    <string name="label_tasty_level">東西好吃</string>
+    <string name="label_quiet_level">安靜程度</string>
+    <string name="label_price_level">價格便宜</string>
+    <string name="label_good_music_level">裝潢音樂</string>
+    <string name="label_url">官網</string>
+    <string name="label_is_socket_provide">插座多</string>
+    <string name="label_is_standing_desk_available">可站立工作</string>
+    <string name="label_is_time_limited">有無限時</string>
+    <string name="label_open_time">營業時間</string>
+    <string name="label_mrt">捷運站</string>
+
+    <string name="button_text_research">搜尋目前位置</string>
+    <string name="dialog_network_require_message">我們需要網路找咖啡廳的資訊</string>
+    <string name="dialog_network_require_pos_btn">前往WI-FI設定!</string>
+
+    <string name="dialog_permission_require_message">我們需要你的位置方便定位附近的咖啡廳</string>
+
+    <string name="lorem_map">MAP View</string>
+
+</resources>

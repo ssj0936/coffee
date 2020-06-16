@@ -94,6 +94,7 @@ dependencies {
 
 //    implementation 'com.trafi:anchor-bottom-sheet-behavior:0.13-alpha'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
 
 
 }

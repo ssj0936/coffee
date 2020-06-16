@@ -14,4 +14,8 @@
     <dimen name="bottom_sheet_anchor_offset">100dp</dimen>
     <dimen name="bottom_sheet_peek_height">170dp</dimen>
 
+    <!-- value -->
+    <item name="google_map_zoom_level" type="dimen" format="float">15</item>
+    <item name="range_cafe_nearby" type="dimen" format="integer">5000</item>
+
 </resources>
