@@ -1,7 +1,7 @@
 <resources>
     <string name="btn_text_navigate">帶我去</string>
 
-    <string name="no_data">No data</string>
+    <string name="no_data">沒提供資訊</string>
 
     <string name="label_wifi_stability">WIFI穩定</string>
     <string name="label_seat_availability">通常有位</string>
@@ -23,5 +23,17 @@
     <string name="dialog_permission_require_message">我們需要你的位置方便定位附近的咖啡廳</string>
 
     <string name="lorem_map">MAP View</string>
+
+    <string name="info_time_limit_text_yes">有限時</string>
+    <string name="info_time_limit_text_maybe">看情況，假日或客滿限時</string>
+    <string name="info_time_limit_text_no">不限時</string>
+
+    <string name="info_socket_provided_text_yes">很多</string>
+    <string name="info_socket_provided_text_maybe">還好，看座位</string>
+    <string name="info_socket_provided_text_no">很少</string>
+
+    <string name="info_standing_desk_text_yes">有些座位可以</string>
+    <string name="info_standing_desk_text_no">無法</string>
+
 
 </resources>

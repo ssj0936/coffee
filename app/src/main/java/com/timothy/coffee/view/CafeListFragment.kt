@@ -27,7 +27,6 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     private var adapter:CafeAdapter = CafeAdapter(listOf(),this)
-    private val compositeDisposable = CompositeDisposable()
     private lateinit var mMainViewModel: MainViewModel
 
     companion object{
@@ -75,36 +74,8 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
             })
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-//        Utils.isLocationPermissionGet(context!!)
-//        mMainViewModel.getCafeList(context!!)
-    }
-
-//    override fun onStart() {
-//        super.onStart()
-//        compositeDisposable.add(
-//            mMainViewModel.getCafeList(context!!)
-//                .subscribeOn(Schedulers.newThread())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe({
-//                    adapter = CafeAdapter(it,this)
-//                    recyclerViewCafeList.swapAdapter(
-//                        adapter,
-//                        false)
-//                    recyclerViewCafeList.visibility = View.VISIBLE
-//                },{error-> Timber.d(error)})
-//        )
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-//        compositeDisposable.clear()
-//    }
-
     override fun onItemClick(cafe: Cafenomad) {
         mMainViewModel.chosenCafe.value = cafe
-        Timber.d(cafe.name)
     }
 
     override fun setNestScrollingEnable(enable:Boolean){

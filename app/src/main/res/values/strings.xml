@@ -29,4 +29,19 @@
     <string name="postfix_navigation_keyword" translatable="false">Cafe</string>
     <string name="lorem_map">MAP View</string>
 
+    <string name="info_value_yes" translatable="false">yes</string>
+    <string name="info_value_maybe" translatable="false">maybe</string>
+    <string name="info_value_no" translatable="false">no</string>
+
+    <string name="info_time_limit_text_yes">has table time limit</string>
+    <string name="info_time_limit_text_maybe">depends on the situation</string>
+    <string name="info_time_limit_text_no">has no table time limit</string>
+
+    <string name="info_socket_provided_text_yes">plenty of sockets are provided</string>
+    <string name="info_socket_provided_text_maybe">depends on the seat</string>
+    <string name="info_socket_provided_text_no">few sockets are provided</string>
+
+    <string name="info_standing_desk_text_yes">some of</string>
+    <string name="info_standing_desk_text_no">not provided</string>
+
 </resources>

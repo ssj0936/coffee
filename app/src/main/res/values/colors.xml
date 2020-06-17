@@ -37,7 +37,7 @@
 
     <color name="lighter_gray">#797979</color>
 
-    <color name="rate_number_text_color">@color/app_color</color>
+    <color name="rate_number_text_color">@color/rate_blue</color>
 
     <color name="rate_red">#DC2543</color>
     <color name="rate_orange">#D66C44</color>

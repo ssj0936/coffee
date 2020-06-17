@@ -77,6 +77,26 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
             Observer<Cafenomad>{
                 adapter.setCafe(it,activity!!)
                 adapter.notifyDataSetChanged()
+
+                binding.contentTimeLimit.text = when(it.isTimeLimited){
+                    getString(R.string.info_value_yes) ->getString(R.string.info_time_limit_text_yes)
+                    getString(R.string.info_value_maybe) ->getString(R.string.info_time_limit_text_maybe)
+                    getString(R.string.info_value_no) ->getString(R.string.info_time_limit_text_no)
+                    else -> getString(R.string.no_data)
+                }
+
+                binding.contentSocketProvide.text = when(it.isSocketProvided){
+                    getString(R.string.info_value_yes) ->getString(R.string.info_socket_provided_text_yes)
+                    getString(R.string.info_value_maybe) ->getString(R.string.info_socket_provided_text_maybe)
+                    getString(R.string.info_value_no) ->getString(R.string.info_socket_provided_text_no)
+                    else -> getString(R.string.no_data)
+                }
+
+                binding.contentStandingDesk.text = when(it.isStandingDeskAvailable){
+                    getString(R.string.info_value_yes) ->getString(R.string.info_standing_desk_text_yes)
+                    getString(R.string.info_value_no) ->getString(R.string.info_standing_desk_text_no)
+                    else -> getString(R.string.no_data)
+                }
             })
     }
 

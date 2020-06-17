@@ -25,13 +25,6 @@
                 android:paddingTop="32dp"
                 android:paddingEnd="30dp">
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.50" />
-
                 <TextView
                     android:id="@+id/cafe_name"
                     android:layout_width="0dp"
@@ -103,8 +96,7 @@
                     android:id="@+id/content_time_limit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewmodel.chosenCafe.isTimeLimited == null ? String.valueOf(viewmodel.chosenCafe.isTimeLimited) :@string/no_data}"
-                    android:textAppearance="@style/RateNumberStyle"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/label_time_limit" />
 
@@ -123,8 +115,7 @@
                     android:id="@+id/content_socket_provide"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewmodel.chosenCafe.isSocketProvided == null ? String.valueOf(viewmodel.chosenCafe.isSocketProvided) :@string/no_data}"
-                    android:textAppearance="@style/RateNumberStyle"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/label_socket_provide" />
 
@@ -143,8 +134,7 @@
                     android:id="@+id/content_standing_desk"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{viewmodel.chosenCafe.isStandingDeskAvailable == null ? String.valueOf(viewmodel.chosenCafe.isStandingDeskAvailable) :@string/no_data}"
-                    android:textAppearance="@style/RateNumberStyle"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/label_standing_desk" />
 
@@ -161,12 +151,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/content_standing_desk" />
 
-<!--                <androidx.constraintlayout.widget.Barrier-->
-<!--                    android:id="@+id/barrier"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    app:barrierDirection="bottom"-->
-<!--                    app:constraint_referenced_ids="total_score_tasty,total_score_music"/>-->
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
     </FrameLayout>
