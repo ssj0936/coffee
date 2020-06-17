@@ -21,24 +21,6 @@
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
-<!--            <Button-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/button_text_research"-->
-<!--                android:layout_gravity="center_horizontal"-->
-<!--                android:layout_marginTop="10dp"/>-->
-
-<!--            <TextView-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:background="@color/gray_bg3"-->
-<!--                android:text="@string/lorem_map"-->
-<!--                android:gravity="center_horizontal"-->
-<!--                android:textSize="26sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:textColor="@android:color/white"-->
-<!--                android:paddingTop="50dp">-->
-<!--            </TextView>-->
 
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager"

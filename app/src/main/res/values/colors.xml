@@ -39,4 +39,9 @@
 
     <color name="rate_number_text_color">@color/app_color</color>
 
+    <color name="rate_red">#DC2543</color>
+    <color name="rate_orange">#D66C44</color>
+    <color name="rate_yellow">#EFB730</color>
+    <color name="rate_green">#757430</color>
+    <color name="rate_blue">#38618F</color>
 </resources>

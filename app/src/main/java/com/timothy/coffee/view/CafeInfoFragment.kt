@@ -9,9 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.GridLayoutManager
 import com.timothy.coffee.R
+import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.FragmentCafeInfoBinding
+import com.timothy.coffee.ui.CafeInfoRecyclerViewAdapter
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
@@ -25,6 +29,7 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
     private lateinit var mMainViewModel: MainViewModel
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
+    var adapter:CafeInfoRecyclerViewAdapter = CafeInfoRecyclerViewAdapter()
 
     companion object {
         @JvmStatic
@@ -55,8 +60,6 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCafeInfoBinding.inflate(inflater,container,false)
-
-        binding.btnNavigate.setOnClickListener(this)
         return binding.root
     }
 
@@ -64,6 +67,17 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         super.onViewCreated(view, savedInstanceState)
         val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
         view.setPadding(0, 0, 0, anchorOffset)
+
+        binding.btnNavigate.setOnClickListener(this)
+        binding.cafeInfoRecyclerview.adapter = adapter
+
+        val mgr = GridLayoutManager(context,2)
+        binding.cafeInfoRecyclerview.layoutManager = mgr
+        mMainViewModel.chosenCafe.observe(this,
+            Observer<Cafenomad>{
+                adapter.setCafe(it,activity!!)
+                adapter.notifyDataSetChanged()
+            })
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
