@@ -98,6 +98,8 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
     override fun onMarkerClick(marker: Marker): Boolean {
         mMainViewModel.chosenCafe.value = marker.tag as Cafenomad
+        mMainViewModel.lastMove.isClickList = false
+        mMainViewModel.lastMove.isClickMap = true
         return false
     }
 

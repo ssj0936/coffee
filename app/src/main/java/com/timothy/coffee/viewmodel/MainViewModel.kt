@@ -11,6 +11,7 @@ import com.timothy.coffee.data.DataSource
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
+import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
@@ -25,9 +26,11 @@ class MainViewModel @Inject constructor(
 ): ViewModel(){
 
     var loc : MutableLiveData<LonAndLat> = MutableLiveData()
-    private var cityName: MutableLiveData<String> = MutableLiveData()
     val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
     val cafeList:MutableLiveData<List<Cafenomad>> = MutableLiveData()
+    var lastMove = Movement(isClickMap = false, isClickList = false)
+
+    private var cityName: MutableLiveData<String> = MutableLiveData()
 
     @SuppressLint("ResourceType")
     fun getCafeList(context: Context):Observable<List<Cafenomad>> {

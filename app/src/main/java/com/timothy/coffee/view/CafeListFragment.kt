@@ -76,6 +76,8 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
 
     override fun onItemClick(cafe: Cafenomad) {
         mMainViewModel.chosenCafe.value = cafe
+        mMainViewModel.lastMove.isClickList = true
+        mMainViewModel.lastMove.isClickMap = false
     }
 
     override fun setNestScrollingEnable(enable:Boolean){

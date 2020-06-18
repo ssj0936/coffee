@@ -168,11 +168,31 @@ class MainActivity : AppCompatActivity(), HasAndroidInjector {
 
     override fun onBackPressed() {
         if(viewpager.currentItem == 0) {
-            viewpager.currentItem = -1
-            super.onBackPressed()
+            when(behavior.state){
+                AnchorBottomSheetBehavior.STATE_ANCHORED ->
+                    behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
+                AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
+                    viewpager.currentItem = -1
+                    super.onBackPressed()
+                }
+            }
         }
-        else
-            viewpager.currentItem = viewpager.currentItem - 1;
+        else if(viewpager.currentItem == 1) {
+            if(mMainViewModel.lastMove.isClickList)
+                viewpager.currentItem = viewpager.currentItem - 1
+            else if (mMainViewModel.lastMove.isClickMap){
+                when(behavior.state){
+                    AnchorBottomSheetBehavior.STATE_ANCHORED ->
+                        behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
+                    AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
+                        viewpager.currentItem = viewpager.currentItem - 1
+                        behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
+                    }
+                }
+
+            }
+
+        }
     }
 
     private fun showNetworkConnectDialog(){
