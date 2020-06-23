@@ -44,4 +44,8 @@
     <string name="info_standing_desk_text_yes">some of</string>
     <string name="info_standing_desk_text_no">not provided</string>
 
+    <!--preference kay-->
+    <string name="preference_key_search_range" translatable="false">"search_range"</string>
+    <string name="preference_title_search_range" translatable="false">"Searching Range"</string>
+    <string name="preference_summary_search_range" translatable="false">"setting range of searching"</string>
 </resources>

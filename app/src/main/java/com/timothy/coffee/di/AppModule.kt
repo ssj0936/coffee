@@ -44,7 +44,7 @@ class AppModule {
         }
 
         return OkHttpClient.Builder()
-            .addInterceptor(logInterceptor)
+//            .addInterceptor(logInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)

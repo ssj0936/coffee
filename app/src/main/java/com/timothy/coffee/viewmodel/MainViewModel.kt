@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.preference.PreferenceManager
 import com.timothy.coffee.R
 
 import com.timothy.coffee.data.DataModel
@@ -33,7 +34,7 @@ class MainViewModel @Inject constructor(
     private var cityName: MutableLiveData<String> = MutableLiveData()
 
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context):Observable<List<Cafenomad>> {
+    fun getCafeList(context: Context, isForce:Boolean):Observable<List<Cafenomad>> {
         return getLocationObservable(context)
             .subscribeOn(Schedulers.newThread())
             .observeOn(Schedulers.newThread())
@@ -41,7 +42,8 @@ class MainViewModel @Inject constructor(
 //                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
 //                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
 
-                if(lonlat != loc.value){
+                if(lonlat != loc.value || isForce){
+//                    Timber.d("different lon && lat:${lonlat.latitude},${lonlat.longitude}")
                     loc.postValue(lonlat)
                     getLocationiqObservable(lonlat.latitude,lonlat.longitude)
                 }else{
@@ -52,7 +54,7 @@ class MainViewModel @Inject constructor(
             .flatMap {locationiq ->
 //                Timber.d("second flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
 
-                if(locationiq.address?.state != cityName.value){
+                if(locationiq.address?.state != cityName.value || isForce){
                     cityName.postValue(locationiq.address?.state)
                     dataSource.query(locationiq.address!!.state!!)
                 }else{
@@ -61,6 +63,7 @@ class MainViewModel @Inject constructor(
                 }
             }
             .map { cafes ->
+//                Timber.d("cafes:${cafes}")
                 cafes.stream().forEach {cafe->
                     loc.value?.let{
                         cafe.distance = Utils.distance(it.latitude,cafe.latitude.toDouble(),
@@ -70,7 +73,9 @@ class MainViewModel @Inject constructor(
 
                 cafes.stream()
                     .filter{cafe->
-                        val range = context.resources.getInteger(R.dimen.range_cafe_nearby)
+                        val range = PreferenceManager.getDefaultSharedPreferences(context)
+                            .getInt(context.getString(R.string.preference_key_search_range)
+                                ,context.resources.getInteger(R.dimen.range_cafe_nearby_min))*1000
                         cafe.distance < range
                     }
                     .sorted{

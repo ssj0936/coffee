@@ -2,14 +2,27 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/color_2</item>
+        <item name="colorPrimaryDark">@color/color_4</item>
+        <item name="colorAccent">@color/color_1</item>
         <item name="android:alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
         <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
-        <item name="android:textColorPrimary">@color/gray</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">false</item>
+<!--        <item name="preferenceTheme">@style/AppTheme.PreferenceFragment</item>-->
+    </style>
+
+    <style name="AppTheme.PreferenceFragment" parent="PreferenceFragment.Material">
+        <item name="layout">@layout/fragment_settings_preference</item>
+    </style>
+
+    <style name="AppTheme.ActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:background">@color/color_3</item>
+        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.text</item>
+    </style>
+
+    <style name="AppTheme.ActionBar.text" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 

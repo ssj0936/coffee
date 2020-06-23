@@ -64,7 +64,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
         view.setPadding(0, 0, 0, anchorOffset)
 
-        mMainViewModel.cafeList.observe(this,
+        mMainViewModel.cafeList.observe(viewLifecycleOwner,
             Observer<List<Cafenomad>>{
                 adapter = CafeAdapter(it,this)
                 recyclerViewCafeList.swapAdapter(

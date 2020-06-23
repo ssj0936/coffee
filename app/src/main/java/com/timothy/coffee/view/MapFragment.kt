@@ -17,6 +17,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.util.LonAndLat
@@ -142,8 +143,19 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 mMap.uiSettings.isMyLocationButtonEnabled = true
             }
         }
-
     }
 
-
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when(requestCode) {
+            MainFragment.RESULT_PERMISSION_LOCATION -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    enableMyLocation()
+                }
+            }
+        }
+    }
 }

@@ -44,4 +44,9 @@
     <color name="rate_yellow">#EFB730</color>
     <color name="rate_green">#757430</color>
     <color name="rate_blue">#38618F</color>
+
+    <color name="color_1">#B78338</color>
+    <color name="color_2">#915C4C</color>
+    <color name="color_3">#40686A</color>
+    <color name="color_4">#2F1812</color>
 </resources>

@@ -37,6 +37,19 @@
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/setting_btn"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:srcCompat="@drawable/ic_settings_black_24dp"
+            android:backgroundTint="@android:color/white"
+            android:elevation="10dp"
+            android:outlineProvider="bounds"
+            android:alpha=".85"
+            style="@style/Widget.AppCompat.Button.Colored"/>
+
         <ProgressBar
             android:id="@+id/list_progressbar"
             android:layout_width="wrap_content"

@@ -15,6 +15,7 @@ import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -85,8 +86,8 @@ class DataModel
     //then fetch current location
     fun getLocationObservable(context: Context):Observable<LonAndLat>{
         return Observable.concatArray(
-            getLastKnownLocation(context),
-            getCurrentLocation(context)
+            getLastKnownLocation(context)
+//            getCurrentLocation(context)
         )
     }
 
