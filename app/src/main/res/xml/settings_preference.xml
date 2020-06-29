@@ -4,8 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        app:key="search_category"
-        app:title="Search Range"
+        app:key="@string/preference_category_key_search"
+        app:title="@string/preference_category_title_search"
         app:iconSpaceReserved="false">
         <SeekBarPreference
             android:key="@string/preference_key_search_range"

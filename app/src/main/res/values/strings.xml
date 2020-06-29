@@ -27,7 +27,7 @@
     <string name="dialog_permission_require_message">We need your location to get cafes near by.</string>
 
     <string name="postfix_navigation_keyword" translatable="false">Cafe</string>
-    <string name="lorem_map">MAP View</string>
+    <string name="lorem_map" translatable="false">MAP View</string>
 
     <string name="info_value_yes" translatable="false">yes</string>
     <string name="info_value_maybe" translatable="false">maybe</string>
@@ -45,7 +45,14 @@
     <string name="info_standing_desk_text_no">not provided</string>
 
     <!--preference kay-->
+    <string name="preference_category_key_search" translatable="false">"search_category"</string>
+    <string name="preference_category_title_search">"Search"</string>
+
     <string name="preference_key_search_range" translatable="false">"search_range"</string>
-    <string name="preference_title_search_range" translatable="false">"Searching Range"</string>
-    <string name="preference_summary_search_range" translatable="false">"setting range of searching"</string>
+    <string name="preference_title_search_range">"Searching Range"</string>
+    <string name="preference_summary_search_range">"setting range of searching"</string>
+
+    <string name="cafe_not_found_text">No cafe nearby</string>
+    <string name="cafe_not_found_subtext">Maybe you can walk around or set larger searching range</string>
+    <string name="cafe_not_found_set_range_btn">Setting search range</string>
 </resources>

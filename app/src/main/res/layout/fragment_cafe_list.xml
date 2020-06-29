@@ -1,25 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.timothy.coffee.viewmodel.MainViewModel" />
+    </data>
+
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainFragment">
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewCafeList"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:clipChildren="false"
-        android:scrollbarStyle="outsideOverlay"
-        app:layoutManager="LinearLayoutManager"
-        tools:listitem="@layout/cafe_recyclerview_item_layout"
-        android:background="@color/background_color"
-        android:visibility="gone"/>
+        android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewCafeList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            android:scrollbarStyle="outsideOverlay"
+            app:layoutManager="LinearLayoutManager"
+            tools:listitem="@layout/cafe_recyclerview_item_layout"
+            android:background="@color/background_color"
+            android:visibility="@{viewmodel.cafeList.size()==0 ? View.GONE : View.VISIBLE}"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/no_data_block"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/common_context_padding"
+                android:paddingEnd="@dimen/common_context_padding"
+                android:visibility="@{viewmodel.cafeList.size()==0 ? View.VISIBLE : View.GONE}">
+                <LinearLayout
+                    android:id="@+id/container"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/bottom_sheet_peek_height"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+                    <ImageView
+                        android:id="@+id/not_found_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_sentiment_very_dissatisfied_black_24dp"
+                        android:tint="@color/color_2"
+                        />
+                    <TextView
+                        android:id="@+id/not_found_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="5dp"
+                        style="@style/CommonTitleStyle"
+                        android:text="@string/cafe_not_found_text"/>
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/not_found_sub_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/cafe_not_found_subtext"
+                    style="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintTop_toBottomOf="@id/container"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 </androidx.core.widget.NestedScrollView>
-</FrameLayout>
+</layout>

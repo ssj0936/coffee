@@ -32,7 +32,7 @@
                 app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"
                 app:behavior_defaultState="collapsed"
                 app:behavior_expandable = "false"
-                android:background="@color/gray_bg"
+                android:background="@color/background_color"
                 android:visibility="@{viewmodel.cafeList!=null ? View.VISIBLE : View.INVISIBLE}"
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

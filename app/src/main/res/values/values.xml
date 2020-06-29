@@ -16,7 +16,7 @@
 
     <!-- value -->
     <item name="google_map_zoom_level" type="dimen" format="float">15</item>
-    <item name="range_cafe_nearby_min" type="dimen" format="integer">3</item>
+    <item name="range_cafe_nearby_min" type="dimen" format="integer">5</item>
     <item name="range_cafe_nearby_max" type="dimen" format="integer">10</item>
 
 </resources>

@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.databinding.FragmentCafeListBinding
 import com.timothy.coffee.ui.CafeAdapter
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
@@ -27,6 +28,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     private var adapter:CafeAdapter = CafeAdapter(listOf(),this)
+    lateinit var binding:FragmentCafeListBinding
     private lateinit var mMainViewModel: MainViewModel
 
     companion object{
@@ -54,7 +56,8 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_cafe_list,container, false)
+        binding = FragmentCafeListBinding.inflate(inflater,container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -66,12 +69,20 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
 
         mMainViewModel.cafeList.observe(viewLifecycleOwner,
             Observer<List<Cafenomad>>{
+                Timber.d("cafeList size:${it.size}")
+
                 adapter = CafeAdapter(it,this)
                 recyclerViewCafeList.swapAdapter(
                     adapter,
                     false)
                 recyclerViewCafeList.visibility = View.VISIBLE
             })
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        binding.viewmodel = mMainViewModel
+        binding.lifecycleOwner = this
     }
 
     override fun onItemClick(cafe: Cafenomad) {
