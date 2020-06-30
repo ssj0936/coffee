@@ -70,16 +70,17 @@ class Utils {
         }
 
         fun getGoogleMapDirectionIntent(startLat:Double, startLon:Double, destName:String):Intent{
-            return Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLon&destination=$destName")
-            )
+            return getURLIntent("https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLon&destination=$destName")
         }
 
         fun getCafenomadURLIntent(id:String):Intent{
+            return getURLIntent("https://cafenomad.tw/shop/${id}")
+        }
+
+        fun getURLIntent(url:String):Intent{
             return Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://cafenomad.tw/shop/${id}")
+                Uri.parse(url)
             )
         }
 

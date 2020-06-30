@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary_orange">#EC651E</color>
-    <color name="secondary_blue">#4455AA</color>
-    <color name="secondary_bluegray">#90A4AE</color>
     <color name="white">#FFFFFF</color>
     <color name="gray_f5">#F5F5F5</color>
     <color name="gray_cd">#CDCDCD</color>
@@ -42,6 +39,7 @@
     <color name="rate_red">#DC2543</color>
     <color name="rate_orange">#D66C44</color>
     <color name="rate_yellow">#EFB730</color>
+    <color name="rate_yellow_alpha">#6DEFB730</color>
     <color name="rate_green">#757430</color>
     <color name="rate_blue">#38618F</color>
 
@@ -49,4 +47,7 @@
     <color name="color_2">#915C4C</color>
     <color name="color_3">#40686A</color>
     <color name="color_4">#2F1812</color>
+
+    <color name="divider_cafe_list_color">@color/gray_bg</color>
+    <color name="divider_cafe_info_color">@color/light_gray</color>
 </resources>

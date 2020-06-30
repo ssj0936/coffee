@@ -203,7 +203,8 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 app:layout_constraintStart_toEndOf="@+id/btn_cafenomad_intro"
-                app:layout_constraintTop_toBottomOf="@id/label_intro"/>
+                app:layout_constraintTop_toBottomOf="@id/label_intro"
+                android:visibility="@{viewmodel.chosenCafe.url.empty ? View.GONE : View.VISIBLE}"/>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_navigate"

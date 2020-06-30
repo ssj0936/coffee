@@ -9,10 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.databinding.FragmentCafeListBinding
 import com.timothy.coffee.ui.CafeAdapter
+import com.timothy.coffee.ui.CafeListDecoration
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
@@ -63,6 +65,12 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerViewCafeList.adapter = adapter
+        recyclerViewCafeList.addItemDecoration(
+            CafeListDecoration(requireContext(),
+                LinearLayoutManager.VERTICAL,
+                isDrawLastDivider = false,
+                isDrawFirstDivider = false)
+        )
 
         val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
         view.setPadding(0, 0, 0, anchorOffset)

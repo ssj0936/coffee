@@ -30,6 +30,14 @@
         <item name="android:textSize">@dimen/common_context_text_size</item>
     </style>
 
+    <style name="CafelistTitleStyle" parent="CommonPrimaryContextTextStyle">
+        <item name="android:textSize">@dimen/cafelist_title_text_size</item>
+    </style>
+
+    <style name="CafelistSubTitleStyle" parent="CommonSecondaryContextTextStyle">
+        <item name="android:textSize">@dimen/cafelist_subtitle_text_size</item>
+    </style>
+
     <style name="RateNumberStyle" parent="CommonPrimaryContextTextStyle">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textColor">@color/rate_number_text_color</item>

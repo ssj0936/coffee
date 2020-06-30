@@ -78,6 +78,10 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         binding.cafeInfoRecyclerview.layoutManager = mgr
         mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<Cafenomad>{
+
+                //scroll to top automatically
+                binding.nestedScrollView.smoothScrollTo(0,0)
+
                 adapter.setCafe(it,requireActivity())
                 adapter.notifyDataSetChanged()
 
@@ -130,7 +134,7 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
 
             binding.btnOfficial->{
                 mMainViewModel.chosenCafe.value?.let {
-                    startActivity(Utils.getCafenomadURLIntent(it.id))
+                    startActivity(Utils.getURLIntent(it.url))
                 }
             }
 

@@ -9,6 +9,12 @@
         <item name="android:progressDrawable">@drawable/tasty_rating_bar_stars</item>
         <item name="android:minHeight">18dp</item>
         <item name="android:maxHeight">18dp</item>
+        <!-- full icon tint -->
+        <item name="android:progressTint">@color/rate_yellow</item>
+        <!-- unfull icon tint -->
+        <item name="android:secondaryProgressTint">@color/rate_yellow_alpha</item>
+        <!-- stroke tint -->
+        <item name="android:progressBackgroundTint">@color/rate_yellow_alpha</item>
     </style>
 
     <style name="CommonButtonStyle" parent="Widget.AppCompat.Button.Colored">
@@ -26,7 +32,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:background">?android:attr/listDivider</item>
-        <item name="android:backgroundTint">@color/light_gray</item>
+        <item name="android:backgroundTint">@color/divider_cafe_info_color</item>
     </style>
 
 
