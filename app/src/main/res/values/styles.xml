@@ -9,38 +9,5 @@
         <item name="alertDialogTheme">@style/Theme.AppCompat.Light.Dialog.Alert</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">false</item>
-<!--        <item name="preferenceTheme">@style/AppTheme.PreferenceFragment</item>-->
     </style>
-
-    <style name="AppTheme.PreferenceFragment" parent="PreferenceFragment.Material">
-        <item name="layout">@layout/fragment_settings_preference</item>
-    </style>
-
-    <style name="AppTheme.ActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:background">@color/color_3</item>
-        <item name="android:titleTextStyle">@style/AppTheme.ActionBar.text</item>
-    </style>
-
-    <style name="AppTheme.ActionBar.text" parent="@android:style/TextAppearance">
-        <item name="android:textColor">@android:color/white</item>
-    </style>
-
-
-    <style name="MainTheme" >
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="TastyRatingBarTheme" parent="Theme.AppCompat">
-        <item name="colorControlNormal">@color/colorAccent</item>
-        <item name="colorControlActivated">@color/ratingStarActive</item>
-    </style>
-
-    <style name="TastyRatingBarStyle" parent="@android:style/Widget.RatingBar">
-        <item name="android:progressDrawable">@drawable/tasty_rating_bar_stars</item>
-        <item name="android:minHeight">18dp</item>
-        <item name="android:maxHeight">18dp</item>
-    </style>
-
 </resources>

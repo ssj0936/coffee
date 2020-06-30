@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TastyRatingBarTheme" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/ratingStarActive</item>
+    </style>
+
+    <style name="TastyRatingBarStyle" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/tasty_rating_bar_stars</item>
+        <item name="android:minHeight">18dp</item>
+        <item name="android:maxHeight">18dp</item>
+    </style>
+
+    <style name="CommonButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:colorButtonNormal">@color/white</item>
+        <item name="android:elevation">5dp</item>
+    </style>
+
+    <style name="WhiteColorButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:colorButtonNormal">@color/white</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
+    <style name="divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
+        <item name="android:backgroundTint">@color/light_gray</item>
+    </style>
+
+
+</resources>

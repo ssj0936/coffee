@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name" translatable="false">coffee</string>
+    <string name="base_url_cafenomad" translatable="false">https://cafenomad.tw/</string>
+    <string name="base_url_locationiq" translatable="false">https://us1.locationiq.com/</string>
 
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
 
     <string name="btn_text_navigate">Navigate</string>
+    <string name="btn_text_cafenomad_url">Intro in Cafenomad</string>
+    <string name="btn_text_official_url">URL</string>
 
     <string name="no_data">No data</string>
 
@@ -19,6 +23,8 @@
     <string name="label_is_time_limited">Time limited</string>
     <string name="label_open_time">Open time</string>
     <string name="label_mrt">MRT station nearby</string>
+    <string name="label_intro">Detail information</string>
+
 
     <string name="button_text_research">Research this field</string>
     <string name="dialog_network_require_message">Network is required for get Cafes information.</string>

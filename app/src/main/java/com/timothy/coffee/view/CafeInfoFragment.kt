@@ -69,13 +69,16 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         view.setPadding(0, 0, 0, anchorOffset)
 
         binding.btnNavigate.setOnClickListener(this)
+        binding.btnCafenomadIntro.setOnClickListener(this)
+        binding.btnOfficial.setOnClickListener(this)
+        binding.favoriteBtn.setOnClickListener(this)
         binding.cafeInfoRecyclerview.adapter = adapter
 
         val mgr = GridLayoutManager(context,2)
         binding.cafeInfoRecyclerview.layoutManager = mgr
-        mMainViewModel.chosenCafe.observe(this,
+        mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<Cafenomad>{
-                adapter.setCafe(it,activity!!)
+                adapter.setCafe(it,requireActivity())
                 adapter.notifyDataSetChanged()
 
                 binding.contentTimeLimit.text = when(it.isTimeLimited){
@@ -108,11 +111,33 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
     }
 
     override fun onClick(v: View?) {
-        val intent = Utils.getGoogleMapDirectionIntent(
-            mMainViewModel.loc.value!!.latitude,
-            mMainViewModel.loc.value!!.longitude,
-            "${mMainViewModel.chosenCafe.value!!.name} ${getString(R.string.postfix_navigation_keyword)}")
-        startActivity(intent)
+        when(v){
+            binding.btnNavigate->{
+                if(mMainViewModel.loc.value != null && mMainViewModel.chosenCafe.value != null){
+                    val intent = Utils.getGoogleMapDirectionIntent(
+                        mMainViewModel.loc.value!!.latitude,
+                        mMainViewModel.loc.value!!.longitude,
+                        "${mMainViewModel.chosenCafe.value!!.name} ${getString(R.string.postfix_navigation_keyword)}")
+                    startActivity(intent)
+                }
+            }
+
+            binding.btnCafenomadIntro->{
+                mMainViewModel.chosenCafe.value?.let {
+                    startActivity(Utils.getCafenomadURLIntent(it.id))
+                }
+            }
+
+            binding.btnOfficial->{
+                mMainViewModel.chosenCafe.value?.let {
+                    startActivity(Utils.getCafenomadURLIntent(it.id))
+                }
+            }
+
+            binding.favoriteBtn->{
+
+            }
+        }
     }
 
     override fun setNestScrollingEnable(enable:Boolean){

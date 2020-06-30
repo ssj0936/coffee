@@ -1,5 +1,7 @@
 <resources>
     <string name="btn_text_navigate">帶我去</string>
+    <string name="btn_text_cafenomad_url">Cafenomad的介紹</string>
+    <string name="btn_text_official_url">官方網站</string>
 
     <string name="no_data">沒提供資訊</string>
 
@@ -15,6 +17,8 @@
     <string name="label_is_time_limited">有無限時</string>
     <string name="label_open_time">營業時間</string>
     <string name="label_mrt">捷運站</string>
+    <string name="label_intro">詳細資訊</string>
+
 
     <string name="button_text_research">搜尋目前位置</string>
     <string name="dialog_network_require_message">我們需要網路找咖啡廳的資訊</string>

@@ -32,7 +32,8 @@
                 app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"
                 app:behavior_defaultState="collapsed"
                 app:behavior_expandable = "false"
-                android:background="@color/background_color"
+                android:elevation="3dp"
+                android:background="@color/gray_bg"
                 android:visibility="@{viewmodel.cafeList!=null ? View.VISIBLE : View.INVISIBLE}"
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -45,8 +46,6 @@
             android:layout_marginTop="8dp"
             app:srcCompat="@drawable/ic_settings_black_24dp"
             android:backgroundTint="@android:color/white"
-            android:elevation="10dp"
-            android:outlineProvider="bounds"
             android:alpha=".85"
             style="@style/Widget.AppCompat.Button.Colored"/>
 

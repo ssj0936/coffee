@@ -9,20 +9,18 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager2.widget.ViewPager2
 import kotlin.math.*
 
-fun ViewPager2.reduceDragSensitivity() {
-    val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
-    recyclerViewField.isAccessible = true
-    val recyclerView = recyclerViewField.get(this) as RecyclerView
-
-    val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
-    touchSlopField.isAccessible = true
-    val touchSlop = touchSlopField.get(recyclerView) as Int
-    touchSlopField.set(recyclerView, touchSlop*4)       // "8" was obtained experimentally
-}
+//fun ViewPager2.reduceDragSensitivity() {
+//    val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
+//    recyclerViewField.isAccessible = true
+//    val recyclerView = recyclerViewField.get(this) as RecyclerView
+//
+//    val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
+//    touchSlopField.isAccessible = true
+//    val touchSlop = touchSlopField.get(recyclerView) as Int
+//    touchSlopField.set(recyclerView, touchSlop*4)       // "8" was obtained experimentally
+//}
 
 class Utils {
     companion object{
@@ -75,6 +73,13 @@ class Utils {
             return Intent(
                 Intent.ACTION_VIEW,
                 Uri.parse("https://www.google.com/maps/dir/?api=1&origin=$startLat,$startLon&destination=$destName")
+            )
+        }
+
+        fun getCafenomadURLIntent(id:String):Intent{
+            return Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://cafenomad.tw/shop/${id}")
             )
         }
 
