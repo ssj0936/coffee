@@ -1,9 +1,6 @@
 package com.timothy.coffee.data.model
 
-import androidx.room.Entity
-import androidx.room.Ignore
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 import com.google.gson.annotations.SerializedName
 
 @Entity(indices = [Index("id"), Index("name")])
@@ -60,30 +57,9 @@ data class Cafenomad (
     val mrtName:String,
 
     @field:SerializedName("open_time")
-    val openTime:String,
+    val openTime:String
 
-    @Ignore var distance:Int
 ){
-    constructor(
-        id:String,
-        name:String,
-        cityname:String,
-        wifiStabilityLevel:Double,
-        seatLevel:Double,
-        quietLevel:Double,
-        tastyLevel:Double,
-        priceLevel:Double,
-        goodMusicLevel:Double,
-        address:String,
-        latitude:String,
-        longitude:String,
-        url:String,
-        isTimeLimited:String,
-        isSocketProvided:String,
-        isStandingDeskAvailable:String,
-        mrtName:String,
-        openTime:String
-    ) : this(
-        id,name,cityname, wifiStabilityLevel, seatLevel, quietLevel, tastyLevel, priceLevel, goodMusicLevel, address, latitude, longitude, url, isTimeLimited, isSocketProvided, isStandingDeskAvailable, mrtName, openTime, Int.MAX_VALUE
-        )
+    @Ignore var distance:Int = Int.MAX_VALUE
 }
+data class CafenomadDisplay(@Embedded var cafenomad: Cafenomad, var isFavorite: Boolean = false)

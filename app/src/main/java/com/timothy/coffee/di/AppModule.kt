@@ -67,7 +67,9 @@ class AppModule {
     @Singleton
     fun provideCafeDao(app:CafeApp): CafeDao {
         val dbName = "cafeapp_db"
-        val db = Room.databaseBuilder(app,CafeDb::class.java,dbName).build()
+        val db = Room.databaseBuilder(app,CafeDb::class.java,dbName)
+            .addMigrations(CafeDb.MIGRATION_1_2)
+            .build()
         return db.cafeDao()
     }
 }

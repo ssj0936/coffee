@@ -55,7 +55,7 @@ class CafeListDecoration(
         val left = parent.paddingLeft
         val right = parent.run { width - paddingRight }
         val childCount = parent.childCount
-        Timber.d("childCount:$childCount")
+//        Timber.d("childCount:$childCount")
         for(index in (if(isDrawFirstDivider)0 else 1) until childCount){
             val child = parent.getChildAt(index)
             val param = child.layoutParams as RecyclerView.LayoutParams

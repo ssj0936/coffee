@@ -77,7 +77,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
 
         mMainViewModel.cafeList.observe(viewLifecycleOwner,
             Observer<List<Cafenomad>>{
-                Timber.d("cafeList size:${it.size}")
+//                Timber.d("cafeList size:${it.size}")
 
                 adapter = CafeAdapter(it,this)
                 recyclerViewCafeList.swapAdapter(
@@ -95,6 +95,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
 
     override fun onItemClick(cafe: Cafenomad) {
         mMainViewModel.chosenCafe.value = cafe
+//        mMainViewModel.saveFavorite(cafe.id)
         mMainViewModel.lastMove.isClickList = true
         mMainViewModel.lastMove.isClickMap = false
     }

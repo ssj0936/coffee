@@ -10,6 +10,7 @@ import com.timothy.coffee.R
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.util.Movement
@@ -65,6 +66,7 @@ class MainViewModel @Inject constructor(
             .map { cafes ->
 //                Timber.d("cafes:${cafes}")
                 cafes.stream().forEach {cafe->
+//                    Timber.d("cafe:${cafe}")
                     loc.value?.let{
                         cafe.distance = Utils.distance(it.latitude,cafe.latitude.toDouble(),
                             it.longitude,cafe.longitude.toDouble()).toInt()
@@ -98,5 +100,13 @@ class MainViewModel @Inject constructor(
     private fun getCafenomadObservable(city:String): Observable<List<Cafenomad>>{
 //        Timber.d("get Cafenomad")
         return dataModel.getCafenomadObservable(city)
+    }
+
+    fun saveFavorite(cafeId:String){
+        Observable.just(cafeId)
+            .subscribeOn(Schedulers.io())
+            .subscribe {
+                dataSource.insertFavorite(it)
+            }
     }
 }

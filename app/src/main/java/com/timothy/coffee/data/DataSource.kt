@@ -6,6 +6,8 @@ import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.data.db.CafeDao
 import com.timothy.coffee.data.model.CafeSearchResult
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
+import com.timothy.coffee.data.model.FavoriteID
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -21,8 +23,8 @@ class DataSource @Inject constructor(
     fun query(city:String):Observable<List<Cafenomad>>{
         return Observable.concatArray(
             queryFromDB(city),
-            queryFromApi(city))
-            .subscribeOn(Schedulers.io())
+            queryFromApi(city)
+        ).subscribeOn(Schedulers.io())
     }
 
     /*有可能Query不到東西，可能像是第一次Query時DB table根本沒建起來，又或是table有了但裡面沒有符合的資料
@@ -36,69 +38,30 @@ class DataSource @Inject constructor(
     (https://medium.com/androiddevelopers/room-rxjava-acb0cd4f3757)
     (https://code.tutsplus.com/zh-hant/tutorials/reactive-programming-operators-in-rxjava-20--cms-28396)*/
     private fun queryFromDB(city: String):Observable<List<Cafenomad>>{
-        return cafeDao.queryCafeSearchResult(city)
-            .filter { it.isNotEmpty() }
+        return cafeDao.queryCafeByCity(city)
             .toObservable()
-            .flatMap {result->
-                    cafeDao.queryCafeByIds(result[0].idList)
-            }
             .subscribeOn(Schedulers.io())
     }
-
-
-    private fun queryFromDBObservable(city: String):Observable<List<Cafenomad>>{
-        return cafeDao.queryCafeSearchResultObservable(city)
-            .doOnComplete {
-                Timber.d("1_Observable doOnComplete")
-            }
-            .doOnNext {
-                Timber.d("1_Observable doOnNext")
-            }
-            .flatMap { result ->
-                if(result.isEmpty()){
-                    Timber.d("result.isEmpty")
-//                    Observable.create<List<Cafenomad>> {
-//                        it.onComplete()
-//                    }
-                    Observable.just(emptyList())
-                }
-                else {
-                    Timber.d("result.isNotEmpty")
-                    cafeDao.queryCafeByIds(result[0].idList)
-                }
-            }
-            .doOnComplete {
-                Timber.d("2_Observable doOnComplete")
-            }
-            .doOnNext {
-                Timber.d("2_Observable doOnNext")
-            }
-            .subscribeOn(Schedulers.io())
-    }
-
 
     private fun insertToDB(list: List<Cafenomad>, city: String){
         var tmpList = list
         tmpList.forEach {it.cityname = city}
-        val searchResult = CafeSearchResult(city,
-            tmpList.stream().map { item->item.id }.collect(Collectors.toList()),
-            tmpList.size)
-        Timber.d(searchResult.toString())
-
-        cafeDao.insertSearchResult(searchResult)
         cafeDao.insertCafe(tmpList)
     }
 
     private fun queryFromApi(city: String):Observable<List<Cafenomad>>{
         return Observable.just("")
-//            .doOnNext {
-//                Timber.d("queryFromApi")
-//            }
             .flatMap {
             cafenomadApiService.searchCafes(city)
                 .doOnNext {list->
                     insertToDB(list,city)
                 }
-        }
+        }.flatMap {
+                queryFromDB(city)
+        }.subscribeOn(Schedulers.io())
+    }
+
+    fun insertFavorite(cafeId:String){
+        cafeDao.insertFavoriteId(FavoriteID(cafeId))
     }
 }
