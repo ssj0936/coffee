@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="cafeinfo"
-            type="com.timothy.coffee.data.model.Cafenomad" />
+            type="com.timothy.coffee.data.model.CafenomadDisplay" />
     </data>
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,27 +28,46 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="textStart"
-                android:text="@{cafeinfo.name}"
+                android:text="@{cafeinfo.cafenomad.name}"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textAppearance="@style/CafelistTitleStyle"/>
 
-            <TextView
-                android:id="@+id/cafe_distance"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{cafeinfo.distance+` M`}"
-                android:textAppearance="@style/CafelistSubTitleStyle"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:id="@+id/cafe_distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{cafeinfo.cafenomad.distance+` M`}"
+                    android:textAppearance="@style/CafelistSubTitleStyle"/>
+                <ImageView
+                    android:id="@+id/favorite_btn"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="5dp"
+                    android:src="@drawable/ic_favorite_black_24dp"
+                    android:tint="@color/rate_red"
+                    android:visibility="@{cafeinfo.isFavorite ? View.VISIBLE : View.GONE}"/>
+            </LinearLayout>
+
         </LinearLayout>
+
+
 
         <androidx.appcompat.widget.AppCompatRatingBar
             android:id="@+id/tasty_rating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:isIndicator="true"
-            android:rating="@{Float.parseFloat(String.valueOf(cafeinfo.tastyLevel))}"
+            android:rating="@{Float.parseFloat(String.valueOf(cafeinfo.cafenomad.tastyLevel))}"
             android:max="5"
             android:numStars="5"
             android:stepSize=".5"
             style="@style/TastyRatingBarStyle"
-            android:visibility="@{cafeinfo.tastyLevel==0 ? View.GONE : View.VISIBLE}"/>
+            android:visibility="@{cafeinfo.cafenomad.tastyLevel==0 ? View.GONE : View.VISIBLE}"/>
      </LinearLayout>
 </layout>

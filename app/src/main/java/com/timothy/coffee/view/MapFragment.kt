@@ -2,13 +2,11 @@ package com.timothy.coffee.view
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,7 +17,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
-import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
@@ -87,7 +85,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
             })
 
         mMainViewModel.cafeList.observe(this,
-            Observer<List<Cafenomad>> { cafes ->
+            Observer<List<CafenomadDisplay>> { cafes ->
                 mMap?.let{
 
                     //remove all markers first
@@ -98,23 +96,24 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        mMainViewModel.chosenCafe.value = marker.tag as Cafenomad
+        mMainViewModel.chosenCafe.value = marker.tag as CafenomadDisplay
+//        mMainViewModel.cafeListChosenId.value = (marker.tag as CafenomadDisplay).cafenomad.id
         mMainViewModel.lastMove.isClickList = false
         mMainViewModel.lastMove.isClickMap = true
         return false
     }
 
-    private fun addMarker(cafe:Cafenomad){
+    private fun addMarker(cafe:CafenomadDisplay){
         mMap?.run {
             addMarker(MarkerOptions()
-                .position(LatLng(cafe.latitude.toDouble(),cafe.longitude.toDouble()))
-                .title(cafe.name)
+                .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
+                .title(cafe.cafenomad.name)
                 .draggable(false)
             ).tag = cafe
         }
     }
 
-    private fun addMarkers(cafes:List<Cafenomad>){
+    private fun addMarkers(cafes:List<CafenomadDisplay>){
         cafes.stream().forEach { cafe -> addMarker(cafe)}
     }
 

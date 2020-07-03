@@ -2,6 +2,7 @@ package com.timothy.coffee.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
@@ -16,9 +17,11 @@ import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
+import java.util.function.Consumer
 import java.util.stream.Collectors
 import javax.inject.Inject
 
@@ -28,14 +31,14 @@ class MainViewModel @Inject constructor(
 ): ViewModel(){
 
     var loc : MutableLiveData<LonAndLat> = MutableLiveData()
-    val chosenCafe: MutableLiveData<Cafenomad> = MutableLiveData()
-    val cafeList:MutableLiveData<List<Cafenomad>> = MutableLiveData()
+    val chosenCafe: MutableLiveData<CafenomadDisplay> = MutableLiveData()
+    val cafeList:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
     var lastMove = Movement(isClickMap = false, isClickList = false)
 
     private var cityName: MutableLiveData<String> = MutableLiveData()
 
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context, isForce:Boolean):Observable<List<Cafenomad>> {
+    fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
         return getLocationObservable(context)
             .subscribeOn(Schedulers.newThread())
             .observeOn(Schedulers.newThread())
@@ -60,7 +63,7 @@ class MainViewModel @Inject constructor(
                     dataSource.query(locationiq.address!!.state!!)
                 }else{
 //                    Timber.d("same city")
-                    Observable.empty<List<Cafenomad>>()
+                    Observable.empty<List<CafenomadDisplay>>()
                 }
             }
             .map { cafes ->
@@ -68,8 +71,8 @@ class MainViewModel @Inject constructor(
                 cafes.stream().forEach {cafe->
 //                    Timber.d("cafe:${cafe}")
                     loc.value?.let{
-                        cafe.distance = Utils.distance(it.latitude,cafe.latitude.toDouble(),
-                            it.longitude,cafe.longitude.toDouble()).toInt()
+                        cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
+                            it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
                     }
                 }
 
@@ -78,10 +81,10 @@ class MainViewModel @Inject constructor(
                         val range = PreferenceManager.getDefaultSharedPreferences(context)
                             .getInt(context.getString(R.string.preference_key_search_range)
                                 ,context.resources.getInteger(R.dimen.range_cafe_nearby_min))*1000
-                        cafe.distance < range
+                        cafe.cafenomad.distance < range
                     }
                     .sorted{
-                        cafe1,cafe2->cafe1.distance.compareTo(cafe2.distance)
+                        cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
                     }
                     .collect(Collectors.toList())
             }
@@ -102,11 +105,21 @@ class MainViewModel @Inject constructor(
         return dataModel.getCafenomadObservable(city)
     }
 
-    fun saveFavorite(cafeId:String){
-        Observable.just(cafeId)
-            .subscribeOn(Schedulers.io())
-            .subscribe {
+    @SuppressLint("CheckResult")
+    fun setFavorite(cafeId:String){
+        Single.just(cafeId)
+            .observeOn(Schedulers.io())
+            .subscribe { it ->
                 dataSource.insertFavorite(it)
+            }
+    }
+
+    @SuppressLint("CheckResult")
+    fun deleteFavorite(cafeId:String){
+        Single.just(cafeId)
+            .observeOn(Schedulers.io())
+            .subscribe { it ->
+                dataSource.deleteFavorite(it)
             }
     }
 }

@@ -20,11 +20,16 @@ class DataSource @Inject constructor(
    private val cafeDao: CafeDao,
    private val cafenomadApiService: CafenomadApiService
 ) {
-    fun query(city:String):Observable<List<Cafenomad>>{
+
+//    fun queryTest(city:String):Observable<List<CafenomadDisplay>>{
+//        return cafeDao.queryCafeByCityTest(city).toObservable().subscribeOn(Schedulers.io())
+//    }
+
+    fun query(city:String):Observable<List<CafenomadDisplay>>{
         return Observable.concatArray(
             queryFromDB(city),
-            queryFromApi(city)
-        ).subscribeOn(Schedulers.io())
+            queryFromApi(city))
+            .subscribeOn(Schedulers.io())
     }
 
     /*有可能Query不到東西，可能像是第一次Query時DB table根本沒建起來，又或是table有了但裡面沒有符合的資料
@@ -37,9 +42,8 @@ class DataSource @Inject constructor(
     (https://blog.nex3z.com/2017/10/31/android-room-rxjava-%E6%9F%A5%E8%AF%A2%E8%AE%B0%E5%BD%95%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95/)
     (https://medium.com/androiddevelopers/room-rxjava-acb0cd4f3757)
     (https://code.tutsplus.com/zh-hant/tutorials/reactive-programming-operators-in-rxjava-20--cms-28396)*/
-    private fun queryFromDB(city: String):Observable<List<Cafenomad>>{
+    private fun queryFromDB(city: String):Observable<List<CafenomadDisplay>>{
         return cafeDao.queryCafeByCity(city)
-            .toObservable()
             .subscribeOn(Schedulers.io())
     }
 
@@ -49,8 +53,9 @@ class DataSource @Inject constructor(
         cafeDao.insertCafe(tmpList)
     }
 
-    private fun queryFromApi(city: String):Observable<List<Cafenomad>>{
+    private fun queryFromApi(city: String):Observable<List<CafenomadDisplay>>{
         return Observable.just("")
+            .observeOn(Schedulers.io())
             .flatMap {
             cafenomadApiService.searchCafes(city)
                 .doOnNext {list->
@@ -58,10 +63,14 @@ class DataSource @Inject constructor(
                 }
         }.flatMap {
                 queryFromDB(city)
-        }.subscribeOn(Schedulers.io())
+        }
     }
 
     fun insertFavorite(cafeId:String){
         cafeDao.insertFavoriteId(FavoriteID(cafeId))
+    }
+
+    fun deleteFavorite(cafeId:String){
+        cafeDao.deleteFavoriteId(cafeId)
     }
 }

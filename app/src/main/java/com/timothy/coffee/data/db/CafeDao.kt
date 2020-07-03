@@ -23,11 +23,11 @@ abstract class CafeDao {
 //    @Query("Select * From Cafenomad Where id in (:cafeIds)")
 //    abstract fun queryCafeByIds(cafeIds:List<String>):Observable<List<Cafenomad>>
 
-    @Query("Select * From Cafenomad Where cityname = (:cityname)")
-    abstract fun queryCafeByCity(cityname:String):Single<List<Cafenomad>>
+//    @Query("Select * From Cafenomad Where cityname = (:cityname)")
+//    abstract fun queryCafeByCity(cityname:String):Single<List<Cafenomad>>
 
-//    @Query("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where cityname = (:cityname)) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId ")
-//    abstract fun queryCafeByCity(cityname:String):Single<List<CafenomadDisplay>>
+    @Query("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where cityname = (:cityname)) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId ")
+    abstract fun queryCafeByCity(cityname:String):Observable<List<CafenomadDisplay>>
 
 //    @Query("Select * From CafeSearchResult Where city = (:city) LIMIT 1")
 //    abstract fun queryCafeSearchResultObservable(city:String): Observable<List<CafeSearchResult>>

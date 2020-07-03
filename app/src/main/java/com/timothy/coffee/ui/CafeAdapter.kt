@@ -4,17 +4,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.CafeRecyclerviewItemLayoutBinding
 import timber.log.Timber
 
 class CafeAdapter(
-    private val cafes:List<Cafenomad>,
+    private val cafes:List<CafenomadDisplay>,
     private val listener:OnCafeAdapterClickListener
 ): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
 
     //hold item view's reference
     class ViewHolder(val binding: CafeRecyclerviewItemLayoutBinding) :RecyclerView.ViewHolder(binding.root){
-        fun bind(cafe:Cafenomad){
+        fun bind(cafe:CafenomadDisplay){
             binding.cafeinfo = cafe
             binding.executePendingBindings()
         }
@@ -33,15 +34,15 @@ class CafeAdapter(
 
     //replacing content of view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val cafe:Cafenomad = cafes[position]
-        holder.bind(cafe)
+        val cafeDisplay = cafes[position]
+        holder.bind(cafeDisplay)
 
         holder.binding.root.setOnClickListener{
-            listener.onItemClick(cafe)
+            listener.onItemClick(cafeDisplay)
         }
     }
 
     interface OnCafeAdapterClickListener{
-        fun onItemClick(cafe:Cafenomad)
+        fun onItemClick(cafe:CafenomadDisplay)
     }
 }

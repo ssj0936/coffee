@@ -1,5 +1,6 @@
 package com.timothy.coffee
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -21,6 +22,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapter
 import com.timothy.coffee.util.Utils
@@ -29,8 +31,10 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
@@ -47,6 +51,7 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
     private val compositeDisposable = CompositeDisposable()
     private lateinit var behavior: AnchorBottomSheetBehavior<View>
 
+    private var isInitialed:Boolean = false
     private val mPageNum = 2
 
     companion object{
@@ -71,6 +76,7 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Timber.d("onViewCreated")
         //viewpager
         cafeAdapter = CafeViewPagerAdapter(requireActivity().supportFragmentManager)
         binding.viewpager.adapter = cafeAdapter
@@ -78,7 +84,7 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
 
         //when user clicked item of cafe list
         mMainViewModel.chosenCafe.observe (viewLifecycleOwner,
-            Observer<Cafenomad> {
+            Observer<CafenomadDisplay> {
                 if(cafeAdapter.isInfoPageHide.value!!){
                     cafeAdapter.setHideInfoPage(false)
                 }
@@ -91,6 +97,9 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             }
         )
 
+        // setting button
+        binding.settingBtn.setOnClickListener(this)
+
         //check network
         if(!Utils.isNetworkAvailable(requireContext()))
             showNetworkConnectDialog()
@@ -100,9 +109,6 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             Timber.d("need to request")
             permissionRequest()
         }
-
-        // setting button
-        binding.settingBtn.setOnClickListener(this)
 
         //get Cafe info when network available && permission granted
         if(Utils.isNetworkAvailable(requireContext()) && isPermissionGranted()) {
@@ -266,32 +272,54 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
 
     override fun onStart() {
         super.onStart()
+        //get Cafe info when network available && permission granted
+        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
+            requestCafe(true)
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        compositeDisposable.clear()
+        if(compositeDisposable.size() != 0)
+            compositeDisposable.clear()
     }
 
     private fun requestCafe() = requestCafe(false)
 
+    @SuppressLint("CheckResult")
     private fun requestCafe(force:Boolean){
         compositeDisposable.add(
-            mMainViewModel.getCafeList(requireContext(),force)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-
-                    //play animation first time
-                    if(mMainViewModel.cafeList.value == null) {
-                        val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.translate)
-                        anim.interpolator = OvershootInterpolator()
-                        viewpager.startAnimation(anim)
-                    }
-
-                    mMainViewModel.cafeList.value = it
-                },{error-> Timber.e(error)})
+            queryCafeList(force)
         )
+    }
+
+    private fun queryCafeList(force:Boolean):Disposable{
+        return mMainViewModel.getCafeList(requireContext(),force)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+
+                //play animation first time
+                if(mMainViewModel.cafeList.value == null) {
+                    val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.translate)
+                    anim.interpolator = OvershootInterpolator()
+                    viewpager.startAnimation(anim)
+                }
+
+                //update cafe list
+                mMainViewModel.cafeList.value = it
+
+                //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
+                //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
+                mMainViewModel.chosenCafe.value?.let { chosenCafe ->
+                    mMainViewModel.chosenCafe.value = mMainViewModel.cafeList.value?.let { cafelist ->
+                        cafelist.stream()
+                            .filter { cafe -> cafe.cafenomad.id == chosenCafe.cafenomad.id}
+                            .findAny()
+                            .orElse(null)
+                    }
+                }
+            },{error-> Timber.e(error)})
     }
 
     private fun isPermissionGranted():Boolean{

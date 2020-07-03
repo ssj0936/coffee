@@ -9,9 +9,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 
 class CafeInfoRecyclerViewAdapter:RecyclerView.Adapter<CafeInfoRecyclerViewAdapter.CafeInfoViewHolder>() {
-    private lateinit var cafe:Cafenomad
+    private lateinit var cafe:CafenomadDisplay
     private var mList = mutableListOf<RateInfo>()
 
     class CafeInfoViewHolder(v:View) : RecyclerView.ViewHolder(v) {
@@ -24,22 +25,22 @@ class CafeInfoRecyclerViewAdapter:RecyclerView.Adapter<CafeInfoRecyclerViewAdapt
         var mRate:Double
     )
 
-    fun setCafe(cafe:Cafenomad, context: Context){
+    fun setCafe(cafe:CafenomadDisplay, context: Context){
         this.cafe = cafe
         mList.clear()
 
-        if (cafe.seatLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_seat_availability),cafe.seatLevel))
-        if (cafe.wifiStabilityLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_wifi_stability),cafe.wifiStabilityLevel))
-        if (cafe.tastyLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_tasty_level),cafe.tastyLevel))
-        if (cafe.quietLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_quiet_level),cafe.quietLevel))
-        if (cafe.priceLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_good_music_level),cafe.priceLevel))
-        if (cafe.goodMusicLevel > 0)
-            this.mList.add(RateInfo(context.getString(R.string.label_seat_availability),cafe.goodMusicLevel))
+        if (cafe.cafenomad.seatLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_seat_availability),cafe.cafenomad.seatLevel))
+        if (cafe.cafenomad.wifiStabilityLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_wifi_stability),cafe.cafenomad.wifiStabilityLevel))
+        if (cafe.cafenomad.tastyLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_tasty_level),cafe.cafenomad.tastyLevel))
+        if (cafe.cafenomad.quietLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_quiet_level),cafe.cafenomad.quietLevel))
+        if (cafe.cafenomad.priceLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_good_music_level),cafe.cafenomad.priceLevel))
+        if (cafe.cafenomad.goodMusicLevel > 0)
+            this.mList.add(RateInfo(context.getString(R.string.label_seat_availability),cafe.cafenomad.goodMusicLevel))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CafeInfoViewHolder {

@@ -11,17 +11,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.timothy.coffee.R
-import com.timothy.coffee.data.model.Cafenomad
+import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentCafeListBinding
 import com.timothy.coffee.ui.CafeAdapter
 import com.timothy.coffee.ui.CafeListDecoration
-import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_cafe_list.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -76,9 +72,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         view.setPadding(0, 0, 0, anchorOffset)
 
         mMainViewModel.cafeList.observe(viewLifecycleOwner,
-            Observer<List<Cafenomad>>{
-//                Timber.d("cafeList size:${it.size}")
-
+            Observer<List<CafenomadDisplay>>{
                 adapter = CafeAdapter(it,this)
                 recyclerViewCafeList.swapAdapter(
                     adapter,
@@ -93,9 +87,8 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         binding.lifecycleOwner = this
     }
 
-    override fun onItemClick(cafe: Cafenomad) {
+    override fun onItemClick(cafe: CafenomadDisplay) {
         mMainViewModel.chosenCafe.value = cafe
-//        mMainViewModel.saveFavorite(cafe.id)
         mMainViewModel.lastMove.isClickList = true
         mMainViewModel.lastMove.isClickMap = false
     }
