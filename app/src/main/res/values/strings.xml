@@ -3,8 +3,6 @@
     <string name="base_url_cafenomad" translatable="false">https://cafenomad.tw/</string>
     <string name="base_url_locationiq" translatable="false">https://us1.locationiq.com/</string>
 
-    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
-
     <string name="btn_text_navigate">Navigate</string>
     <string name="btn_text_cafenomad_url">Intro in Cafenomad</string>
     <string name="btn_text_official_url">URL</string>
@@ -17,7 +15,6 @@
     <string name="label_quiet_level">Quiet</string>
     <string name="label_price_level">Price</string>
     <string name="label_good_music_level">Music Taste</string>
-    <string name="label_url">URL</string>
     <string name="label_is_socket_provide">Socket providing</string>
     <string name="label_is_standing_desk_available">Standing working desk</string>
     <string name="label_is_time_limited">Time limited</string>
@@ -33,7 +30,6 @@
     <string name="dialog_permission_require_message">We need your location to get cafes near by.</string>
 
     <string name="postfix_navigation_keyword" translatable="false">Cafe</string>
-    <string name="lorem_map" translatable="false">MAP View</string>
 
     <string name="info_value_yes" translatable="false">yes</string>
     <string name="info_value_maybe" translatable="false">maybe</string>
@@ -60,5 +56,4 @@
 
     <string name="cafe_not_found_text">No cafe nearby</string>
     <string name="cafe_not_found_subtext">Maybe you can walk around or set larger searching range</string>
-    <string name="cafe_not_found_set_range_btn">Setting search range</string>
 </resources>
