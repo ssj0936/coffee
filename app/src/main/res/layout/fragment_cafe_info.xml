@@ -13,41 +13,42 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:isScrollContainer="true"
-        android:background="@color/background_color">
+        android:background="@color/background_color"
+        android:paddingBottom="@dimen/bottom_sheet_anchor_offset">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
-            android:paddingStart="30dp"
-            android:paddingTop="32dp"
-            android:paddingEnd="30dp">
+            android:paddingStart="@dimen/cafeinfo_padding_side"
+            android:paddingTop="@dimen/cafeinfo_padding_top"
+            android:paddingEnd="@dimen/cafeinfo_padding_side"
+            android:clipToPadding="false">
 
             <TextView
                 android:id="@+id/cafe_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:layout_constraintWidth_default="wrap"
                 android:autoSizeMaxTextSize="@dimen/common_title_text_size"
                 android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
-
                 android:autoSizeTextType="uniform"
                 android:text="@{viewmodel.chosenCafe.cafenomad.name}"
                 android:textAppearance="@style/CommonTitleStyle"
 
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintRight_toLeftOf="@id/favorite_btn"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
             <ImageView
                 android:id="@+id/favorite_btn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="@dimen/cafeinfo_favorite_btn_size"
+                android:layout_height="@dimen/cafeinfo_favorite_btn_size"
                 android:padding="5dp"
                 app:layout_constraintStart_toEndOf="@id/cafe_name"
                 app:layout_constraintTop_toTopOf="@id/cafe_name"
                 app:layout_constraintBottom_toBottomOf="@id/cafe_name"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
+                android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
                 android:src="@{viewmodel.chosenCafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
                 android:tint="@{viewmodel.chosenCafe.isFavorite ? @color/rate_red : @color/light_gray}"/>
 

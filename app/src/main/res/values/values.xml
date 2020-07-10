@@ -16,6 +16,12 @@
     <dimen name="cafelist_title_text_size">17sp</dimen>
     <dimen name="cafelist_subtitle_text_size">13sp</dimen>
 
+    <dimen name="cafeinfo_padding_top">32dp</dimen>
+    <dimen name="cafeinfo_padding_side">30dp</dimen>
+
+    <dimen name="cafeinfo_favorite_btn_size">30dp</dimen>
+    <dimen name="cafeinfo_favorite_btn_margin_side">10dp</dimen>
+
     <!-- value -->
     <item name="google_map_zoom_level" type="dimen" format="float">15</item>
     <item name="range_cafe_nearby_min" type="dimen" format="integer">5</item>

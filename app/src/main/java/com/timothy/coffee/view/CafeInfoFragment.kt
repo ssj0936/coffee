@@ -1,7 +1,9 @@
 package com.timothy.coffee.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,10 +63,20 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
         return binding.root
     }
 
+    @SuppressLint("BinaryOperationInTimber")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
-        view.setPadding(0, 0, 0, anchorOffset)
+//        val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
+//        view.setPadding(0, 0, 0, anchorOffset)
+
+        val displayMetrics = DisplayMetrics()
+        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val width: Int = displayMetrics.widthPixels
+
+        binding.cafeName.maxWidth =
+            width - (resources.getDimensionPixelSize(R.dimen.cafeinfo_padding_side)*2
+                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_margin_side)*2
+                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_size))
 
         binding.btnNavigate.setOnClickListener(this)
         binding.btnCafenomadIntro.setOnClickListener(this)
