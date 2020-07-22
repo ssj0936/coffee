@@ -273,24 +273,24 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
     override fun onStart() {
         super.onStart()
         //get Cafe info when network available && permission granted
-        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
-            requestCafe(true)
-        }
+//        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
+//            requestCafe(true)
+//        }
     }
 
     override fun onStop() {
         super.onStop()
-        if(compositeDisposable.size() != 0)
-            compositeDisposable.clear()
+//        if(compositeDisposable.size() != 0)
+//            compositeDisposable.clear()
     }
 
     private fun requestCafe() = requestCafe(false)
 
     @SuppressLint("CheckResult")
     private fun requestCafe(force:Boolean){
-        compositeDisposable.add(
+//        compositeDisposable.add(
             queryCafeList(force)
-        )
+//        )
     }
 
     private fun queryCafeList(force:Boolean):Disposable{

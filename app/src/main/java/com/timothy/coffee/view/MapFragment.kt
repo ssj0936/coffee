@@ -77,10 +77,13 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
             onCreate(savedInstanceState)
             onResume()
             getMapAsync(this@MapFragment)
+            Timber.d("onViewCreated")
+
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+        Timber.d("onMapReady")
         mMap = googleMap
         mMap.setOnMarkerClickListener(this)
         enableMyLocation()
@@ -90,7 +93,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 moveCamera()
             })
 
-        mMainViewModel.cafeList.observe(this,
+        mMainViewModel.cafeList.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>> { cafes ->
                 mMap?.let{
                     Timber.d("cafeList change (map)")
@@ -100,7 +103,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 }
             })
 
-        mMainViewModel.chosenCafe.observe(this,
+        mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<CafenomadDisplay> {
                 Timber.d("chosenCafe change")
                 moveCameraTo(it)
