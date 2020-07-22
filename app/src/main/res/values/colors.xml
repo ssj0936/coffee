@@ -32,4 +32,8 @@
 
     <color name="divider_cafe_list_color">@color/gray_bg</color>
     <color name="divider_cafe_info_color">@color/light_gray</color>
+
+    <color name="map_icon_normal">@color/color_2</color>
+    <color name="map_icon_selected">@color/color_1</color>
+    <color name="map_icon_favorite">@color/rate_red</color>
 </resources>

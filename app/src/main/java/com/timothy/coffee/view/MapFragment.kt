@@ -2,6 +2,9 @@ package com.timothy.coffee.view
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -23,6 +26,7 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_map.*
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -34,6 +38,8 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     private lateinit var mMap:GoogleMap
     private val isMapInitialed:Boolean
         get() = mMap!=null
+
+    private val markerList = mutableListOf<Marker>()
 
     companion object {
         @JvmStatic
@@ -87,34 +93,101 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         mMainViewModel.cafeList.observe(this,
             Observer<List<CafenomadDisplay>> { cafes ->
                 mMap?.let{
-
+                    Timber.d("cafeList change (map)")
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
                 }
             })
+
+        mMainViewModel.chosenCafe.observe(this,
+            Observer<CafenomadDisplay> {
+                Timber.d("chosenCafe change")
+                moveCameraTo(it)
+                updateMarkersIcon()
+            })
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
         mMainViewModel.chosenCafe.value = marker.tag as CafenomadDisplay
-//        mMainViewModel.cafeListChosenId.value = (marker.tag as CafenomadDisplay).cafenomad.id
         mMainViewModel.lastMove.isClickList = false
         mMainViewModel.lastMove.isClickMap = true
+
         return false
     }
 
-    private fun addMarker(cafe:CafenomadDisplay){
-        mMap?.run {
-            addMarker(MarkerOptions()
-                .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
-                .title(cafe.cafenomad.name)
-                .draggable(false)
-            ).tag = cafe
+//    private fun addMarker(cafe:CafenomadDisplay){
+//        mMap?.run {
+//            addMarker(MarkerOptions()
+//                .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
+//                .icon(
+//                    when {
+//                        cafe.isFavorite ->
+//                            getBitmapMapPin(R.drawable.ic_place_favorite)
+//                        cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
+//                            getBitmapMapPin(R.drawable.ic_place_selected)
+//                        else ->
+//                            getBitmapMapPin(R.drawable.ic_place)
+//                    }
+//                )
+//                .title(cafe.cafenomad.name)
+//                .draggable(false)
+//            ).tag = cafe
+//        }
+//    }
+
+    private fun updateMarkersIcon(){
+        markerList.stream().forEach {
+            when {
+                (it.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
+                    it.setIcon(getBitmapMapPin(R.drawable.ic_place_selected))
+                (it.tag as CafenomadDisplay).isFavorite ->
+                    it.setIcon(getBitmapMapPin(R.drawable.ic_place_favorite))
+                else ->
+                    it.setIcon(getBitmapMapPin(R.drawable.ic_place))
+            }
         }
     }
 
     private fun addMarkers(cafes:List<CafenomadDisplay>){
-        cafes.stream().forEach { cafe -> addMarker(cafe)}
+        markerList.clear()
+
+        cafes.stream().forEach { cafe ->run{
+            mMap?.run {
+                val marker = addMarker(MarkerOptions()
+                    .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
+                    .icon(
+                        when {
+                            cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
+                                getBitmapMapPin(R.drawable.ic_place_selected)
+                            cafe.isFavorite ->
+                                getBitmapMapPin(R.drawable.ic_place_favorite)
+                            else ->
+                                getBitmapMapPin(R.drawable.ic_place)
+                        }
+                    )
+                    .title(cafe.cafenomad.name)
+                    .draggable(false)
+                )
+
+                marker.tag = cafe
+                markerList.add(marker)
+            }
+        }}
+    }
+
+    private fun getBitmapMapPin(resId:Int): BitmapDescriptor?{
+        val drawable = ContextCompat.getDrawable(requireContext(),resId)
+        return drawable?.run{
+            setBounds(0,0,intrinsicWidth,intrinsicHeight)
+
+            val bitmap = Bitmap.createBitmap(intrinsicWidth,intrinsicHeight,Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            draw(canvas)
+
+            BitmapDescriptorFactory.fromBitmap(bitmap)
+        }
     }
 
     private fun moveCamera(){
@@ -129,7 +202,28 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 })
                 .build()
 
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+        }
+    }
+
+    private fun moveCameraTo(cafe:CafenomadDisplay) {
+        moveCameraTo(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
+    }
+
+
+    private fun moveCameraTo(latlng:LatLng){
+        mMap?.run{
+            val cameraPosition = CameraPosition.builder()
+                .target(latlng)
+                .zoom(
+                    kotlin.run {
+                        val outValue = TypedValue()
+                        resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
+                        outValue.float
+                    })
+                .build()
+
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
     }
 
