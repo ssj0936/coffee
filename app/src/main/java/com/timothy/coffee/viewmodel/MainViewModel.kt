@@ -40,8 +40,8 @@ class MainViewModel @Inject constructor(
     @SuppressLint("ResourceType")
     fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
         return getLocationObservable(context)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(Schedulers.newThread())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
             .flatMap{lonlat ->
 //                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
 //                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")

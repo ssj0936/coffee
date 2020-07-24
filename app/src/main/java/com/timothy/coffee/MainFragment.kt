@@ -273,30 +273,30 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
     override fun onStart() {
         super.onStart()
         //get Cafe info when network available && permission granted
-//        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
-//            requestCafe(true)
-//        }
+        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
+            requestCafe(true)
+        }
     }
 
     override fun onStop() {
         super.onStop()
-//        if(compositeDisposable.size() != 0)
-//            compositeDisposable.clear()
+        if(compositeDisposable.size() != 0)
+            compositeDisposable.clear()
     }
 
     private fun requestCafe() = requestCafe(false)
 
     @SuppressLint("CheckResult")
     private fun requestCafe(force:Boolean){
-//        compositeDisposable.add(
+        compositeDisposable.add(
             queryCafeList(force)
-//        )
+        )
     }
 
     private fun queryCafeList(force:Boolean):Disposable{
         return mMainViewModel.getCafeList(requireContext(),force)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.computation())
             .subscribe({
 
                 //play animation first time
@@ -307,17 +307,26 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                 }
 
                 //update cafe list
-                mMainViewModel.cafeList.value = it
+                if(mMainViewModel.cafeList.value == null) {
+                    mMainViewModel.cafeList.postValue(it)
+                }else if(mMainViewModel.cafeList.value != it){
+                    mMainViewModel.cafeList.postValue(it)
+                }
 
+                //for favorite showing
                 //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
                 //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
-                mMainViewModel.chosenCafe.value?.let { chosenCafe ->
-                    mMainViewModel.chosenCafe.value = mMainViewModel.cafeList.value?.let { cafelist ->
+                val currentCafe = mMainViewModel.chosenCafe.value
+                if(currentCafe != null){
+                    val newCafe = it.let { cafelist ->
                         cafelist.stream()
-                            .filter { cafe -> cafe.cafenomad.id == chosenCafe.cafenomad.id}
+                            .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
                             .findAny()
                             .orElse(null)
                     }
+
+                    if(currentCafe != newCafe)
+                        mMainViewModel.chosenCafe.postValue(newCafe)
                 }
             },{error-> Timber.e(error)})
     }

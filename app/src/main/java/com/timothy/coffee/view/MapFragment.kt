@@ -77,26 +77,24 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
             onCreate(savedInstanceState)
             onResume()
             getMapAsync(this@MapFragment)
-            Timber.d("onViewCreated")
-
         }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        Timber.d("onMapReady")
+//        Timber.d("onMapReady")
         mMap = googleMap
         mMap.setOnMarkerClickListener(this)
         enableMyLocation()
 
-        mMainViewModel.loc.observe(this,
+        mMainViewModel.loc.observe(viewLifecycleOwner,
             Observer<LonAndLat>{
                 moveCamera()
+                mMainViewModel.loc.removeObservers(viewLifecycleOwner)
             })
 
         mMainViewModel.cafeList.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>> { cafes ->
                 mMap?.let{
-                    Timber.d("cafeList change (map)")
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
@@ -105,7 +103,6 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
         mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<CafenomadDisplay> {
-                Timber.d("chosenCafe change")
                 moveCameraTo(it)
                 updateMarkersIcon()
             })
@@ -118,26 +115,6 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
         return false
     }
-
-//    private fun addMarker(cafe:CafenomadDisplay){
-//        mMap?.run {
-//            addMarker(MarkerOptions()
-//                .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
-//                .icon(
-//                    when {
-//                        cafe.isFavorite ->
-//                            getBitmapMapPin(R.drawable.ic_place_favorite)
-//                        cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
-//                            getBitmapMapPin(R.drawable.ic_place_selected)
-//                        else ->
-//                            getBitmapMapPin(R.drawable.ic_place)
-//                    }
-//                )
-//                .title(cafe.cafenomad.name)
-//                .draggable(false)
-//            ).tag = cafe
-//        }
-//    }
 
     private fun updateMarkersIcon(){
         markerList.stream().forEach {

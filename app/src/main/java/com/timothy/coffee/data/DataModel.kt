@@ -7,6 +7,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.api.LocationiqApiService
@@ -25,16 +26,28 @@ class DataModel
     private val locationiqApiService:LocationiqApiService,
     private val cafenomadApiService:CafenomadApiService
 ){
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private fun getFusedLocationClient(context: Context):FusedLocationProviderClient{
+        if(!::fusedLocationClient.isInitialized)
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+        return fusedLocationClient
+    }
+
     private fun getLastKnownLocation(context: Context):Observable<LonAndLat>{
         return Maybe.create<LonAndLat> { emitter ->
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-            fusedLocationClient.lastLocation
+            getFusedLocationClient(context).lastLocation
                 .addOnSuccessListener {
 //                    Timber.d("getLastKnownLocation success")
-                    emitter.onSuccess(LonAndLat(
-                        it.longitude,
-                        it.latitude
-                    ))
+                    if(it!=null){
+                        emitter.onSuccess(LonAndLat(
+                            it.longitude,
+                            it.latitude
+                        ))
+                    }else{
+                        Timber.d("get location null")
+                        emitter.onComplete()
+                    }
                 }
                 .addOnFailureListener {
 //                    Timber.d("getLastKnownLocation error")

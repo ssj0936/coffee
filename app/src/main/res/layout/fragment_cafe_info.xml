@@ -29,7 +29,7 @@
                 android:id="@+id/cafe_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintWidth_default="wrap"
+                app:layout_constrainedWidth="true"
                 android:autoSizeMaxTextSize="@dimen/common_title_text_size"
                 android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
                 android:autoSizeTextType="uniform"
