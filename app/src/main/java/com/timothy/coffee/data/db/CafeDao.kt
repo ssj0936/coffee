@@ -27,7 +27,7 @@ abstract class CafeDao {
 //    abstract fun queryCafeByCity(cityname:String):Single<List<Cafenomad>>
 
     @Query("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where cityname = (:cityname)) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId ")
-    abstract fun queryCafeByCity(cityname:String):Observable<List<CafenomadDisplay>>
+    abstract fun queryCafeByCity(cityname:String):Single<List<CafenomadDisplay>>
 
 //    @Query("Select * From CafeSearchResult Where city = (:city) LIMIT 1")
 //    abstract fun queryCafeSearchResultObservable(city:String): Observable<List<CafeSearchResult>>
@@ -36,9 +36,9 @@ abstract class CafeDao {
 //    abstract fun queryCafeSearchResult(city:String): Single<List<CafeSearchResult>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insertFavoriteId(favorite:FavoriteID)
+    abstract fun insertFavoriteId(favorite:FavoriteID):Long
 
     @Query("DELETE FROM FavoriteID WHERE cafeId=(:favoriteID)")
-    abstract fun deleteFavoriteId(favoriteID:String)
+    abstract fun deleteFavoriteId(favoriteID:String):Int
 
 }

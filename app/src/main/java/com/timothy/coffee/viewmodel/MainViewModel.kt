@@ -66,6 +66,7 @@ class MainViewModel @Inject constructor(
                     Observable.empty<List<CafenomadDisplay>>()
                 }
             }
+            .observeOn(Schedulers.computation())
             .map { cafes ->
 //                Timber.d("cafes:${cafes}")
                 cafes.stream().forEach {cafe->
@@ -109,8 +110,28 @@ class MainViewModel @Inject constructor(
     fun setFavorite(cafeId:String){
         Single.just(cafeId)
             .observeOn(Schedulers.io())
-            .subscribe { it ->
-                dataSource.insertFavorite(it)
+            .subscribe { id ->
+                if(dataSource.insertFavorite(id) > 0){
+                    //cafeList update
+                    cafeList.value?.let{
+                        val updatedItem = it.stream().filter{cafe->
+                            cafe.cafenomad.id == id
+                        }.findAny().orElse(null)
+
+                        if(updatedItem != null){
+                            updatedItem.isFavorite = true
+                            cafeList.postValue(cafeList.value)
+                        }
+                    }
+
+                    //chosen Cafe update
+                    if(id == chosenCafe.value?.cafenomad?.id){
+                        chosenCafe.value?.let {
+                            it.isFavorite = true
+                        }
+                        chosenCafe.postValue(chosenCafe.value)
+                    }
+                }
             }
     }
 
@@ -118,8 +139,28 @@ class MainViewModel @Inject constructor(
     fun deleteFavorite(cafeId:String){
         Single.just(cafeId)
             .observeOn(Schedulers.io())
-            .subscribe { it ->
-                dataSource.deleteFavorite(it)
+            .subscribe { id ->
+                if(dataSource.deleteFavorite(id)>0){
+                    //cafeList update
+                    cafeList.value?.let{
+                        val updatedItem = it.stream().filter{cafe->
+                            cafe.cafenomad.id == id
+                        }.findAny().orElse(null)
+
+                        if(updatedItem != null){
+                            updatedItem.isFavorite = false
+                            cafeList.postValue(cafeList.value)
+                        }
+                    }
+
+                    //chosen Cafe update
+                    if(id == chosenCafe.value?.cafenomad?.id){
+                        chosenCafe.value?.let {
+                            it.isFavorite = false
+                        }
+                        chosenCafe.postValue(chosenCafe.value)
+                    }
+                }
             }
     }
 }

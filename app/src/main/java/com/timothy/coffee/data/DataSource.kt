@@ -44,6 +44,7 @@ class DataSource @Inject constructor(
     (https://code.tutsplus.com/zh-hant/tutorials/reactive-programming-operators-in-rxjava-20--cms-28396)*/
     private fun queryFromDB(city: String):Observable<List<CafenomadDisplay>>{
         return cafeDao.queryCafeByCity(city)
+            .toObservable()
             .subscribeOn(Schedulers.io())
     }
 
@@ -66,11 +67,13 @@ class DataSource @Inject constructor(
         }
     }
 
-    fun insertFavorite(cafeId:String){
-        cafeDao.insertFavoriteId(FavoriteID(cafeId))
+    fun insertFavorite(cafeId:String):Long{
+        //return ID for success, return -1 for conflict replace
+        return cafeDao.insertFavoriteId(FavoriteID(cafeId))
     }
 
-    fun deleteFavorite(cafeId:String){
-        cafeDao.deleteFavoriteId(cafeId)
+    fun deleteFavorite(cafeId:String):Int{
+        //return num of delete item
+        return cafeDao.deleteFavoriteId(cafeId)
     }
 }
