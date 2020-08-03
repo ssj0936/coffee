@@ -10,4 +10,8 @@ interface CafenomadApiService{
 
     @GET("api/v1.2/cafes/{city}")
     fun searchCafes (@Path("city") city:String) : Observable<List<Cafenomad>>
+
+    @GET("api/v1.2/cafes/")
+    fun searchAllCafes() : Observable<List<Cafenomad>>
+
 }

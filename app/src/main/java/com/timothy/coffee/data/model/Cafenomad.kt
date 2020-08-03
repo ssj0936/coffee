@@ -12,7 +12,7 @@ data class Cafenomad (
     @field:SerializedName("name")
     val name:String,
 
-    var cityname:String,
+    var cityname:String?,
 
     @field:SerializedName("wifi")
     val wifiStabilityLevel:Double,

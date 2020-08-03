@@ -38,7 +38,7 @@ class MainViewModel @Inject constructor(
     private var cityName: MutableLiveData<String> = MutableLiveData()
 
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
+    fun getCafeList_(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
         return getLocationObservable(context)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
@@ -62,15 +62,15 @@ class MainViewModel @Inject constructor(
                     cityName.postValue(locationiq.address?.state)
                     dataSource.query(locationiq.address!!.state!!)
                 }else{
-//                    Timber.d("same city")
+                    Timber.d("same city")
                     Observable.empty<List<CafenomadDisplay>>()
                 }
             }
             .observeOn(Schedulers.computation())
             .map { cafes ->
-//                Timber.d("cafes:${cafes}")
+                //                Timber.d("cafes:${cafes}")
                 cafes.stream().forEach {cafe->
-//                    Timber.d("cafe:${cafe}")
+                    //                    Timber.d("cafe:${cafe}")
                     loc.value?.let{
                         cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
                             it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
@@ -85,7 +85,50 @@ class MainViewModel @Inject constructor(
                         cafe.cafenomad.distance < range
                     }
                     .sorted{
-                        cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                            cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                    }
+                    .collect(Collectors.toList())
+            }
+    }
+
+    @SuppressLint("ResourceType")
+    fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
+        return getLocationObservable(context)
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .flatMap{lonlat ->
+                //                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
+//                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
+
+                if(lonlat != loc.value || isForce){
+                    Timber.d("different lon && lat:${lonlat.latitude},${lonlat.longitude}")
+                    val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
+                    loc.postValue(lonlat)
+                    dataSource.queryV2(lonlat.latitude,lonlat.longitude,range)
+                }else{
+//                    Timber.d("same lon && lat")
+                    Observable.empty<List<CafenomadDisplay>>()
+                }
+            }
+            .observeOn(Schedulers.computation())
+            .map { cafes ->
+//                Timber.d("cafes:${cafes}")
+                cafes.stream().forEach {cafe->
+                    loc.value?.let{
+                        cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
+                            it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
+                    }
+                }
+
+                cafes.stream()
+                    .filter{cafe->
+                        val range = PreferenceManager.getDefaultSharedPreferences(context)
+                            .getInt(context.getString(R.string.preference_key_search_range)
+                                ,context.resources.getInteger(R.dimen.range_cafe_nearby_min))*1000
+                        cafe.cafenomad.distance < range
+                    }
+                    .sorted{
+                            cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
                     }
                     .collect(Collectors.toList())
             }

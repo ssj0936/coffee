@@ -32,6 +32,30 @@ class DataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
     }
 
+    @SuppressLint("CheckResult")
+    fun queryV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
+        return Observable.just("")
+            .flatMap {
+                cafeDao.getRowNum().toObservable()
+            }.flatMap {
+                if(it<=0){
+//                    Timber.d("no data in DB")
+                    cafenomadApiService.searchAllCafes()
+                        .doOnNext {list->
+//                            Timber.d("insert into DB:${list}")
+                            insertToDBV2(list)
+                        }
+                }else{
+//                    Timber.d("Data in DB already")
+                    Observable.just(emptyList())
+                }
+            }.flatMap {
+//                Timber.d("fetch from DB")
+                queryFromDBV2(latitude, longitude, range)
+            }
+            .subscribeOn(Schedulers.io())
+    }
+
     /*有可能Query不到東西，可能像是第一次Query時DB table根本沒建起來，又或是table有了但裡面沒有符合的資料
     若Dao return type為Observable，query不到東西不會emit這就蠻尷尬的，因為這樣在concatArray中也不會觸發下一個type為Observable開始工作
     解決的方法是改用Single<List<T>>，使用Single的的差別在於：
@@ -48,9 +72,28 @@ class DataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
     }
 
+    private fun queryFromDBV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
+        return queryFromDBV2Convert(latitude,longitude,range)
+            .toObservable()
+            .subscribeOn(Schedulers.io())
+    }
+
+    private fun queryFromDBV2Convert(latitude:Double, longitude:Double, range:Int):Single<List<CafenomadDisplay>>{
+        Timber.d("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where latitude BETWEEN ${latitude+0.01*range} AND ${latitude-0.01*range} AND longitude BETWEEN ${longitude+0.01*range} AND ${longitude-0.01*range}) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId")
+
+        return cafeDao.queryCafeByCoordinateV2(latitude+0.01*range,latitude-0.01*range,
+            longitude+0.01*range,longitude-0.01*range)
+    }
+
     private fun insertToDB(list: List<Cafenomad>, city: String){
         var tmpList = list
         tmpList.forEach {it.cityname = city}
+        cafeDao.insertCafe(tmpList)
+    }
+
+    private fun insertToDBV2(list: List<Cafenomad>){
+        var tmpList = list
+        tmpList.forEach {it.cityname = null}
         cafeDao.insertCafe(tmpList)
     }
 
@@ -58,13 +101,26 @@ class DataSource @Inject constructor(
         return Observable.just("")
             .observeOn(Schedulers.io())
             .flatMap {
-            cafenomadApiService.searchCafes(city)
-                .doOnNext {list->
-                    insertToDB(list,city)
-                }
-        }.flatMap {
+                cafenomadApiService.searchCafes(city)
+                    .doOnNext {list->
+                        insertToDB(list,city)
+                    }
+            }.flatMap {
                 queryFromDB(city)
-        }
+            }
+    }
+
+    private fun queryFromApiV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
+        return Observable.just("")
+            .observeOn(Schedulers.io())
+            .flatMap {
+                cafenomadApiService.searchAllCafes()
+                    .doOnNext {list->
+                        insertToDBV2(list)
+                    }
+            }.flatMap {
+                queryFromDBV2(latitude, longitude, range)
+            }
     }
 
     fun insertFavorite(cafeId:String):Long{
