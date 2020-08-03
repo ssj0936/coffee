@@ -2,10 +2,10 @@ package com.timothy.coffee.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
+import com.google.android.gms.maps.model.LatLng
 import com.timothy.coffee.R
 
 import com.timothy.coffee.data.DataModel
@@ -13,15 +13,12 @@ import com.timothy.coffee.data.DataSource
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.data.model.Locationiq
-import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.Utils
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
-import java.util.*
-import java.util.function.Consumer
 import java.util.stream.Collectors
 import javax.inject.Inject
 
@@ -30,7 +27,7 @@ class MainViewModel @Inject constructor(
     private val dataSource: DataSource
 ): ViewModel(){
 
-    var loc : MutableLiveData<LonAndLat> = MutableLiveData()
+    var loc : MutableLiveData<LatLng> = MutableLiveData()
     val chosenCafe: MutableLiveData<CafenomadDisplay> = MutableLiveData()
     val cafeList:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
     var lastMove = Movement(isClickMap = false, isClickList = false)
@@ -62,15 +59,13 @@ class MainViewModel @Inject constructor(
                     cityName.postValue(locationiq.address?.state)
                     dataSource.query(locationiq.address!!.state!!)
                 }else{
-                    Timber.d("same city")
+//                    Timber.d("same city")
                     Observable.empty<List<CafenomadDisplay>>()
                 }
             }
             .observeOn(Schedulers.computation())
             .map { cafes ->
-                //                Timber.d("cafes:${cafes}")
                 cafes.stream().forEach {cafe->
-                    //                    Timber.d("cafe:${cafe}")
                     loc.value?.let{
                         cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
                             it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
@@ -134,7 +129,7 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    private fun getLocationObservable(context: Context): Observable<LonAndLat> {
+    private fun getLocationObservable(context: Context): Observable<LatLng> {
 //        Timber.d("get Test Location")
         return dataModel.getLocationObservable(context)
     }

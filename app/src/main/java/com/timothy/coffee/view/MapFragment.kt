@@ -3,7 +3,6 @@ package com.timothy.coffee.view
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.os.Bundle
 import android.util.TypedValue
@@ -21,12 +20,10 @@ import com.google.android.gms.maps.model.*
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
 import com.timothy.coffee.data.model.CafenomadDisplay
-import com.timothy.coffee.util.LonAndLat
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_map.*
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -87,7 +84,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         enableMyLocation()
 
         mMainViewModel.loc.observe(viewLifecycleOwner,
-            Observer<LonAndLat>{
+            Observer<LatLng>{
                 moveCamera()
                 mMainViewModel.loc.removeObservers(viewLifecycleOwner)
             })

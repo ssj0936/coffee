@@ -9,11 +9,11 @@ import android.os.Bundle
 import android.os.Looper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.timothy.coffee.api.CafenomadApiService
 import com.timothy.coffee.api.LocationiqApiService
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
-import com.timothy.coffee.util.LonAndLat
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import timber.log.Timber
@@ -34,16 +34,15 @@ class DataModel
         return fusedLocationClient
     }
 
-    private fun getLastKnownLocation(context: Context):Observable<LonAndLat>{
-        return Maybe.create<LonAndLat> { emitter ->
+    private fun getLastKnownLocation(context: Context):Observable<LatLng>{
+        return Maybe.create<LatLng> { emitter ->
             getFusedLocationClient(context).lastLocation
                 .addOnSuccessListener {
 //                    Timber.d("getLastKnownLocation success")
                     if(it!=null){
-                        emitter.onSuccess(LonAndLat(
-                            it.longitude,
-                            it.latitude
-                        ))
+                        emitter.onSuccess(LatLng(
+                            it.latitude,it.longitude)
+                        )
                     }else{
                         Timber.d("get location null")
                         emitter.onComplete()
@@ -58,7 +57,7 @@ class DataModel
     }
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocation(context: Context): Observable<LonAndLat> {
+    private fun getCurrentLocation(context: Context): Observable<LatLng> {
         return Observable.create { emitter ->
             // Acquire a reference to the system Location Manager
             val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -68,10 +67,7 @@ class DataModel
                 override fun onLocationChanged(location: Location) {
 //                    Timber.d( "${location.longitude},${location.latitude}")
                     emitter.onNext(
-                        LonAndLat(
-                            location.longitude,
-                            location.latitude
-                        )
+                        LatLng(location.latitude,location.longitude)
                     )
                     emitter.onComplete()
                 }
@@ -90,21 +86,20 @@ class DataModel
         }
     }
 
-    private val testLonLat = listOf(LonAndLat(121.525,25.0392),//Taipei
-        LonAndLat(120.675679,24.123206)//TaiChung
-//        LonAndLat(120.4605903,22.6924778)
+    private val testLonLat = listOf(LatLng(25.0392,121.525),//Taipei
+        LatLng(24.123206,120.675679)//TaiChung
         )
 
     //get last location first and show it
     //then fetch current location
-    fun getLocationObservable(context: Context):Observable<LonAndLat>{
+    fun getLocationObservable(context: Context):Observable<LatLng>{
         return Observable.concatArray(
             getLastKnownLocation(context)
 //            getCurrentLocation(context)
         )
     }
 
-    fun getLocationObservableTest(context: Context): Observable<LonAndLat> {
+    fun getLocationObservableTest(context: Context): Observable<LatLng> {
 //        return Observable.interval(5, TimeUnit.SECONDS)
 //            .flatMap {
 //                Timber.d(""+testLonLat[it.toInt() % testLonLat.size].toString())
