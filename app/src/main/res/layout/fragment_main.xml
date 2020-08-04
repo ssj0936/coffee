@@ -34,7 +34,7 @@
                 app:behavior_expandable = "false"
                 android:elevation="3dp"
                 android:background="@color/gray_bg"
-                android:visibility="@{viewmodel.cafeList!=null ? View.VISIBLE : View.INVISIBLE}"
+                android:visibility="@{viewmodel.cafeListDisplay!=null ? View.VISIBLE : View.INVISIBLE}"
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -54,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="@{viewmodel.cafeList==null ? View.VISIBLE : View.INVISIBLE}"
+            android:visibility="@{viewmodel.cafeListDisplay==null ? View.VISIBLE : View.INVISIBLE}"
             style="?android:attr/progressBarStyle"
             />
 

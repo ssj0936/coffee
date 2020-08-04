@@ -14,14 +14,11 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.OvershootInterpolator
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.preference.Preference
 import androidx.preference.PreferenceManager
-import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapter
@@ -32,12 +29,12 @@ import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
+import java.util.stream.Collectors
 import javax.inject.Inject
 
 
@@ -293,6 +290,7 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
         )
     }
 
+    @SuppressLint("ResourceType")
     private fun queryCafeList(force:Boolean):Disposable{
         return mMainViewModel.getCafeList(requireContext(),force)
             .subscribeOn(Schedulers.io())
@@ -300,18 +298,31 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             .subscribe({
 
                 //play animation first time
-                if(mMainViewModel.cafeList.value == null) {
+                if(mMainViewModel.cafeListAll.value == null) {
                     val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.translate)
                     anim.interpolator = OvershootInterpolator()
                     viewpager.startAnimation(anim)
                 }
 
                 //update cafe list
-                if(mMainViewModel.cafeList.value == null) {
-                    mMainViewModel.cafeList.postValue(it)
-                }else if(mMainViewModel.cafeList.value != it){
-                    mMainViewModel.cafeList.postValue(it)
+                if(mMainViewModel.cafeListAll.value == null || mMainViewModel.cafeListAll.value != it) {
+                    mMainViewModel.cafeListAll.postValue(it)
                 }
+
+                //update cafelist for display
+                mMainViewModel.cafeListDisplay.postValue(
+                    it.stream()
+                        .filter { cafe ->
+                            val range = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                .getInt(
+                                    getString(R.string.preference_key_search_range)
+                                    , resources.getInteger(R.dimen.range_cafe_nearby_min)
+                                ) * 1000
+                            cafe.cafenomad.distance < range
+                        }.collect(Collectors.toList())
+                )
+
+
 
                 //for favorite showing
                 //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
@@ -370,12 +381,23 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             .unregisterOnSharedPreferenceChangeListener(this)
     }
 
+    @SuppressLint("ResourceType")
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         when(key){
             getString(R.string.preference_key_search_range)->{
-                //get Cafe info when network available && permission granted
-                if(Utils.isNetworkAvailable(requireContext()) && isPermissionGranted()) {
-                    requestCafe(true)
+                //update cafelist for display
+                mMainViewModel.cafeListAll.value?.let {
+                    mMainViewModel.cafeListDisplay.postValue(
+                        it.stream()
+                            .filter { cafe ->
+                                val range = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                    .getInt(
+                                        getString(R.string.preference_key_search_range)
+                                        , resources.getInteger(R.dimen.range_cafe_nearby_min)
+                                    ) * 1000
+                                cafe.cafenomad.distance < range
+                            }.collect(Collectors.toList())
+                    )
                 }
             }
         }

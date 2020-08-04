@@ -26,7 +26,7 @@
             app:layoutManager="LinearLayoutManager"
             tools:listitem="@layout/cafe_recyclerview_item_layout"
             android:background="@color/background_color"
-            android:visibility="@{viewmodel.cafeList.size()==0 ? View.GONE : View.VISIBLE}"/>
+            android:visibility="@{viewmodel.cafeListDisplay.size()==0 ? View.GONE : View.VISIBLE}"/>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/no_data_block"
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/common_context_padding"
                 android:paddingEnd="@dimen/common_context_padding"
-                android:visibility="@{viewmodel.cafeList.size()==0 ? View.VISIBLE : View.GONE}">
+                android:visibility="@{viewmodel.cafeListDisplay.size()==0 ? View.VISIBLE : View.GONE}">
                 <LinearLayout
                     android:id="@+id/container"
                     android:layout_width="match_parent"

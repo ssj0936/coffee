@@ -19,7 +19,6 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_cafe_list.*
-import timber.log.Timber
 import javax.inject.Inject
 
 class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClickListener{
@@ -71,7 +70,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         val anchorOffset = resources.getDimensionPixelOffset(R.dimen.bottom_sheet_anchor_offset)
         view.setPadding(0, 0, 0, anchorOffset)
 
-        mMainViewModel.cafeList.observe(viewLifecycleOwner,
+        mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>>{
                 adapter = CafeAdapter(it,this)
                 recyclerViewCafeList.swapAdapter(

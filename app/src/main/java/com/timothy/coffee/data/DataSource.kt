@@ -39,18 +39,14 @@ class DataSource @Inject constructor(
                 cafeDao.getRowNum().toObservable()
             }.flatMap {
                 if(it<=0){
-//                    Timber.d("no data in DB")
                     cafenomadApiService.searchAllCafes()
                         .doOnNext {list->
-//                            Timber.d("insert into DB:${list}")
                             insertToDBV2(list)
                         }
                 }else{
-//                    Timber.d("Data in DB already")
                     Observable.just(emptyList())
                 }
             }.flatMap {
-//                Timber.d("fetch from DB")
                 queryFromDBV2(latitude, longitude, range)
             }
             .subscribeOn(Schedulers.io())
@@ -79,8 +75,6 @@ class DataSource @Inject constructor(
     }
 
     private fun queryFromDBV2Convert(latitude:Double, longitude:Double, range:Int):Single<List<CafenomadDisplay>>{
-        Timber.d("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where latitude BETWEEN ${latitude+0.01*range} AND ${latitude-0.01*range} AND longitude BETWEEN ${longitude+0.01*range} AND ${longitude-0.01*range}) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId")
-
         return cafeDao.queryCafeByCoordinateV2(latitude+0.01*range,latitude-0.01*range,
             longitude+0.01*range,longitude-0.01*range)
     }

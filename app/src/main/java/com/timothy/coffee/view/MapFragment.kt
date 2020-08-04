@@ -89,7 +89,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 mMainViewModel.loc.removeObservers(viewLifecycleOwner)
             })
 
-        mMainViewModel.cafeList.observe(viewLifecycleOwner,
+        mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>> { cafes ->
                 mMap?.let{
                     //remove all markers first
