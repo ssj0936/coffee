@@ -10,8 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.timothy.coffee.R
 import timber.log.Timber
+import kotlin.math.roundToInt
 
-class CafeListDecoration(
+class VerticalRecyclerviewDecoration(
     mContext: Context,
     orientation:Int
 ): RecyclerView.ItemDecoration() {
@@ -23,6 +24,7 @@ class CafeListDecoration(
     private var mDivider: Drawable
     private var isDrawFirstDivider: Boolean = true
     private var isDrawLastDivider: Boolean = true
+    private val mBounds = Rect()
 
     constructor(mContext: Context,
                 orientation:Int,
@@ -52,17 +54,26 @@ class CafeListDecoration(
     }
 
     private fun drawHorizontal(c: Canvas, parent: RecyclerView){
-        val left = parent.paddingLeft
-        val right = parent.run { width - paddingRight }
+        var left:Int
+        var right:Int
+
+        if (parent.clipToPadding) {
+            left = parent.paddingLeft
+            right = parent.width - parent.paddingRight
+            c.clipRect(left, parent.paddingTop, right,
+                parent.height - parent.paddingBottom)
+        } else {
+            left = 0
+            right = parent.width
+        }
+
         val childCount = parent.childCount
 //        Timber.d("childCount:$childCount")
-        for(index in (if(isDrawFirstDivider)0 else 1) until childCount){
+        for(index in 0 until if(isDrawLastDivider) childCount else childCount-1){
             val child = parent.getChildAt(index)
-            val param = child.layoutParams as RecyclerView.LayoutParams
-
-            val top = child.top - param.topMargin
-            val bottom = top + mDivider.intrinsicHeight
-
+            parent.getDecoratedBoundsWithMargins(child, mBounds)
+            val bottom = mBounds.bottom + child.translationY.roundToInt()
+            val top = bottom - mDivider.intrinsicHeight
             mDivider.setBounds(left,top, right, bottom)
             mDivider.draw(c)
         }
