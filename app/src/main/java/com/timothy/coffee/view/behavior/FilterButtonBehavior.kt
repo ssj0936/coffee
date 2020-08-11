@@ -1,9 +1,10 @@
-package com.timothy.coffee.view
+package com.timothy.coffee.view.behavior
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.marginStart
 import androidx.viewpager.widget.ViewPager
 import com.timothy.coffee.R
 
@@ -29,6 +30,7 @@ class FilterButtonBehavior: CoordinatorLayout.Behavior<View>{
         child: View,
         dependency: View
     ): Boolean {
+
         child.x = dependency.x
         child.y = dependency.y - child.height
         return true

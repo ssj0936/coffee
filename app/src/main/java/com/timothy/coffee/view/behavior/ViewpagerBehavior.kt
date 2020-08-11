@@ -1,4 +1,4 @@
-package com.timothy.coffee.view
+package com.timothy.coffee.view.behavior
 
 import android.content.Context
 import android.util.AttributeSet

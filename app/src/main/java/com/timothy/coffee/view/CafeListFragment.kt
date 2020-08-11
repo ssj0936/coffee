@@ -14,7 +14,7 @@ import com.timothy.coffee.R
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentCafeListBinding
 import com.timothy.coffee.ui.CafeAdapter
-import com.timothy.coffee.ui.CafeListDecoration
+import com.timothy.coffee.ui.VerticalRecyclerviewDecoration
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
@@ -61,7 +61,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
         super.onViewCreated(view, savedInstanceState)
         recyclerViewCafeList.adapter = adapter
         recyclerViewCafeList.addItemDecoration(
-            CafeListDecoration(requireContext(),
+            VerticalRecyclerviewDecoration(requireContext(),
                 LinearLayoutManager.VERTICAL,
                 isDrawLastDivider = false,
                 isDrawFirstDivider = false)

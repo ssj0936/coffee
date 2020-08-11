@@ -32,6 +32,10 @@ class MainViewModel @Inject constructor(
     val cafeListAll:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
     val cafeListDisplay:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
 
+    val favoriteOnly:MutableLiveData<Boolean> = MutableLiveData(false)
+    val sortType:MutableLiveData<String> = MutableLiveData()
+    var lastSortType:String? = null
+
     var lastMove = Movement(isClickMap = false, isClickList = false)
 
     private var cityName: MutableLiveData<String> = MutableLiveData()
@@ -69,9 +73,6 @@ class MainViewModel @Inject constructor(
                 cafes.stream()
                     .filter{cafe->
                         val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)*1000
-//                        val range = PreferenceManager.getDefaultSharedPreferences(context)
-//                            .getInt(context.getString(R.string.preference_key_search_range)
-//                                ,context.resources.getInteger(R.dimen.range_cafe_nearby_min))*1000
                         cafe.cafenomad.distance < range
                     }
                     .sorted{
@@ -95,6 +96,68 @@ class MainViewModel @Inject constructor(
 //        Timber.d("get Cafenomad")
         return dataModel.getCafenomadObservable(city)
     }
+
+    @SuppressLint("ResourceType")
+    fun setCafeDataFavoriteOnly(favoriteOnly:Boolean, context: Context){
+        if(cafeListAll.value == null) return
+
+        cafeListDisplay.value = cafeListAll.value?.let {
+            it.stream()
+                .filter { cafe ->
+                    val range = PreferenceManager.getDefaultSharedPreferences(context)
+                        .getInt(
+                            context.getString(R.string.preference_key_search_range)
+                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
+                        ) * 1000
+
+                    (cafe.cafenomad.distance < range) && (if(favoriteOnly) cafe.isFavorite else true)
+                }.collect(Collectors.toList())
+        }
+    }
+
+    @SuppressLint("ResourceType")
+    fun setCafeViaSortType(type:String, context: Context){
+        if(cafeListAll.value == null || type == lastSortType) return
+        Timber.d("SORT TYPE:${type}")
+
+        cafeListDisplay.value = cafeListAll.value?.let {
+            it.stream()
+                .filter { cafe ->
+                    val range = PreferenceManager.getDefaultSharedPreferences(context)
+                        .getInt(
+                            context.getString(R.string.preference_key_search_range)
+                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
+                        ) * 1000
+
+                    val isSetFavoriteOnly = type == context.resources.getString(R.string.filter_label_favorite_only)
+                    (cafe.cafenomad.distance < range) && (if(isSetFavoriteOnly) cafe.isFavorite else true)
+                }.sorted{cafe1,cafe2 ->
+                    when(type){
+                        context.resources.getString(R.string.filter_label_distance_farthest) ->{
+                                cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)*-1
+                        }
+                        context.resources.getString(R.string.filter_label_star) ->{
+                                cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
+                        }
+                        else -> cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                    }
+                }.collect(Collectors.toList())
+        }
+        lastSortType = type
+//        cafeListDisplay.value = cafeListAll.value?.let {
+//            it.stream()
+//                .filter { cafe ->
+//                    val range = PreferenceManager.getDefaultSharedPreferences(context)
+//                        .getInt(
+//                            context.getString(R.string.preference_key_search_range)
+//                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
+//                        ) * 1000
+//
+//                    (cafe.cafenomad.distance < range) && (if(favoriteOnly) cafe.isFavorite else true)
+//                }.collect(Collectors.toList())
+//        }
+    }
+
 
     @SuppressLint("CheckResult")
     fun setFavorite(cafeId:String){

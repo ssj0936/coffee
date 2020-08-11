@@ -24,6 +24,7 @@ import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapter
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.view.MapFragment
+import com.timothy.coffee.view.SortDialogFragment
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
@@ -94,8 +95,14 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             }
         )
 
+        mMainViewModel.sortType.observe(viewLifecycleOwner,
+            Observer<String>{
+                mMainViewModel.setCafeViaSortType(it,requireContext())
+            })
+
         // setting button
         binding.settingBtn.setOnClickListener(this)
+        binding.sortBtn.setOnClickListener(this)
 
         //check network
         if(!Utils.isNetworkAvailable(requireContext()))
@@ -322,8 +329,6 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                         }.collect(Collectors.toList())
                 )
 
-
-
                 //for favorite showing
                 //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
                 //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
@@ -359,10 +364,19 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
         requestPermissions(Utils.needPermissions, RESULT_PERMISSION_LOCATION)
     }
 
+    private fun showFilterDialog(){
+        requireActivity().supportFragmentManager?.let{
+            SortDialogFragment().show(it,"")
+        }
+    }
+
     override fun onClick(v: View) {
         when(v){
             setting_btn ->{
                 (requireActivity() as? MainActivity)?.switchToSettingPreference()
+            }
+            sort_btn->{
+                showFilterDialog()
             }
         }
     }

@@ -5,6 +5,7 @@ import com.timothy.coffee.view.CafeInfoFragment
 import com.timothy.coffee.view.CafeListFragment
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.view.MapFragment
+import com.timothy.coffee.view.SortDialogFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -24,5 +25,8 @@ abstract class BuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeMapFragment(): MapFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeSortDialogFragment(): SortDialogFragment
 
 }

@@ -56,4 +56,35 @@
 
     <string name="cafe_not_found_text">No cafe nearby</string>
     <string name="cafe_not_found_subtext">Maybe you can walk around or set larger searching range</string>
+
+    <string name="toggle_false">ALL</string>
+    <string name="toggle_true">FAVORITE ONLY</string>
+
+    <string name="filter_text_all">All (Distance)</string>
+    <string name="filter_text_favorite_only">Show favorite only</string>
+    <string name="filter_text_distance_nearest">Distance (Nearest first)</string>
+    <string name="filter_text_distance_farthest">Distance (Farthest first)</string>
+    <string name="filter_text_star">Star rating</string>
+
+    <string-array name="sort_item_display">
+        <item>@string/filter_text_all</item>
+        <item>@string/filter_text_favorite_only</item>
+        <item>@string/filter_text_distance_nearest</item>
+        <item>@string/filter_text_distance_farthest</item>
+        <item>@string/filter_text_star</item>
+    </string-array>
+
+    <string name="filter_label_all" translatable="false">FILTER_ALL</string>
+    <string name="filter_label_favorite_only" translatable="false">FILTER_FAVORITE_ONLY</string>
+    <string name="filter_label_distance_nearest" translatable="false">FILTER_DISTANCE_NEAREST</string>
+    <string name="filter_label_distance_farthest" translatable="false">FILTER_DISTANCE_FARTHEST</string>
+    <string name="filter_label_star" translatable="false">FILTER_STAR</string>
+
+    <string-array name="sort_item">
+        <item>@string/filter_label_all</item>
+        <item>@string/filter_label_favorite_only</item>
+        <item>@string/filter_label_distance_nearest</item>
+        <item>@string/filter_label_distance_farthest</item>
+        <item>@string/filter_label_star</item>
+    </string-array>
 </resources>
