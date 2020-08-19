@@ -44,7 +44,7 @@
                 app:behavior_defaultState="collapsed"
                 app:behavior_expandable = "false"
                 android:elevation="3dp"
-                android:background="@color/gray_bg"
+                android:background="@color/background_color"
                 android:visibility="@{viewmodel.cafeListDisplay!=null ? View.VISIBLE : View.INVISIBLE}"
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

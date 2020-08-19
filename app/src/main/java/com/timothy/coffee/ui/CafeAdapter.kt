@@ -2,14 +2,16 @@ package com.timothy.coffee.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.CafeRecyclerviewItemLayoutBinding
 import timber.log.Timber
 
 class CafeAdapter(
-    private val cafes:List<CafenomadDisplay>,
+    private var cafes:List<CafenomadDisplay>,
     private val listener:OnCafeAdapterClickListener
 ): RecyclerView.Adapter<CafeAdapter.ViewHolder>(){
 
@@ -38,8 +40,18 @@ class CafeAdapter(
         holder.bind(cafeDisplay)
 
         holder.binding.root.setOnClickListener{
-            listener.onItemClick(cafeDisplay)
+            // bind在item上的是copy
+            // 防止item上的東西改變後，因為是pass by reference，進而改變cafes這個list，Diffutil判別不出來前後的差別
+            listener.onItemClick(cafeDisplay.copy())
         }
+    }
+
+    fun swap(newCafeList: List<CafenomadDisplay>){
+        val diffCallback = CafeListDiffCallback(newCafeList,this.cafes)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
+        this.cafes = newCafeList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     interface OnCafeAdapterClickListener{

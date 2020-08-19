@@ -1,6 +1,7 @@
 package com.timothy.coffee.viewmodel
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,13 +33,9 @@ class MainViewModel @Inject constructor(
     val cafeListAll:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
     val cafeListDisplay:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
 
-    val favoriteOnly:MutableLiveData<Boolean> = MutableLiveData(false)
     val sortType:MutableLiveData<String> = MutableLiveData()
     var lastSortType:String? = null
-
     var lastMove = Movement(isClickMap = false, isClickList = false)
-
-    private var cityName: MutableLiveData<String> = MutableLiveData()
 
     @SuppressLint("ResourceType")
     fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
@@ -63,6 +60,7 @@ class MainViewModel @Inject constructor(
             .map { cafes ->
 //                Timber.d("cafes:${cafes}")
 
+                //distance assignment
                 cafes.stream().forEach {cafe->
                     loc.value?.let{
                         cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
@@ -71,12 +69,14 @@ class MainViewModel @Inject constructor(
                 }
 
                 cafes.stream()
+                    //double filtering cafe out of range
                     .filter{cafe->
                         val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)*1000
                         cafe.cafenomad.distance < range
                     }
+                    //sort by distance from nearest to farest
                     .sorted{
-                            cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                        cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
                     }
                     .collect(Collectors.toList())
             }
@@ -98,69 +98,57 @@ class MainViewModel @Inject constructor(
     }
 
     @SuppressLint("ResourceType")
-    fun setCafeDataFavoriteOnly(favoriteOnly:Boolean, context: Context){
-        if(cafeListAll.value == null) return
-
-        cafeListDisplay.value = cafeListAll.value?.let {
-            it.stream()
-                .filter { cafe ->
-                    val range = PreferenceManager.getDefaultSharedPreferences(context)
-                        .getInt(
-                            context.getString(R.string.preference_key_search_range)
-                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
-                        ) * 1000
-
-                    (cafe.cafenomad.distance < range) && (if(favoriteOnly) cafe.isFavorite else true)
-                }.collect(Collectors.toList())
-        }
-    }
-
-    @SuppressLint("ResourceType")
     fun setCafeViaSortType(type:String, context: Context){
         if(cafeListAll.value == null || type == lastSortType) return
         Timber.d("SORT TYPE:${type}")
 
         cafeListDisplay.value = cafeListAll.value?.let {
-            it.stream()
-                .filter { cafe ->
-                    val range = PreferenceManager.getDefaultSharedPreferences(context)
-                        .getInt(
-                            context.getString(R.string.preference_key_search_range)
-                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
-                        ) * 1000
-
-                    val isSetFavoriteOnly = type == context.resources.getString(R.string.filter_label_favorite_only)
-                    (cafe.cafenomad.distance < range) && (if(isSetFavoriteOnly) cafe.isFavorite else true)
-                }.sorted{cafe1,cafe2 ->
-                    when(type){
-                        context.resources.getString(R.string.filter_label_distance_farthest) ->{
-                                cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)*-1
-                        }
-                        context.resources.getString(R.string.filter_label_star) ->{
-                                cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
-                        }
-                        else -> cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
-                    }
-                }.collect(Collectors.toList())
+//            Timber.d("Original:${it}")
+            val newOne = getSortedCafeList(it,type,context)
+//            Timber.d("newOne:${newOne}")
+            newOne
         }
         lastSortType = type
-//        cafeListDisplay.value = cafeListAll.value?.let {
-//            it.stream()
-//                .filter { cafe ->
-//                    val range = PreferenceManager.getDefaultSharedPreferences(context)
-//                        .getInt(
-//                            context.getString(R.string.preference_key_search_range)
-//                            , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
-//                        ) * 1000
-//
-//                    (cafe.cafenomad.distance < range) && (if(favoriteOnly) cafe.isFavorite else true)
-//                }.collect(Collectors.toList())
-//        }
     }
 
+    @SuppressLint("ResourceType")
+    fun getSortedCafeList(list:List<CafenomadDisplay>, type:String, context: Context):List<CafenomadDisplay> {
+        return list.stream()
+            .filter { cafe ->
+                val range = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getInt(
+                        context.getString(R.string.preference_key_search_range)
+                        , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
+                    ) * 1000
+
+                val isSetFavoriteOnly = (type == context.resources.getString(R.string.filter_label_favorite_only))
+                (cafe.cafenomad.distance < range) && (if(isSetFavoriteOnly) cafe.isFavorite else true)
+            }.sorted{cafe1,cafe2 ->
+                when(type){
+                    context.resources.getString(R.string.filter_label_distance_farthest) ->{
+                        if(cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance) != 0)
+                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)*-1
+                        else
+                            cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
+                    }
+                    context.resources.getString(R.string.filter_label_star) ->{
+                        if(cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel) != 0)
+                            cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
+                        else
+                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                    }
+                    else -> {
+                        if(cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance) !=0)
+                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                        else
+                            cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
+                    }
+                }
+            }.collect(Collectors.toList())
+    }
 
     @SuppressLint("CheckResult")
-    fun setFavorite(cafeId:String){
+    fun setFavorite(cafeId:String, context: Context){
         Single.just(cafeId)
             .observeOn(Schedulers.io())
             .subscribe { id ->
@@ -173,7 +161,7 @@ class MainViewModel @Inject constructor(
 
                         if(updatedItem != null){
                             updatedItem.isFavorite = true
-                            cafeListAll.postValue(cafeListAll.value)
+                            cafeListAll.postValue(it)
                         }
                     }
 
@@ -185,7 +173,12 @@ class MainViewModel @Inject constructor(
 
                         if(updatedItem != null){
                             updatedItem.isFavorite = true
-                            cafeListDisplay.postValue(cafeListDisplay.value)
+
+                            // 更改完內容後，依據目前的display type決定是否需要做刪減
+                            if(lastSortType!=null)
+                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+                            else
+                                cafeListDisplay.postValue(it)
                         }
                     }
 
@@ -193,15 +186,15 @@ class MainViewModel @Inject constructor(
                     if(id == chosenCafe.value?.cafenomad?.id){
                         chosenCafe.value?.let {
                             it.isFavorite = true
+                            chosenCafe.postValue(it)
                         }
-                        chosenCafe.postValue(chosenCafe.value)
                     }
                 }
             }
     }
 
     @SuppressLint("CheckResult")
-    fun deleteFavorite(cafeId:String){
+    fun deleteFavorite(cafeId:String, context: Context){
         Single.just(cafeId)
             .observeOn(Schedulers.io())
             .subscribe { id ->
@@ -214,7 +207,7 @@ class MainViewModel @Inject constructor(
 
                         if(updatedItem != null){
                             updatedItem.isFavorite = false
-                            cafeListAll.postValue(cafeListAll.value)
+                            cafeListAll.postValue(it)
                         }
                     }
 
@@ -226,7 +219,12 @@ class MainViewModel @Inject constructor(
 
                         if(updatedItem != null){
                             updatedItem.isFavorite = false
-                            cafeListDisplay.postValue(cafeListDisplay.value)
+
+                            // 更改完內容後，依據目前的display type決定是否需要做刪減
+                            if(lastSortType!=null)
+                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+                            else
+                                cafeListDisplay.postValue(it)
                         }
                     }
 
@@ -234,8 +232,8 @@ class MainViewModel @Inject constructor(
                     if(id == chosenCafe.value?.cafenomad?.id){
                         chosenCafe.value?.let {
                             it.isFavorite = false
+                            chosenCafe.postValue(it)
                         }
-                        chosenCafe.postValue(chosenCafe.value)
                     }
                 }
             }

@@ -317,16 +317,32 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                 }
 
                 //update cafelist for display
+                if(mMainViewModel.cafeListDisplay.value == null) {
+                    mMainViewModel.cafeListDisplay.postValue(
+                        it.stream()
+                            .filter { cafe ->
+                                val range =
+                                    PreferenceManager.getDefaultSharedPreferences(requireContext())
+                                        .getInt(
+                                            getString(R.string.preference_key_search_range)
+                                            , resources.getInteger(R.dimen.range_cafe_nearby_min)
+                                        ) * 1000
+                                cafe.cafenomad.distance < range
+                            }.collect(Collectors.toList())
+                    )
+                }
+
+                //update cafelist for display
                 mMainViewModel.cafeListDisplay.postValue(
-                    it.stream()
-                        .filter { cafe ->
-                            val range = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                                .getInt(
-                                    getString(R.string.preference_key_search_range)
-                                    , resources.getInteger(R.dimen.range_cafe_nearby_min)
-                                ) * 1000
-                            cafe.cafenomad.distance < range
-                        }.collect(Collectors.toList())
+                    if(mMainViewModel.sortType.value == null){
+                        mMainViewModel.getSortedCafeList(
+                            it,getString(R.string.filter_label_all),requireContext()
+                        )
+                    }else{
+                        mMainViewModel.getSortedCafeList(
+                            mMainViewModel.cafeListDisplay.value ?: it, mMainViewModel.sortType.value!!, requireContext()
+                        )
+                    }
                 )
 
                 //for favorite showing
@@ -416,4 +432,17 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
             }
         }
     }
+
+    fun listsEqual(list1: List<Any>, list2: List<Any>): Boolean {
+
+        if (list1.size != list2.size)
+            return false
+
+        val pairList = list1.zip(list2)
+
+        return pairList.all { (elt1, elt2) ->
+            elt1 == elt2
+        }
+    }
+
 }

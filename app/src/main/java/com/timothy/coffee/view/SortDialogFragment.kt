@@ -78,7 +78,6 @@ class SortDialogFragment: DialogFragment(){
     class SortingListAdapter(
         private val mSortTypeDisplay:List<String>,
         private val mSortType:List<String>
-//        private val mListener:OnSortItemSelectListener
 
     ): RecyclerView.Adapter<SortingListAdapter.ViewHolder>() {
 

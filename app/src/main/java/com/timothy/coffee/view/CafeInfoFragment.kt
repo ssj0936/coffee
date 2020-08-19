@@ -148,9 +148,9 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
             binding.favoriteBtn -> {
                 mMainViewModel.chosenCafe.value?.let {
                     if (it.isFavorite)
-                        mMainViewModel.deleteFavorite(it.cafenomad.id)
+                        mMainViewModel.deleteFavorite(it.cafenomad.id,requireContext())
                      else
-                        mMainViewModel.setFavorite(it.cafenomad.id)
+                        mMainViewModel.setFavorite(it.cafenomad.id,requireContext())
                 }
             }
         }
