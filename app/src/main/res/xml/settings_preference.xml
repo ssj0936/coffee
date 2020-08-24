@@ -21,4 +21,14 @@
             />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:key="@string/preference_category_key_refetch_data"
+        app:title="@string/preference_category_title_refetch_data"
+        app:iconSpaceReserved="false">
+        <Preference android:title="@string/preference_title_refetch_data"
+            android:key="@string/preference_key_refetch_data"
+            app:iconSpaceReserved="false"/>
+    </PreferenceCategory>
+
+
 </PreferenceScreen>

@@ -36,6 +36,7 @@ class MainViewModel @Inject constructor(
     val sortType:MutableLiveData<String> = MutableLiveData()
     var lastSortType:String? = null
     var lastMove = Movement(isClickMap = false, isClickList = false)
+    var isDataFetching = false
 
     @SuppressLint("ResourceType")
     fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
@@ -82,6 +83,40 @@ class MainViewModel @Inject constructor(
             }
     }
 
+    @SuppressLint("ResourceType")
+    fun refetchCafeData(context: Context):Observable<List<CafenomadDisplay>>{
+        val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
+        if(loc.value != null) {
+            return dataSource.queryV2(loc.value!!.latitude, loc.value!!.longitude, range, true)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .map{cafes ->
+                    //distance assignment
+                    cafes.stream().forEach {cafe->
+                        loc.value?.let{
+                            cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
+                                it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
+                        }
+                    }
+
+                    cafes.stream()
+                        //double filtering cafe out of range
+                        .filter{cafe->
+                            val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)*1000
+                            cafe.cafenomad.distance < range
+                        }
+                        //sort by distance from nearest to farest
+                        .sorted{
+                                cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                        }
+                        .collect(Collectors.toList())
+                }
+        }else{
+            return Observable.empty<List<CafenomadDisplay>>()
+        }
+    }
+
+
     private fun getLocationObservable(context: Context): Observable<LatLng> {
 //        Timber.d("get Test Location")
         return dataModel.getLocationObservable(context)
@@ -109,6 +144,38 @@ class MainViewModel @Inject constructor(
             newOne
         }
         lastSortType = type
+    }
+
+    fun updateLocalCafeData(list: List<CafenomadDisplay>, context: Context){
+        //update cafe list
+        if(cafeListAll.value == null || cafeListAll.value != list) {
+            cafeListAll.postValue(list)
+        }
+
+        //update cafelist for display
+        cafeListDisplay.postValue(
+            getSortedCafeList(
+                list,
+                sortType.value ?: context.getString(R.string.filter_label_all),
+                context
+            )
+        )
+
+        //for favorite showing
+        //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
+        //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
+        val currentCafe = chosenCafe.value
+        if(currentCafe != null){
+            val newCafe = list.let { cafelist ->
+                cafelist.stream()
+                    .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
+                    .findAny()
+                    .orElse(null)
+            }
+
+            if(currentCafe != newCafe)
+                chosenCafe.postValue(newCafe)
+        }
     }
 
     @SuppressLint("ResourceType")

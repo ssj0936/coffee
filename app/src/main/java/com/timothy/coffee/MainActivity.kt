@@ -25,22 +25,9 @@ class MainActivity: AppCompatActivity(), HasAndroidInjector {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        initFragment()
         switchToMainFragment()
 
         supportActionBar?.setShowHideAnimationEnabled(true)
-    }
-
-    private fun initFragment(){
-        supportActionBar?.hide()
-
-
-        supportFragmentManager.beginTransaction()
-            .add(R.id.container,SettingsPreferenceFragment.getInstance(),SettingsPreferenceFragment.TAG)
-            .hide(SettingsPreferenceFragment.getInstance())
-            .add(R.id.container,MainFragment.getInstance(), MainFragment.TAG)
-            .show(MainFragment.getInstance())
-            .commit()
     }
 
     private fun switchFragment(fragment:Fragment, tag:String){
@@ -76,7 +63,7 @@ class MainActivity: AppCompatActivity(), HasAndroidInjector {
         switchFragment(SettingsPreferenceFragment.getInstance(),SettingsPreferenceFragment.TAG)
     }
 
-    fun switchToMainFragment(){
+    private fun switchToMainFragment(){
         switchFragment(MainFragment.getInstance(), MainFragment.TAG)
     }
 

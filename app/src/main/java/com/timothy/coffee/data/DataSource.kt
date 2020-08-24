@@ -32,13 +32,17 @@ class DataSource @Inject constructor(
             .subscribeOn(Schedulers.io())
     }
 
-    @SuppressLint("CheckResult")
     fun queryV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
+        return queryV2(latitude, longitude, range, false)
+    }
+
+    @SuppressLint("CheckResult")
+    fun queryV2(latitude:Double, longitude:Double, range:Int, isForce:Boolean):Observable<List<CafenomadDisplay>>{
         return Observable.just("")
             .flatMap {
                 cafeDao.getRowNum().toObservable()
             }.flatMap {
-                if(it<=0){
+                if(it<=0 || isForce){
                     cafenomadApiService.searchAllCafes()
                         .doOnNext {list->
                             insertToDBV2(list)

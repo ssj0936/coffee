@@ -1,11 +1,8 @@
 package com.timothy.coffee.di
 
 import com.timothy.coffee.MainActivity
-import com.timothy.coffee.view.CafeInfoFragment
-import com.timothy.coffee.view.CafeListFragment
 import com.timothy.coffee.MainFragment
-import com.timothy.coffee.view.MapFragment
-import com.timothy.coffee.view.SortDialogFragment
+import com.timothy.coffee.view.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -28,5 +25,8 @@ abstract class BuildersModule {
 
     @ContributesAndroidInjector
     abstract fun contributeSortDialogFragment(): SortDialogFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeSettingsPreferenceFragment(): SettingsPreferenceFragment
 
 }

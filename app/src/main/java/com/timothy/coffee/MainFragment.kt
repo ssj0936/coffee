@@ -312,54 +312,8 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                 }
 
                 //update cafe list
-                if(mMainViewModel.cafeListAll.value == null || mMainViewModel.cafeListAll.value != it) {
-                    mMainViewModel.cafeListAll.postValue(it)
-                }
+                mMainViewModel.updateLocalCafeData(it, requireContext())
 
-                //update cafelist for display
-                if(mMainViewModel.cafeListDisplay.value == null) {
-                    mMainViewModel.cafeListDisplay.postValue(
-                        it.stream()
-                            .filter { cafe ->
-                                val range =
-                                    PreferenceManager.getDefaultSharedPreferences(requireContext())
-                                        .getInt(
-                                            getString(R.string.preference_key_search_range)
-                                            , resources.getInteger(R.dimen.range_cafe_nearby_min)
-                                        ) * 1000
-                                cafe.cafenomad.distance < range
-                            }.collect(Collectors.toList())
-                    )
-                }
-
-                //update cafelist for display
-                mMainViewModel.cafeListDisplay.postValue(
-                    if(mMainViewModel.sortType.value == null){
-                        mMainViewModel.getSortedCafeList(
-                            it,getString(R.string.filter_label_all),requireContext()
-                        )
-                    }else{
-                        mMainViewModel.getSortedCafeList(
-                            mMainViewModel.cafeListDisplay.value ?: it, mMainViewModel.sortType.value!!, requireContext()
-                        )
-                    }
-                )
-
-                //for favorite showing
-                //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
-                //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
-                val currentCafe = mMainViewModel.chosenCafe.value
-                if(currentCafe != null){
-                    val newCafe = it.let { cafelist ->
-                        cafelist.stream()
-                            .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
-                            .findAny()
-                            .orElse(null)
-                    }
-
-                    if(currentCafe != newCafe)
-                        mMainViewModel.chosenCafe.postValue(newCafe)
-                }
             },{error-> Timber.e(error)})
     }
 
@@ -415,34 +369,21 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         when(key){
             getString(R.string.preference_key_search_range)->{
+                mMainViewModel.isDataFetching = true
+
                 //update cafelist for display
                 mMainViewModel.cafeListAll.value?.let {
                     mMainViewModel.cafeListDisplay.postValue(
-                        it.stream()
-                            .filter { cafe ->
-                                val range = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                                    .getInt(
-                                        getString(R.string.preference_key_search_range)
-                                        , resources.getInteger(R.dimen.range_cafe_nearby_min)
-                                    ) * 1000
-                                cafe.cafenomad.distance < range
-                            }.collect(Collectors.toList())
+                        mMainViewModel.getSortedCafeList(
+                            it,
+                            mMainViewModel.sortType.value ?: getString(R.string.filter_label_all),
+                            requireContext()
+                        )
                     )
+
+                    mMainViewModel.isDataFetching = false
                 }
             }
         }
     }
-
-    fun listsEqual(list1: List<Any>, list2: List<Any>): Boolean {
-
-        if (list1.size != list2.size)
-            return false
-
-        val pairList = list1.zip(list2)
-
-        return pairList.all { (elt1, elt2) ->
-            elt1 == elt2
-        }
-    }
-
 }

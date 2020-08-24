@@ -42,8 +42,19 @@
     <string name="preference_title_search_range">"搜尋範圍"</string>
     <string name="preference_summary_search_range">"搜尋半徑大小設定"</string>
 
+    <string name="preference_category_title_refetch_data">資料更新</string>
+
+    <string name="preference_title_refetch_data">重新下載Cafe資料</string>
+    <string name="preference_summary_refetch_data"></string>
+
     <string name="cafe_not_found_text">附近沒有咖啡廳欸</string>
     <string name="cafe_not_found_subtext">說不定你可以附近走走，或是設定更大的搜尋範圍</string>
-    <string name="cafe_not_found_set_range_btn">設定搜尋範圍</string>
 
+    <string name="filter_text_all">全部 (從近到遠)</string>
+    <string name="filter_text_favorite_only">只顯示最愛</string>
+    <string name="filter_text_distance_farthest">距離 (從遠到近)</string>
+    <string name="filter_text_star">好吃程度 (從高到低)</string>
+
+    <string name="snackbar_refetch_done">資料更新完成</string>
+    <string name="snackbar_refetch_fail">資料更新失敗，請等等再重試一次</string>
 </resources>
