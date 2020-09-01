@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="cafe"
+            type="com.timothy.coffee.data.model.CafenomadDisplay" />
+    </data>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="80dp"
+        app:cardUseCompatPadding="true">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:isScrollContainer="true"
+            android:background="@color/background_color"
+            android:paddingBottom="@dimen/bottom_sheet_anchor_offset">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:paddingStart="@dimen/cafeinfo_padding_side"
+                android:paddingTop="@dimen/cafeinfo_padding_top"
+                android:paddingEnd="@dimen/cafeinfo_padding_side"
+                android:clipToPadding="false">
+
+                <TextView
+                    android:id="@+id/cafe_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constrainedWidth="true"
+                    android:autoSizeMaxTextSize="@dimen/common_title_text_size"
+                    android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
+                    android:autoSizeTextType="uniform"
+                    android:textAppearance="@style/CommonTitleStyle"
+                    android:text="@{cafe.cafenomad.name}"
+
+                    app:layout_constraintRight_toLeftOf="@id/favorite_btn"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+                <ImageView
+                    android:id="@+id/favorite_btn"
+                    android:layout_width="@dimen/cafeinfo_favorite_btn_size"
+                    android:layout_height="@dimen/cafeinfo_favorite_btn_size"
+                    android:padding="5dp"
+                    app:layout_constraintStart_toEndOf="@id/cafe_name"
+                    app:layout_constraintTop_toTopOf="@id/cafe_name"
+                    app:layout_constraintBottom_toBottomOf="@id/cafe_name"
+                    android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
+                    android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
+                    android:src="@{cafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
+                    android:tint="@{cafe.isFavorite ? @color/rate_red : @color/light_gray}"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/address"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/common_context_text_size"
+                    android:textAppearance="@style/CommonSubtitleStyle"
+                    android:text="@{String.valueOf(cafe.cafenomad.address)}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cafe_name" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/distance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{String.valueOf(cafe.cafenomad.distance)}"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/address" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/M"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="M"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintBottom_toBottomOf="@+id/distance"
+                    app:layout_constraintStart_toEndOf="@id/distance"
+                    app:layout_constraintTop_toTopOf="@+id/distance" />
+
+                <View
+                    android:id="@+id/divider_1"
+                    style="@style/divider"
+                    android:layout_marginStart="-18dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="-18dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/distance" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/cafe_info_recyclerview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider_1"
+                    tools:listitem="@layout/cafe_info_recyclerview_item_layout" />
+
+                <!--is time limited-->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/label_time_limit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:text="@string/label_is_time_limited"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cafe_info_recyclerview" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/content_time_limit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/label_time_limit" />
+
+                <!--is socket provided-->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/label_socket_provide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/common_title_text_size"
+                    android:text="@string/label_is_socket_provide"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/content_time_limit" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/content_socket_provide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/label_socket_provide" />
+
+                <!--is time limited-->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/label_standing_desk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/common_title_text_size"
+                    android:text="@string/label_is_standing_desk_available"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/content_socket_provide" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/content_standing_desk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/label_standing_desk" />
+
+                <View
+                    android:id="@+id/divider_2"
+                    style="@style/divider"
+                    android:layout_marginStart="-18dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="-18dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/content_standing_desk" />
+
+    <!--            <androidx.appcompat.widget.AppCompatTextView-->
+    <!--                android:id="@+id/label_intro"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginTop="@dimen/common_title_text_size"-->
+    <!--                android:text="@string/label_intro"-->
+    <!--                android:textAppearance="@style/CommonPrimaryContextTextStyle"-->
+    <!--                app:layout_constraintStart_toStartOf="parent"-->
+    <!--                app:layout_constraintEnd_toEndOf="parent"-->
+    <!--                app:layout_constraintTop_toBottomOf="@id/divider_2" />-->
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_cafenomad_intro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_local_cafe_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="@color/gray"
+                    android:text="@string/btn_text_cafenomad_url"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    android:theme="@style/CommonButtonStyle"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginTop="30dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider_2"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_official"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_public_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="@color/gray"
+                    android:text="@string/btn_text_official_url"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    android:theme="@style/CommonButtonStyle"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="30dp"
+                    android:visibility="@{cafe.cafenomad.url.empty ? View.GONE : View.VISIBLE}"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btn_cafenomad_intro"/>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btn_navigate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="32dp"
+                    android:paddingEnd="32dp"
+                    android:drawableStart="@drawable/ic_directions_black_24dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTint="@color/gray"
+                    android:text="@string/btn_text_navigate"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    android:theme="@style/CommonButtonStyle"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btn_official"
+                    app:layout_constraintBottom_toTopOf="@id/fake_margin_bottom"/>
+
+                <View
+                    android:id="@+id/fake_margin_bottom"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/btn_navigate"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+
+    </androidx.cardview.widget.CardView>
+</layout>

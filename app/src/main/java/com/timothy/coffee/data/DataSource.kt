@@ -126,8 +126,18 @@ class DataSource @Inject constructor(
         return cafeDao.insertFavoriteId(FavoriteID(cafeId))
     }
 
+    fun insertFavoriteV2(cafeId:String):Single<Long>{
+        //return ID for success, return -1 for conflict replace
+        return cafeDao.insertFavoriteIdV2(FavoriteID(cafeId))
+    }
+
     fun deleteFavorite(cafeId:String):Int{
         //return num of delete item
         return cafeDao.deleteFavoriteId(cafeId)
+    }
+
+    fun deleteFavoriteV2(cafeId:String):Single<Int>{
+        //return num of delete item
+        return cafeDao.deleteFavoriteIdV2(cafeId)
     }
 }

@@ -33,18 +33,38 @@
                 android:alpha=".85"
                 style="@style/Widget.AppCompat.Button.Colored"
                 app:layout_behavior=".view.behavior.FilterButtonBehavior"/>
+<!--            <androidx.viewpager.widget.ViewPager-->
+<!--                android:id="@+id/viewpager"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                app:layout_behavior="com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior"-->
+<!--                app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"-->
+<!--                app:behavior_hideable="false"-->
+<!--                app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"-->
+<!--                app:behavior_defaultState="collapsed"-->
+<!--                app:behavior_expandable = "false"-->
+<!--                android:elevation="3dp"-->
+<!--                android:background="@color/background_color"-->
+<!--                android:visibility="@{viewmodel.cafeListDisplay!=null ? View.VISIBLE : View.INVISIBLE}"-->
+<!--                />-->
             <androidx.viewpager.widget.ViewPager
                 android:id="@+id/viewpager"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:elevation="3dp"
+                android:paddingEnd="@dimen/cafeinfo_v2_card_padding"
+                android:paddingLeft="@dimen/cafeinfo_v2_card_padding"
+                android:paddingRight="@dimen/cafeinfo_v2_card_padding"
+                android:paddingStart="@dimen/cafeinfo_v2_card_padding"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
                 app:layout_behavior="com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior"
                 app:behavior_peekHeight="@dimen/bottom_sheet_peek_height"
                 app:behavior_hideable="false"
                 app:behavior_anchorOffset="@dimen/bottom_sheet_anchor_offset"
                 app:behavior_defaultState="collapsed"
                 app:behavior_expandable = "false"
-                android:elevation="3dp"
-                android:background="@color/background_color"
+
                 android:visibility="@{viewmodel.cafeListDisplay!=null ? View.VISIBLE : View.INVISIBLE}"
                 />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>

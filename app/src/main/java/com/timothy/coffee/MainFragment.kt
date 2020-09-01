@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -19,9 +20,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.PreferenceManager
+import androidx.viewpager.widget.ViewPager
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
-import com.timothy.coffee.ui.CafeViewPagerAdapter
+import com.timothy.coffee.ui.CafeViewPagerAdapterV2
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.view.MapFragment
 import com.timothy.coffee.view.SortDialogFragment
@@ -29,28 +31,31 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
-import java.util.stream.Collectors
+import java.util.stream.IntStream
 import javax.inject.Inject
 
+val Int.toPx: Int
+    get() = (this * Resources.getSystem().displayMetrics.density).toInt()
 
-class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedPreferenceChangeListener {
+class MainFragment: Fragment()
+    , View.OnClickListener
+    , SharedPreferences.OnSharedPreferenceChangeListener
+{
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
     private lateinit var mMainViewModel: MainViewModel
-    private lateinit var cafeAdapter: CafeViewPagerAdapter
+//    private lateinit var cafeAdapter: CafeViewPagerAdapter
+    private lateinit var cafeAdapter: CafeViewPagerAdapterV2
     private lateinit var binding: FragmentMainBinding
     private val compositeDisposable = CompositeDisposable()
     private lateinit var behavior: AnchorBottomSheetBehavior<View>
-
-    private var isInitialed:Boolean = false
-    private val mPageNum = 2
 
     companion object{
         const val RESULT_PERMISSION_LOCATION = 0
@@ -76,24 +81,35 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
         super.onViewCreated(view, savedInstanceState)
         Timber.d("onViewCreated")
         //viewpager
-        cafeAdapter = CafeViewPagerAdapter(requireActivity().supportFragmentManager)
-        binding.viewpager.adapter = cafeAdapter
+//        cafeAdapter = CafeViewPagerAdapter(requireActivity().supportFragmentManager)
+        cafeAdapter = CafeViewPagerAdapterV2(requireActivity().supportFragmentManager)
+        binding.viewpager?.apply {
+            adapter = cafeAdapter
+            pageMargin = 10.toPx
+            addOnPageChangeListener(mPageChangeListener)
+        }
         behavior = AnchorBottomSheetBehavior.from(viewpager)
 
         //when user clicked item of cafe list
         mMainViewModel.chosenCafe.observe (viewLifecycleOwner,
             Observer<CafenomadDisplay> {
-                if(cafeAdapter.isInfoPageHide.value!!){
-                    cafeAdapter.setHideInfoPage(false)
-                }
+//                Timber.d("chosen: $it")
+//                //nav to second page
+//                binding.viewpager.currentItem = mPageNum-1
 
-                //nav to second page
-                binding.viewpager.currentItem = mPageNum-1
+                val findIndex:Int = IntStream.range(0,cafeAdapter.cafeListCurrent.size)
+                    .filter{ i -> cafeAdapter.cafeListCurrent[i].cafenomad.id == it.cafenomad.id}
+                    .findFirst().asInt
 
-                if(behavior.state!=AnchorBottomSheetBehavior.STATE_ANCHORED)
-                    behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
+                binding.viewpager.currentItem = findIndex
             }
         )
+
+        mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
+            Observer<List<CafenomadDisplay>>{
+                Timber.d("cafeListDisplay changed")
+                cafeAdapter.setCardList(it)
+        })
 
         mMainViewModel.sortType.observe(viewLifecycleOwner,
             Observer<String>{
@@ -213,34 +229,34 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
 
     //return false for event propagation
     fun onBackPressed():Boolean {
-        if(viewpager.currentItem == 0) {
-            when(behavior.state){
-                AnchorBottomSheetBehavior.STATE_ANCHORED -> {
-                    behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
-                    return true
-                }
-                AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
-                    viewpager.currentItem = -1
-                    return false
-                }
-            }
-        }
-        else if(viewpager.currentItem == 1) {
-            if(mMainViewModel.lastMove.isClickList) {
-                viewpager.currentItem = viewpager.currentItem - 1
-            }
-            else if (mMainViewModel.lastMove.isClickMap){
-                when(behavior.state){
-                    AnchorBottomSheetBehavior.STATE_ANCHORED ->
-                        behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
-                    AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
-                        viewpager.currentItem = viewpager.currentItem - 1
-                        behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
-                    }
-                }
-            }
-            return true
-        }
+//        if(viewpager.currentItem == 0) {
+//            when(behavior.state){
+//                AnchorBottomSheetBehavior.STATE_ANCHORED -> {
+//                    behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
+//                    return true
+//                }
+//                AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
+//                    viewpager.currentItem = -1
+//                    return false
+//                }
+//            }
+//        }
+//        else if(viewpager.currentItem == 1) {
+//            if(mMainViewModel.lastMove.isClickList) {
+//                viewpager.currentItem = viewpager.currentItem - 1
+//            }
+//            else if (mMainViewModel.lastMove.isClickMap){
+//                when(behavior.state){
+//                    AnchorBottomSheetBehavior.STATE_ANCHORED ->
+//                        behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
+//                    AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
+//                        viewpager.currentItem = viewpager.currentItem - 1
+//                        behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
+//                    }
+//                }
+//            }
+//            return true
+//        }
         return false
     }
 
@@ -301,7 +317,7 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
     private fun queryCafeList(force:Boolean):Disposable{
         return mMainViewModel.getCafeList(requireContext(),force)
             .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.computation())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
 
                 //play animation first time
@@ -310,8 +326,6 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                     anim.interpolator = OvershootInterpolator()
                     viewpager.startAnimation(anim)
                 }
-
-                //update cafe list
                 mMainViewModel.updateLocalCafeData(it, requireContext())
 
             },{error-> Timber.e(error)})
@@ -384,6 +398,22 @@ class MainFragment: Fragment(), View.OnClickListener,SharedPreferences.OnSharedP
                     mMainViewModel.isDataFetching = false
                 }
             }
+        }
+    }
+
+    private val mPageChangeListener = object :ViewPager.OnPageChangeListener {
+
+        override fun onPageScrollStateChanged(state: Int) {}
+
+        override fun onPageScrolled(
+            position: Int,
+            positionOffset: Float,
+            positionOffsetPixels: Int
+        ) {}
+
+        //position是你當前選中的頁面的Position（位置編號）(從A滑動到B，就是B的position)
+        override fun onPageSelected(position: Int) {
+            mMainViewModel.chosenCafe.value = cafeAdapter.cafeListCurrent[position].copy()
         }
     }
 }

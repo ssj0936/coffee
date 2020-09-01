@@ -138,10 +138,7 @@ class MainViewModel @Inject constructor(
         Timber.d("SORT TYPE:${type}")
 
         cafeListDisplay.value = cafeListAll.value?.let {
-//            Timber.d("Original:${it}")
-            val newOne = getSortedCafeList(it,type,context)
-//            Timber.d("newOne:${newOne}")
-            newOne
+            getSortedCafeList(it,type,context)
         }
         lastSortType = type
     }
@@ -153,13 +150,12 @@ class MainViewModel @Inject constructor(
         }
 
         //update cafelist for display
-        cafeListDisplay.postValue(
-            getSortedCafeList(
-                list,
-                sortType.value ?: context.getString(R.string.filter_label_all),
-                context
-            )
+        val sortedConditionalCafeList = getSortedCafeList(
+            list,
+            sortType.value ?: context.getString(R.string.filter_label_all),
+            context
         )
+        cafeListDisplay.postValue(sortedConditionalCafeList)
 
         //for favorite showing
         //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
@@ -175,6 +171,10 @@ class MainViewModel @Inject constructor(
 
             if(currentCafe != newCafe)
                 chosenCafe.postValue(newCafe)
+        }
+        else{
+            if(sortedConditionalCafeList.isNotEmpty())
+                chosenCafe.postValue(sortedConditionalCafeList.first())
         }
     }
 
@@ -211,46 +211,53 @@ class MainViewModel @Inject constructor(
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                     }
                 }
-            }.collect(Collectors.toList())
+            }.limit(10).collect(Collectors.toList())
     }
 
     @SuppressLint("CheckResult")
-    fun setFavorite(cafeId:String, context: Context){
-        Single.just(cafeId)
+    fun setFavorite(cafeId:String, context: Context):Single<Long>{
+        return dataSource.insertFavoriteV2(cafeId)
+            .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
-            .subscribe { id ->
-                if(dataSource.insertFavorite(id) > 0){
-                    //cafeList update
-                    cafeListAll.value?.let{
-                        val updatedItem = it.stream().filter{cafe->
-                            cafe.cafenomad.id == id
+            .doOnSuccess {inserID ->
+                Timber.d("setFavorite")
+                if(inserID>0) {
+                    cafeListAll.value?.let {
+                        val updatedItem = it.stream().filter { cafe ->
+                            cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
 
-                        if(updatedItem != null){
+                        if (updatedItem != null) {
                             updatedItem.isFavorite = true
                             cafeListAll.postValue(it)
                         }
                     }
 
                     //cafeDisplay update
-                    cafeListDisplay.value?.let{
-                        val updatedItem = it.stream().filter{cafe->
-                            cafe.cafenomad.id == id
+                    cafeListDisplay.value?.let {
+                        val updatedItem = it.stream().filter { cafe ->
+                            cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
 
-                        if(updatedItem != null){
+                        if (updatedItem != null) {
                             updatedItem.isFavorite = true
 
                             // 更改完內容後，依據目前的display type決定是否需要做刪減
-                            if(lastSortType!=null)
-                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+                            if (lastSortType != null)
+                                cafeListDisplay.postValue(
+                                    getSortedCafeList(
+                                        it,
+                                        lastSortType!!,
+                                        context
+                                    )
+                                )
                             else
                                 cafeListDisplay.postValue(it)
                         }
                     }
 
                     //chosen Cafe update
-                    if(id == chosenCafe.value?.cafenomad?.id){
+                    if (cafeId == chosenCafe.value?.cafenomad?.id) {
                         chosenCafe.value?.let {
                             it.isFavorite = true
                             chosenCafe.postValue(it)
@@ -258,45 +265,97 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
+
+
+//        Single.just(cafeId)
+//            .observeOn(Schedulers.io())
+//            .subscribe { id ->
+//                if(dataSource.insertFavorite(id) > 0){
+//                    //cafeList update
+//                    cafeListAll.value?.let{
+//                        val updatedItem = it.stream().filter{cafe->
+//                            cafe.cafenomad.id == id
+//                        }.findAny().orElse(null)
+//
+//                        if(updatedItem != null){
+//                            updatedItem.isFavorite = true
+//                            cafeListAll.postValue(it)
+//                        }
+//                    }
+//
+//                    //cafeDisplay update
+//                    cafeListDisplay.value?.let{
+//                        val updatedItem = it.stream().filter{cafe->
+//                            cafe.cafenomad.id == id
+//                        }.findAny().orElse(null)
+//
+//                        if(updatedItem != null){
+//                            updatedItem.isFavorite = true
+//
+//                            // 更改完內容後，依據目前的display type決定是否需要做刪減
+//                            if(lastSortType!=null)
+//                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+//                            else
+//                                cafeListDisplay.postValue(it)
+//                        }
+//                    }
+//
+//                    //chosen Cafe update
+//                    if(id == chosenCafe.value?.cafenomad?.id){
+//                        chosenCafe.value?.let {
+//                            it.isFavorite = true
+//                            chosenCafe.postValue(it)
+//                        }
+//                    }
+//                }
+//            }
     }
 
     @SuppressLint("CheckResult")
-    fun deleteFavorite(cafeId:String, context: Context){
-        Single.just(cafeId)
+    fun deleteFavorite(cafeId:String, context: Context):Single<Int>{
+        return dataSource.deleteFavoriteV2(cafeId)
+            .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
-            .subscribe { id ->
-                if(dataSource.deleteFavorite(id)>0){
+            .doOnSuccess {deleteCnt->
+                Timber.d("deleteFavorite")
+                if(deleteCnt>0) {
                     //cafeList update
-                    cafeListAll.value?.let{
-                        val updatedItem = it.stream().filter{cafe->
-                            cafe.cafenomad.id == id
+                    cafeListAll.value?.let {
+                        val updatedItem = it.stream().filter { cafe ->
+                            cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
 
-                        if(updatedItem != null){
+                        if (updatedItem != null) {
                             updatedItem.isFavorite = false
                             cafeListAll.postValue(it)
                         }
                     }
 
                     //cafeDisplay update
-                    cafeListDisplay.value?.let{
-                        val updatedItem = it.stream().filter{cafe->
-                            cafe.cafenomad.id == id
+                    cafeListDisplay.value?.let {
+                        val updatedItem = it.stream().filter { cafe ->
+                            cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
 
-                        if(updatedItem != null){
+                        if (updatedItem != null) {
                             updatedItem.isFavorite = false
 
                             // 更改完內容後，依據目前的display type決定是否需要做刪減
-                            if(lastSortType!=null)
-                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+                            if (lastSortType != null)
+                                cafeListDisplay.postValue(
+                                    getSortedCafeList(
+                                        it,
+                                        lastSortType!!,
+                                        context
+                                    )
+                                )
                             else
                                 cafeListDisplay.postValue(it)
                         }
                     }
 
                     //chosen Cafe update
-                    if(id == chosenCafe.value?.cafenomad?.id){
+                    if (cafeId == chosenCafe.value?.cafenomad?.id) {
                         chosenCafe.value?.let {
                             it.isFavorite = false
                             chosenCafe.postValue(it)
@@ -304,5 +363,48 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
+
+//        Single.just(cafeId)
+//            .observeOn(Schedulers.io())
+//            .subscribe { id ->
+//                if(dataSource.deleteFavorite(id)>0){
+//                    //cafeList update
+//                    cafeListAll.value?.let{
+//                        val updatedItem = it.stream().filter{cafe->
+//                            cafe.cafenomad.id == id
+//                        }.findAny().orElse(null)
+//
+//                        if(updatedItem != null){
+//                            updatedItem.isFavorite = false
+//                            cafeListAll.postValue(it)
+//                        }
+//                    }
+//
+//                    //cafeDisplay update
+//                    cafeListDisplay.value?.let{
+//                        val updatedItem = it.stream().filter{cafe->
+//                            cafe.cafenomad.id == id
+//                        }.findAny().orElse(null)
+//
+//                        if(updatedItem != null){
+//                            updatedItem.isFavorite = false
+//
+//                            // 更改完內容後，依據目前的display type決定是否需要做刪減
+//                            if(lastSortType!=null)
+//                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
+//                            else
+//                                cafeListDisplay.postValue(it)
+//                        }
+//                    }
+//
+//                    //chosen Cafe update
+//                    if(id == chosenCafe.value?.cafenomad?.id){
+//                        chosenCafe.value?.let {
+//                            it.isFavorite = false
+//                            chosenCafe.postValue(it)
+//                        }
+//                    }
+//                }
+//            }
     }
 }

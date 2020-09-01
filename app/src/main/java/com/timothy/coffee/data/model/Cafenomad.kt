@@ -2,6 +2,7 @@ package com.timothy.coffee.data.model
 
 import androidx.room.*
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 @Entity(indices = [Index("id"), Index("name")])
 data class Cafenomad (
@@ -59,7 +60,7 @@ data class Cafenomad (
     @field:SerializedName("open_time")
     val openTime:String
 
-){
+): Serializable {
     @Ignore var distance:Int = Int.MAX_VALUE
 }
-data class CafenomadDisplay(@Embedded var cafenomad: Cafenomad, var isFavorite: Boolean = false)
+data class CafenomadDisplay(@Embedded var cafenomad: Cafenomad, var isFavorite: Boolean = false): Serializable

@@ -16,6 +16,8 @@
     <dimen name="cafelist_title_text_size">17sp</dimen>
     <dimen name="cafelist_subtitle_text_size">13sp</dimen>
 
+    <dimen name="cafeinfo_v2_card_padding">30dp</dimen>
+
     <dimen name="cafeinfo_padding_top">32dp</dimen>
     <dimen name="cafeinfo_padding_side">30dp</dimen>
 

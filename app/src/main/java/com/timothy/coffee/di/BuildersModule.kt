@@ -21,6 +21,9 @@ abstract class BuildersModule {
     abstract fun contributeCafeInfoFragment(): CafeInfoFragment
 
     @ContributesAndroidInjector
+    abstract fun contributeCafeInfoV2Fragment(): CafeInfoV2Fragment
+
+    @ContributesAndroidInjector
     abstract fun contributeMapFragment(): MapFragment
 
     @ContributesAndroidInjector

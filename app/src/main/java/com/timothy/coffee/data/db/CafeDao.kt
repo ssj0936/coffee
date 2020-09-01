@@ -47,7 +47,13 @@ abstract class CafeDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insertFavoriteId(favorite:FavoriteID):Long
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insertFavoriteIdV2(favorite:FavoriteID):Single<Long>
+
     @Query("DELETE FROM FavoriteID WHERE cafeId=(:favoriteID)")
     abstract fun deleteFavoriteId(favoriteID:String):Int
+
+    @Query("DELETE FROM FavoriteID WHERE cafeId=(:favoriteID)")
+    abstract fun deleteFavoriteIdV2(favoriteID:String):Single<Int>
 
 }
