@@ -98,12 +98,13 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
+                    moveCameraToShowAllMarkers()
                 }
             })
 
         mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<CafenomadDisplay> {
-                moveCameraTo(it)
+//                moveCameraTo(it)
                 updateMarkersIcon()
             })
     }
@@ -113,12 +114,12 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         mMainViewModel.lastMove.isClickList = false
         mMainViewModel.lastMove.isClickMap = true
 
-        return false
+        //return true for not moving camera after marker clicking
+        return true
     }
 
     private fun updateMarkersIcon(){
         IntStream.range(0,markerList.size).forEach {index ->
-//        markerList.stream().forEach {
             val item = markerList[index]
             when {
                 (item.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
@@ -135,7 +136,6 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         markerList.clear()
 
         IntStream.range(0,cafes.size).forEach { cafeIndex -> run{
-//        cafes.stream().forEach { cafe ->run{
             val cafe = cafes[cafeIndex]
             mMap?.run {
                 val marker = addMarker(MarkerOptions()
@@ -206,7 +206,6 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         moveCameraTo(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
     }
 
-
     private fun moveCameraTo(latlng:LatLng){
         mMap?.run{
             val cameraPosition = CameraPosition.builder()
@@ -221,6 +220,21 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
+    }
+
+    private fun LatLngBounds.Builder.createBoundsForAllMarkers(markers: MutableList<Marker>):LatLngBounds {
+        markers.stream().forEach {
+            include(it.position)
+        }
+
+        return build()
+    }
+
+    private fun moveCameraToShowAllMarkers(){
+        val builder = LatLngBounds.Builder()
+        var bounds = builder.createBoundsForAllMarkers(markerList)  //Updated bounds.
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 72))
+
     }
 
     private fun enableMyLocation(){
