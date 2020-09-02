@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -24,6 +26,7 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_map.*
+import java.util.stream.IntStream
 import javax.inject.Inject
 
 
@@ -114,14 +117,16 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     }
 
     private fun updateMarkersIcon(){
-        markerList.stream().forEach {
+        IntStream.range(0,markerList.size).forEach {index ->
+//        markerList.stream().forEach {
+            val item = markerList[index]
             when {
-                (it.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
-                    it.setIcon(getBitmapMapPin(R.drawable.ic_place_selected))
-                (it.tag as CafenomadDisplay).isFavorite ->
-                    it.setIcon(getBitmapMapPin(R.drawable.ic_place_favorite))
+                (item.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
+                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin_selected))
+                (item.tag as CafenomadDisplay).isFavorite ->
+                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin_favorite))
                 else ->
-                    it.setIcon(getBitmapMapPin(R.drawable.ic_place))
+                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin))
             }
         }
     }
@@ -129,18 +134,20 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     private fun addMarkers(cafes:List<CafenomadDisplay>){
         markerList.clear()
 
-        cafes.stream().forEach { cafe ->run{
+        IntStream.range(0,cafes.size).forEach { cafeIndex -> run{
+//        cafes.stream().forEach { cafe ->run{
+            val cafe = cafes[cafeIndex]
             mMap?.run {
                 val marker = addMarker(MarkerOptions()
                     .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
                     .icon(
                         when {
                             cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
-                                getBitmapMapPin(R.drawable.ic_place_selected)
+                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin_selected)
                             cafe.isFavorite ->
-                                getBitmapMapPin(R.drawable.ic_place_favorite)
+                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin_favorite)
                             else ->
-                                getBitmapMapPin(R.drawable.ic_place)
+                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin)
                         }
                     )
                     .title(cafe.cafenomad.name)
@@ -153,16 +160,28 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         }}
     }
 
-    private fun getBitmapMapPin(resId:Int): BitmapDescriptor?{
+    private fun getBitmapMapPin(number:Int, resId:Int): BitmapDescriptor?{
         val drawable = ContextCompat.getDrawable(requireContext(),resId)
         return drawable?.run{
             setBounds(0,0,intrinsicWidth,intrinsicHeight)
-
             val bitmap = Bitmap.createBitmap(intrinsicWidth,intrinsicHeight,Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
 
+            val canvas = Canvas(bitmap)
+            val mPaint = Paint()
             draw(canvas)
 
+            val text = number.toString()
+            mPaint.apply {
+                strokeWidth = 3f
+                textSize = 40f
+                color = resources.getColor(R.color.white,null)
+            }
+            val bounds = Rect()
+            mPaint.getTextBounds(text, 0, text.length, bounds)
+            val fontMetrics: Paint.FontMetricsInt = mPaint.fontMetricsInt
+            val baseline: Int =
+                (bitmap.height - fontMetrics.bottom + fontMetrics.top) / 2 - fontMetrics.top
+            canvas.drawText(text,(bitmap.width/2).toFloat() - bounds.width() / 2 - 4, (baseline - 5).toFloat(), mPaint);
             BitmapDescriptorFactory.fromBitmap(bitmap)
         }
     }
