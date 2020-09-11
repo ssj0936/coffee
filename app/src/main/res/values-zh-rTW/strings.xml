@@ -45,7 +45,7 @@
     <string name="preference_category_title_refetch_data">資料更新</string>
 
     <string name="preference_title_refetch_data">重新下載Cafe資料</string>
-    <string name="preference_summary_refetch_data"></string>
+    <string name="preference_title_max_cafe_return_number">最大附近咖啡廳顯示數</string>
 
     <string name="cafe_not_found_text">附近沒有咖啡廳欸</string>
     <string name="cafe_not_found_subtext">說不定你可以附近走走，或是設定更大的搜尋範圍</string>

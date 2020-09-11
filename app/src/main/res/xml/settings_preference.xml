@@ -7,17 +7,25 @@
         app:key="@string/preference_category_key_search"
         app:title="@string/preference_category_title_search"
         app:iconSpaceReserved="false">
-        <SeekBarPreference
-            android:key="@string/preference_key_search_range"
-            android:id="@+id/preference_search_range_seek_bar"
-            android:title="@string/preference_title_search_range"
-            android:summary="@string/preference_summary_search_range"
-            app:showSeekBarValue="true"
+<!--        <SeekBarPreference-->
+<!--            android:key="@string/preference_key_search_range"-->
+<!--            android:id="@+id/preference_search_range_seek_bar"-->
+<!--            android:title="@string/preference_title_search_range"-->
+<!--            android:summary="@string/preference_summary_search_range"-->
+<!--            app:showSeekBarValue="true"-->
+<!--            app:iconSpaceReserved="false"-->
+<!--            android:layout="@layout/seekbar_preference_layout"-->
+<!--            app:min="@dimen/range_cafe_nearby_min"-->
+<!--            android:max="@dimen/range_cafe_nearby_max"-->
+<!--            app:defaultValue="@dimen/range_cafe_nearby_min"-->
+<!--            />-->
+        <ListPreference
+            android:title="@string/preference_title_max_cafe_return_number"
+            android:key="@string/preference_key_max_cafe_return_number"
             app:iconSpaceReserved="false"
-            android:layout="@layout/seekbar_preference_layout"
-            app:min="@dimen/range_cafe_nearby_min"
-            android:max="@dimen/range_cafe_nearby_max"
-            app:defaultValue="@dimen/range_cafe_nearby_min"
+            android:defaultValue="20"
+            android:entries="@array/preference_cafe_number_option"
+            android:entryValues="@array/preference_cafe_number_option"
             />
     </PreferenceCategory>
 

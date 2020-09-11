@@ -83,9 +83,6 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                     + resources.getDimensionPixelSize(R.dimen.cafeinfo_v2_card_padding)*2
                     + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_margin_side)*2
                     + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_size))
-//        cafe_name.text = ARGUMENT_DATA.cafenomad.name
-//        address.text = ARGUMENT_DATA.cafenomad.address
-//        distance.text = ARGUMENT_DATA.cafenomad.distance.toString()
 
         binding.btnNavigate.setOnClickListener(this)
         binding.btnCafenomadIntro.setOnClickListener(this)
@@ -164,16 +161,20 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                         if (it.isFavorite)
                             mMainViewModel.deleteFavorite(it.cafenomad.id,requireContext())
                                 .subscribe({
-                                    setFavoriteBtn(false)
+//                                    setFavoriteBtn(false)
+                                    Timber.d("delete favorite success")
                                 },{error ->
                                     Timber.d("delete favorite fail: $error")
+                                    error.printStackTrace()
                                 })
                         else
                             mMainViewModel.setFavorite(it.cafenomad.id,requireContext())
                                 .subscribe({
-                                    setFavoriteBtn(true)
+//                                    setFavoriteBtn(true)
+                                    Timber.d("adding favorite success")
                                 },{error ->
                                     Timber.d("adding favorite fail: $error")
+                                    error.printStackTrace()
                                 })
                     }
                 }
@@ -181,29 +182,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         }
     }
 
-    private fun setFavoriteBtn(isActivated:Boolean){
-        when(isActivated){
-            true->{
-                binding.favoriteBtn.setImageResource(R.drawable.ic_favorite_black_24dp)
-                binding.favoriteBtn.setColorFilter(
-                    ContextCompat.getColor(requireContext(), R.color.rate_red),
-                    android.graphics.PorterDuff.Mode.SRC_IN
-                )
-            }
-
-            false->{
-                binding.favoriteBtn.setImageResource(R.drawable.ic_favorite_border_black_24dp)
-                binding.favoriteBtn.setColorFilter(
-                    ContextCompat.getColor(requireContext(), R.color.light_gray),
-                    android.graphics.PorterDuff.Mode.SRC_IN
-                )
-            }
-        }
+    fun scrollToTop(){
+        binding.nestedScrollView.scrollY = 0
     }
-
-//    override fun setNestScrollingEnable(enable:Boolean){
-//        if (lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
-//            binding.nestedScrollView.isSmoothScrollingEnabled = enable
-//        }
-//    }
 }

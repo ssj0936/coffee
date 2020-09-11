@@ -59,7 +59,9 @@
 
     <string name="preference_key_refetch_data" translatable="false">"refetch_data"</string>
     <string name="preference_title_refetch_data">"Refetch data"</string>
-    <string name="preference_summary_refetch_data">"Refetch data"</string>
+
+    <string name="preference_key_max_cafe_return_number" translatable="false">"max_cafe_return_number"</string>
+    <string name="preference_title_max_cafe_return_number">"Max number of showing cafe near by"</string>
 
 
     <string name="cafe_not_found_text">No cafe nearby</string>

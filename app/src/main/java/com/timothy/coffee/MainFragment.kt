@@ -3,7 +3,6 @@ package com.timothy.coffee
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.net.Uri
@@ -19,12 +18,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.preference.PreferenceManager
 import androidx.viewpager.widget.ViewPager
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapterV2
 import com.timothy.coffee.util.Utils
+import com.timothy.coffee.view.CafeInfoV2Fragment
 import com.timothy.coffee.view.MapFragment
 import com.timothy.coffee.view.SortDialogFragment
 import com.timothy.coffee.viewmodel.MainViewModel
@@ -45,7 +44,6 @@ val Int.toPx: Int
 
 class MainFragment: Fragment()
     , View.OnClickListener
-    , SharedPreferences.OnSharedPreferenceChangeListener
 {
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
@@ -97,24 +95,34 @@ class MainFragment: Fragment()
 //                //nav to second page
 //                binding.viewpager.currentItem = mPageNum-1
 
-                val findIndex:Int = IntStream.range(0,cafeAdapter.cafeListCurrent.size)
-                    .filter{ i -> cafeAdapter.cafeListCurrent[i].cafenomad.id == it.cafenomad.id}
-                    .findFirst().asInt
+                //nav to chosen cafe position or index0
+                if(it == null){
+                    binding.viewpager.currentItem = 0
+                }else {
+                    val findIndex: Int = IntStream.range(0, cafeAdapter.cafeListCurrent.size)
+                        .filter { i -> cafeAdapter.cafeListCurrent[i].cafenomad.id == it.cafenomad.id }
+                        .findFirst().orElse(0)
 
-                binding.viewpager.currentItem = findIndex
+                    binding.viewpager.currentItem = findIndex
+                }
+
+                //scroll to top
+                (cafeAdapter.getItem(binding.viewpager.currentItem) as? CafeInfoV2Fragment)?.scrollToTop()
+
             }
         )
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>>{
-                Timber.d("cafeListDisplay changed")
+                //"no data" fragment no need to be able to drag
+                behavior.allowUserDragging = it.isNotEmpty()
                 cafeAdapter.setCardList(it)
         })
 
         mMainViewModel.sortType.observe(viewLifecycleOwner,
             Observer<String>{
                 mMainViewModel.setCafeViaSortType(it,requireContext())
-            })
+        })
 
         // setting button
         binding.settingBtn.setOnClickListener(this)
@@ -326,7 +334,7 @@ class MainFragment: Fragment()
                     anim.interpolator = OvershootInterpolator()
                     viewpager.startAnimation(anim)
                 }
-                mMainViewModel.updateLocalCafeData(it, requireContext())
+                mMainViewModel.initialLocalCafeData(it, requireContext())
 
             },{error-> Timber.e(error)})
     }
@@ -365,42 +373,6 @@ class MainFragment: Fragment()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        PreferenceManager
-            .getDefaultSharedPreferences(requireContext())
-            .registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        PreferenceManager
-            .getDefaultSharedPreferences(requireContext())
-            .unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    @SuppressLint("ResourceType")
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        when(key){
-            getString(R.string.preference_key_search_range)->{
-                mMainViewModel.isDataFetching = true
-
-                //update cafelist for display
-                mMainViewModel.cafeListAll.value?.let {
-                    mMainViewModel.cafeListDisplay.postValue(
-                        mMainViewModel.getSortedCafeList(
-                            it,
-                            mMainViewModel.sortType.value ?: getString(R.string.filter_label_all),
-                            requireContext()
-                        )
-                    )
-
-                    mMainViewModel.isDataFetching = false
-                }
-            }
-        }
-    }
-
     private val mPageChangeListener = object :ViewPager.OnPageChangeListener {
 
         override fun onPageScrollStateChanged(state: Int) {}
@@ -413,7 +385,11 @@ class MainFragment: Fragment()
 
         //position是你當前選中的頁面的Position（位置編號）(從A滑動到B，就是B的position)
         override fun onPageSelected(position: Int) {
-            mMainViewModel.chosenCafe.value = cafeAdapter.cafeListCurrent[position].copy()
+            this@MainFragment.onPageSelected(position)
         }
+    }
+
+    fun onPageSelected(position: Int){
+        mMainViewModel.chosenCafe.value = cafeAdapter.cafeListCurrent[position].copy()
     }
 }

@@ -28,12 +28,17 @@ class MainViewModel @Inject constructor(
     private val dataSource: DataSource
 ): ViewModel(){
 
+    //目前user所在
     var loc : MutableLiveData<LatLng> = MutableLiveData()
+    //用來控制目前顯示的cafe頁面所binding的cafenomad data
     val chosenCafe: MutableLiveData<CafenomadDisplay> = MutableLiveData()
+    //抓下來的所以cafenomad資料
     val cafeListAll:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
+    //經過排序與filter後要顯示出來的cafenomad資料
     val cafeListDisplay:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
-
+    //紀錄目前使用的顯示模式(sort/filter)
     val sortType:MutableLiveData<String> = MutableLiveData()
+
     var lastSortType:String? = null
     var lastMove = Movement(isClickMap = false, isClickList = false)
     var isDataFetching = false
@@ -137,13 +142,22 @@ class MainViewModel @Inject constructor(
         if(cafeListAll.value == null || type == lastSortType) return
         Timber.d("SORT TYPE:${type}")
 
-        cafeListDisplay.value = cafeListAll.value?.let {
-            getSortedCafeList(it,type,context)
+        cafeListAll.value?.let {
+            val sortedConditionalCafeList = getSortedCafeList(it,type,context)
+
+            //cafeListDisplay
+            cafeListDisplay.value = sortedConditionalCafeList
+
+            //chosenCafe
+            chosenCafe.postValue(
+                if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
+                else null
+            )
         }
         lastSortType = type
     }
 
-    fun updateLocalCafeData(list: List<CafenomadDisplay>, context: Context){
+    fun initialLocalCafeData(list: List<CafenomadDisplay>, context: Context){
         //update cafe list
         if(cafeListAll.value == null || cafeListAll.value != list) {
             cafeListAll.postValue(list)
@@ -162,12 +176,10 @@ class MainViewModel @Inject constructor(
         //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
         val currentCafe = chosenCafe.value
         if(currentCafe != null){
-            val newCafe = list.let { cafelist ->
-                cafelist.stream()
-                    .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
-                    .findAny()
-                    .orElse(null)
-            }
+            val newCafe = list.stream()
+                .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
+                .findAny()
+                .orElse(null)
 
             if(currentCafe != newCafe)
                 chosenCafe.postValue(newCafe)
@@ -178,15 +190,56 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("CheckResult")
+    fun updateDisplayCafeData(context: Context){
+        Single.just("")
+            .observeOn(Schedulers.computation())
+            .subscribe({
+                isDataFetching = true
+
+                //update cafelist for display
+                cafeListAll.value?.let {
+
+                    //update cafelist for display
+                    val sortedConditionalCafeList = getSortedCafeList(
+                        it,
+                        sortType.value ?: context.getString(R.string.filter_label_all),
+                        context
+                    )
+                    cafeListDisplay.postValue(sortedConditionalCafeList)
+
+                    //update chosenCafe
+                    val currentCafe = chosenCafe.value
+                    if(currentCafe != null){
+                        val newCafe = it.stream()
+                            .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
+                            .findAny()
+                            .orElse(null)
+
+                        if(currentCafe != newCafe)
+                            chosenCafe.postValue(newCafe)
+                    }
+                    else{
+                        if(sortedConditionalCafeList.isNotEmpty())
+                            chosenCafe.postValue(sortedConditionalCafeList.first())
+                    }
+                }
+                isDataFetching = false
+            },{error ->
+                Timber.d("Update max cafe return number error: $error")
+            })
+    }
+
     @SuppressLint("ResourceType")
     fun getSortedCafeList(list:List<CafenomadDisplay>, type:String, context: Context):List<CafenomadDisplay> {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val maxCafeNumShowing = sharedPreferences.getString(
+            context.getString(R.string.preference_key_max_cafe_return_number),
+            context.resources.getStringArray(R.array.preference_cafe_number_option)[0])!!.toLong()
+
         return list.stream()
             .filter { cafe ->
-                val range = PreferenceManager.getDefaultSharedPreferences(context)
-                    .getInt(
-                        context.getString(R.string.preference_key_search_range)
-                        , context.resources.getInteger(R.dimen.range_cafe_nearby_min)
-                    ) * 1000
+                val range = context.resources.getInteger(R.dimen.range_cafe_nearby_min) * 1000
 
                 val isSetFavoriteOnly = (type == context.resources.getString(R.string.filter_label_favorite_only))
                 (cafe.cafenomad.distance < range) && (if(isSetFavoriteOnly) cafe.isFavorite else true)
@@ -211,7 +264,7 @@ class MainViewModel @Inject constructor(
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                     }
                 }
-            }.limit(10).collect(Collectors.toList())
+            }.limit(maxCafeNumShowing).collect(Collectors.toList())
     }
 
     @SuppressLint("CheckResult")
@@ -220,7 +273,6 @@ class MainViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .doOnSuccess {inserID ->
-                Timber.d("setFavorite")
                 if(inserID>0) {
                     cafeListAll.value?.let {
                         val updatedItem = it.stream().filter { cafe ->
@@ -265,50 +317,6 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
-
-
-//        Single.just(cafeId)
-//            .observeOn(Schedulers.io())
-//            .subscribe { id ->
-//                if(dataSource.insertFavorite(id) > 0){
-//                    //cafeList update
-//                    cafeListAll.value?.let{
-//                        val updatedItem = it.stream().filter{cafe->
-//                            cafe.cafenomad.id == id
-//                        }.findAny().orElse(null)
-//
-//                        if(updatedItem != null){
-//                            updatedItem.isFavorite = true
-//                            cafeListAll.postValue(it)
-//                        }
-//                    }
-//
-//                    //cafeDisplay update
-//                    cafeListDisplay.value?.let{
-//                        val updatedItem = it.stream().filter{cafe->
-//                            cafe.cafenomad.id == id
-//                        }.findAny().orElse(null)
-//
-//                        if(updatedItem != null){
-//                            updatedItem.isFavorite = true
-//
-//                            // 更改完內容後，依據目前的display type決定是否需要做刪減
-//                            if(lastSortType!=null)
-//                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
-//                            else
-//                                cafeListDisplay.postValue(it)
-//                        }
-//                    }
-//
-//                    //chosen Cafe update
-//                    if(id == chosenCafe.value?.cafenomad?.id){
-//                        chosenCafe.value?.let {
-//                            it.isFavorite = true
-//                            chosenCafe.postValue(it)
-//                        }
-//                    }
-//                }
-//            }
     }
 
     @SuppressLint("CheckResult")
@@ -317,8 +325,8 @@ class MainViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .doOnSuccess {deleteCnt->
-                Timber.d("deleteFavorite")
                 if(deleteCnt>0) {
+
                     //cafeList update
                     cafeListAll.value?.let {
                         val updatedItem = it.stream().filter { cafe ->
@@ -332,16 +340,18 @@ class MainViewModel @Inject constructor(
                     }
 
                     //cafeDisplay update
+                    var currentIndex = 0
+
                     cafeListDisplay.value?.let {
                         val updatedItem = it.stream().filter { cafe ->
                             cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
-
+                        currentIndex = it.indexOf(updatedItem)
                         if (updatedItem != null) {
                             updatedItem.isFavorite = false
 
                             // 更改完內容後，依據目前的display type決定是否需要做刪減
-                            if (lastSortType != null)
+                            if (lastSortType != null){
                                 cafeListDisplay.postValue(
                                     getSortedCafeList(
                                         it,
@@ -349,8 +359,10 @@ class MainViewModel @Inject constructor(
                                         context
                                     )
                                 )
-                            else
+                            }
+                            else {
                                 cafeListDisplay.postValue(it)
+                            }
                         }
                     }
 
@@ -358,53 +370,30 @@ class MainViewModel @Inject constructor(
                     if (cafeId == chosenCafe.value?.cafenomad?.id) {
                         chosenCafe.value?.let {
                             it.isFavorite = false
-                            chosenCafe.postValue(it)
+
+                            //if current chosenCafe is inappropriate to be shown on cafeListDisplay
+                            //then set chosenCafe to cafeListDisplay[0]
+                            if(cafeListDisplay.value != null
+                                && cafeListDisplay.value!!
+                                    .stream()
+                                    .filter { cafe -> cafe.cafenomad.id == it.cafenomad.id }
+                                    .count() == 0L){
+
+                                if(cafeListDisplay.value!!.isNotEmpty()){
+                                    if(currentIndex<0 || currentIndex >= cafeListDisplay.value!!.size)
+                                        chosenCafe.postValue(cafeListDisplay.value!![0].copy())
+                                    else
+                                        chosenCafe.postValue(cafeListDisplay.value!![currentIndex].copy())
+                                }else{
+                                    chosenCafe.postValue(null)
+                                }
+                            }else{
+                                chosenCafe.postValue(it)
+                            }
                         }
                     }
+
                 }
             }
-
-//        Single.just(cafeId)
-//            .observeOn(Schedulers.io())
-//            .subscribe { id ->
-//                if(dataSource.deleteFavorite(id)>0){
-//                    //cafeList update
-//                    cafeListAll.value?.let{
-//                        val updatedItem = it.stream().filter{cafe->
-//                            cafe.cafenomad.id == id
-//                        }.findAny().orElse(null)
-//
-//                        if(updatedItem != null){
-//                            updatedItem.isFavorite = false
-//                            cafeListAll.postValue(it)
-//                        }
-//                    }
-//
-//                    //cafeDisplay update
-//                    cafeListDisplay.value?.let{
-//                        val updatedItem = it.stream().filter{cafe->
-//                            cafe.cafenomad.id == id
-//                        }.findAny().orElse(null)
-//
-//                        if(updatedItem != null){
-//                            updatedItem.isFavorite = false
-//
-//                            // 更改完內容後，依據目前的display type決定是否需要做刪減
-//                            if(lastSortType!=null)
-//                                cafeListDisplay.postValue(getSortedCafeList(it,lastSortType!!,context))
-//                            else
-//                                cafeListDisplay.postValue(it)
-//                        }
-//                    }
-//
-//                    //chosen Cafe update
-//                    if(id == chosenCafe.value?.cafenomad?.id){
-//                        chosenCafe.value?.let {
-//                            it.isFavorite = false
-//                            chosenCafe.postValue(it)
-//                        }
-//                    }
-//                }
-//            }
     }
 }

@@ -36,8 +36,8 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     lateinit var mViewModelFactory:ViewModelFactory
     private lateinit var mMainViewModel: MainViewModel
     private lateinit var mMap:GoogleMap
-    private val isMapInitialed:Boolean
-        get() = mMap!=null
+    private val Z_INDEX_NORMAL = 0f
+    private val Z_INDEX_CURRENT = 2f
 
     private val markerList = mutableListOf<Marker>()
 
@@ -98,7 +98,10 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
-                    moveCameraToShowAllMarkers()
+
+                    //only move camera when scrolling too far from group of marker
+                    if(!isThereMarkerInMap())
+                        moveCameraToShowAllMarkers()
                 }
             })
 
@@ -121,13 +124,24 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     private fun updateMarkersIcon(){
         IntStream.range(0,markerList.size).forEach {index ->
             val item = markerList[index]
+            val cafeIndexDisplay = 1+index
+
             when {
                 (item.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
-                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin_selected))
+                    item.apply {
+                        setIcon(getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_selected))
+                        zIndex = Z_INDEX_CURRENT
+                    }
                 (item.tag as CafenomadDisplay).isFavorite ->
-                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin_favorite))
+                    item.apply {
+                        setIcon(getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_favorite))
+                        zIndex = Z_INDEX_NORMAL
+                    }
                 else ->
-                    item.setIcon(getBitmapMapPin(index, R.drawable.ic_location_pin))
+                    item.apply {
+                        setIcon(getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin))
+                        zIndex = Z_INDEX_NORMAL
+                    }
             }
         }
     }
@@ -135,29 +149,36 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
     private fun addMarkers(cafes:List<CafenomadDisplay>){
         markerList.clear()
 
-        IntStream.range(0,cafes.size).forEach { cafeIndex -> run{
+        IntStream.range(0,cafes.size).forEach { cafeIndex ->
             val cafe = cafes[cafeIndex]
-            mMap?.run {
+            val cafeIndexDisplay = 1+cafeIndex
+            mMap.run {
                 val marker = addMarker(MarkerOptions()
                     .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
                     .icon(
                         when {
                             cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
-                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin_selected)
+                                getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_selected)
                             cafe.isFavorite ->
-                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin_favorite)
+                                getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_favorite)
                             else ->
-                                getBitmapMapPin(cafeIndex, R.drawable.ic_location_pin)
+                                getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin)
                         }
                     )
                     .title(cafe.cafenomad.name)
                     .draggable(false)
+                    .zIndex(
+                        when {
+                            cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id -> Z_INDEX_CURRENT
+                            else -> Z_INDEX_NORMAL
+                        }
+                    )
                 )
 
                 marker.tag = cafe
                 markerList.add(marker)
             }
-        }}
+        }
     }
 
     private fun getBitmapMapPin(number:Int, resId:Int): BitmapDescriptor?{
@@ -222,7 +243,11 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         }
     }
 
-    private fun LatLngBounds.Builder.createBoundsForAllMarkers(markers: MutableList<Marker>):LatLngBounds {
+    //extend function of LatLngBounds.Builder
+    //to create a bound for all markers.
+    private fun LatLngBounds.Builder.createBoundsForAllMarkers(markers: MutableList<Marker>):LatLngBounds? {
+        if(markers.isEmpty()) return null
+
         markers.stream().forEach {
             include(it.position)
         }
@@ -232,9 +257,9 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
     private fun moveCameraToShowAllMarkers(){
         val builder = LatLngBounds.Builder()
-        var bounds = builder.createBoundsForAllMarkers(markerList)  //Updated bounds.
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 72))
+        val bounds = builder.createBoundsForAllMarkers(markerList) ?: return  //Updated bounds.
 
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 72))
     }
 
     private fun enableMyLocation(){
@@ -246,6 +271,11 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                 mMap.uiSettings.isMyLocationButtonEnabled = true
             }
         }
+    }
+
+    private fun isThereMarkerInMap():Boolean{
+        val currentViewBound = mMap.projection.visibleRegion.latLngBounds
+        return markerList.stream().anyMatch{ marker -> currentViewBound.contains(marker.position)}
     }
 
     override fun onRequestPermissionsResult(
