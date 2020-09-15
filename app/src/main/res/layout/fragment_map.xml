@@ -1,8 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.gms.maps.MapView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mapView"
-    android:layout_width="match_parent"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewmodel"
+            type="com.timothy.coffee.viewmodel.MainViewModel" />
+    </data>
+<FrameLayout
     android:layout_height="match_parent"
-    tools:context=".view.MapFragment">
-</com.google.android.gms.maps.MapView>
+    android:layout_width="match_parent">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/research_this_area_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/button_text_search_this_area"
+        android:layout_gravity="center_horizontal"
+        android:visibility="@{viewmodel.isReSearchable ? View.VISIBLE : View.INVISIBLE}"
+        android:theme="@style/CommonButtonStyle"/>
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.MapFragment">
+    </com.google.android.gms.maps.MapView>
+</FrameLayout>
+</layout>

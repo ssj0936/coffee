@@ -57,4 +57,6 @@
 
     <string name="snackbar_refetch_done">資料更新完成</string>
     <string name="snackbar_refetch_fail">資料更新失敗，請等等再重試一次</string>
+
+    <string name="button_text_search_this_area">搜尋這個區域</string>
 </resources>

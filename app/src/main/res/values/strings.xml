@@ -77,8 +77,8 @@
         <item>@string/filter_text_all</item>
         <item>@string/filter_text_favorite_only</item>
 <!--        <item>@string/filter_text_distance_nearest</item>-->
-        <item>@string/filter_text_distance_farthest</item>
-        <item>@string/filter_text_star</item>
+<!--        <item>@string/filter_text_distance_farthest</item>-->
+<!--        <item>@string/filter_text_star</item>-->
     </string-array>
 
     <string name="filter_label_all" translatable="false">FILTER_ALL</string>
@@ -91,11 +91,13 @@
         <item>@string/filter_label_all</item>
         <item>@string/filter_label_favorite_only</item>
 <!--        <item>@string/filter_label_distance_nearest</item>-->
-        <item>@string/filter_label_distance_farthest</item>
-        <item>@string/filter_label_star</item>
+<!--        <item>@string/filter_label_distance_farthest</item>-->
+<!--        <item>@string/filter_label_star</item>-->
     </string-array>
 
     <string name="snackbar_refetch_done">Refetch Cafe data Finish.</string>
     <string name="snackbar_refetch_fail">Refetch Cafe data fail, please retry later.</string>
+
+    <string name="button_text_search_this_area">Serach this Area</string>
 
 </resources>

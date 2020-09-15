@@ -12,7 +12,6 @@ import com.timothy.coffee.R
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,9 +66,9 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
 
         mRefetchButton = findPreference(getString(R.string.preference_key_refetch_data))!!
         mRefetchButton.setOnPreferenceClickListener {
-            if(mMainViewModel.isDataFetching) return@setOnPreferenceClickListener true
+            if(mMainViewModel.isLoading.value == true) return@setOnPreferenceClickListener true
 
-            mMainViewModel.isDataFetching = true
+            mMainViewModel.isLoading.value = true
 
             mMainViewModel.refetchCafeData(requireContext())
                 .subscribeOn(Schedulers.io())
@@ -84,7 +83,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
                     //update cafe list
                     mMainViewModel.initialLocalCafeData(it, requireContext())
 
-                    mMainViewModel.isDataFetching = false
+                    mMainViewModel.isLoading.postValue(false)
                 },{error->
                     Timber.e("ReFetch data error: $error")
                     Snackbar.make(
@@ -92,7 +91,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
                         R.string.snackbar_refetch_fail,
                         Snackbar.LENGTH_LONG
                     ).setAction("Action", null).show()
-                    mMainViewModel.isDataFetching = false
+                    mMainViewModel.isLoading.postValue(false)
                 })
 
                 true

@@ -1,7 +1,6 @@
 package com.timothy.coffee.viewmodel
 
 import android.annotation.SuppressLint
-import android.app.Application
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,11 +10,10 @@ import com.timothy.coffee.R
 
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
-import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
-import com.timothy.coffee.data.model.Locationiq
 import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.Utils
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -39,13 +37,23 @@ class MainViewModel @Inject constructor(
     //紀錄目前使用的顯示模式(sort/filter)
     val sortType:MutableLiveData<String> = MutableLiveData()
 
+    val isReSearchable:MutableLiveData<Boolean> = MutableLiveData()
+
     var lastSortType:String? = null
     var lastMove = Movement(isClickMap = false, isClickList = false)
-    var isDataFetching = false
+    var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
     @SuppressLint("ResourceType")
     fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
-        return getLocationObservable(context)
+        return Observable.just("")
+            .flatMap {
+                if (loc.value == null) {
+                    getLocationObservable(context)
+                }
+                else{
+                    Observable.just(loc.value)
+                }
+            }
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .flatMap{lonlat ->
@@ -54,87 +62,59 @@ class MainViewModel @Inject constructor(
 
                 if(lonlat != loc.value || isForce){
 //                    Timber.d("different lon && lat:${lonlat.latitude},${lonlat.longitude}")
-                    val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
+                    Timber.d("loc:${loc.value}")
                     loc.postValue(lonlat)
-                    dataSource.queryV2(lonlat.latitude,lonlat.longitude,range)
+                    getCafeListFromLocation(context,lonlat,false)
                 }else{
 //                    Timber.d("same lon && lat")
                     Observable.empty<List<CafenomadDisplay>>()
                 }
             }
-            .observeOn(Schedulers.computation())
-            .map { cafes ->
-//                Timber.d("cafes:${cafes}")
+    }
 
-                //distance assignment
-                cafes.stream().forEach {cafe->
-                    loc.value?.let{
-                        cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
-                            it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
-                    }
-                }
+    @SuppressLint("ResourceType")
+    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForce:Boolean):Observable<List<CafenomadDisplay>> {
+        return Observable.just(latLng)
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .flatMap {lonlat->
+                val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
+                dataSource.queryV2(lonlat.latitude,lonlat.longitude,range,isForce)
+                    .observeOn(Schedulers.computation())
+                    .map { cafes ->
+                        //distance assignment
+                        cafes.stream().forEach {cafe->
+                            loc.value?.let{
+                                cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
+                                    it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
+                            }
+                        }
 
-                cafes.stream()
-                    //double filtering cafe out of range
-                    .filter{cafe->
-                        val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)*1000
-                        cafe.cafenomad.distance < range
+                        cafes.stream()
+                            //double filtering cafe out of range
+                            .filter{cafe->
+                                cafe.cafenomad.distance < range*1000
+                            }
+                            //sort by distance from nearest to farest
+                            .sorted{
+                                    cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                            }
+                            .collect(Collectors.toList())
                     }
-                    //sort by distance from nearest to farest
-                    .sorted{
-                        cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
-                    }
-                    .collect(Collectors.toList())
             }
     }
 
     @SuppressLint("ResourceType")
     fun refetchCafeData(context: Context):Observable<List<CafenomadDisplay>>{
-        val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
-        if(loc.value != null) {
-            return dataSource.queryV2(loc.value!!.latitude, loc.value!!.longitude, range, true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
-                .map{cafes ->
-                    //distance assignment
-                    cafes.stream().forEach {cafe->
-                        loc.value?.let{
-                            cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
-                                it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
-                        }
-                    }
-
-                    cafes.stream()
-                        //double filtering cafe out of range
-                        .filter{cafe->
-                            val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)*1000
-                            cafe.cafenomad.distance < range
-                        }
-                        //sort by distance from nearest to farest
-                        .sorted{
-                                cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
-                        }
-                        .collect(Collectors.toList())
-                }
-        }else{
-            return Observable.empty<List<CafenomadDisplay>>()
+        loc.value?.let {
+            return@refetchCafeData getCafeListFromLocation(context,it,true)
         }
+        return Observable.empty<List<CafenomadDisplay>>()
     }
-
 
     private fun getLocationObservable(context: Context): Observable<LatLng> {
 //        Timber.d("get Test Location")
         return dataModel.getLocationObservable(context)
-    }
-
-    private fun getLocationiqObservable(lat: Double, lon:Double): Observable<Locationiq>{
-//        Timber.d("get Locationiq")
-        return dataModel.getLocationiqObservable(lat,lon)
-    }
-
-    private fun getCafenomadObservable(city:String): Observable<List<Cafenomad>>{
-//        Timber.d("get Cafenomad")
-        return dataModel.getCafenomadObservable(city)
     }
 
     @SuppressLint("ResourceType")
@@ -195,7 +175,7 @@ class MainViewModel @Inject constructor(
         Single.just("")
             .observeOn(Schedulers.computation())
             .subscribe({
-                isDataFetching = true
+                isLoading.postValue(true)
 
                 //update cafelist for display
                 cafeListAll.value?.let {
@@ -224,9 +204,10 @@ class MainViewModel @Inject constructor(
                             chosenCafe.postValue(sortedConditionalCafeList.first())
                     }
                 }
-                isDataFetching = false
+                isLoading.postValue(false)
             },{error ->
                 Timber.d("Update max cafe return number error: $error")
+                isLoading.postValue(false)
             })
     }
 

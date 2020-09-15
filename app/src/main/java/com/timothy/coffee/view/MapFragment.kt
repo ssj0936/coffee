@@ -1,5 +1,6 @@
 package com.timothy.coffee.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -15,27 +16,38 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
+import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
+import com.timothy.coffee.databinding.FragmentMapBinding
+import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_map.*
+import timber.log.Timber
 import java.util.stream.IntStream
 import javax.inject.Inject
 
 
-class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+class MapFragment : Fragment(),OnMapReadyCallback,
+    GoogleMap.OnMarkerClickListener,
+    GoogleMap.OnCameraIdleListener,
+    View.OnClickListener
+{
 
     @Inject
     lateinit var mViewModelFactory:ViewModelFactory
     private lateinit var mMainViewModel: MainViewModel
     private lateinit var mMap:GoogleMap
+    private lateinit var binding: FragmentMapBinding
     private val Z_INDEX_NORMAL = 0f
     private val Z_INDEX_CURRENT = 2f
 
@@ -67,17 +79,23 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        binding = FragmentMapBinding.inflate(inflater,container,false)
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.viewmodel = mMainViewModel
+        binding.lifecycleOwner=this
+
         mapView?.run {
             onCreate(savedInstanceState)
             onResume()
             getMapAsync(this@MapFragment)
         }
+
+        binding.researchThisAreaBtn.setOnClickListener(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -94,13 +112,13 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>> { cafes ->
-                mMap?.let{
+                mMap.let{
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
 
                     //only move camera when scrolling too far from group of marker
-                    if(!isThereMarkerInMap())
+//                    if(!isThereMarkerInMap())
                         moveCameraToShowAllMarkers()
                 }
             })
@@ -110,6 +128,8 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 //                moveCameraTo(it)
                 updateMarkersIcon()
             })
+
+        mMap.setOnCameraIdleListener(this)
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
@@ -259,7 +279,41 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         val builder = LatLngBounds.Builder()
         val bounds = builder.createBoundsForAllMarkers(markerList) ?: return  //Updated bounds.
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 72))
+//        Timber.d("bounds:$bounds")
+//
+//        markerList.stream().forEach {
+//            (it.tag as CafenomadDisplay).run{
+//                Timber.d("name:${this.cafenomad.name}/lat:${this.cafenomad.latitude}/lng:${this.cafenomad.longitude}")
+//            }
+//        }
+
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels -
+                resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height)*2
+        val padding = (width * 0.1).toInt()
+        val cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding)
+
+        mMap.animateCamera(cu, object :GoogleMap.CancelableCallback{
+            //Invoked if the animation goes to completion without interruption.
+            override fun onFinish() {
+                mMap.cameraPosition.target?.let {
+                    if(it != mMainViewModel.loc.value) {
+                        mMainViewModel.loc.value = it
+                        mMainViewModel.isReSearchable.value = false
+                    }
+                }
+            }
+
+            //Invoked if the animation is interrupted by calling stopAnimation() or starting a new camera movement.
+            override fun onCancel() {
+                mMap.cameraPosition.target?.let {
+                    if(it != mMainViewModel.loc.value) {
+                        mMainViewModel.loc.value = it
+                        mMainViewModel.isReSearchable.value = false
+                    }
+                }
+            }
+        })
     }
 
     private fun enableMyLocation(){
@@ -289,6 +343,41 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
                     enableMyLocation()
                 }
             }
+        }
+    }
+
+    override fun onCameraIdle() {
+        val currentCenterCoordinate = mMap.cameraPosition.target
+
+        mMainViewModel.loc.value?.let {
+            if(Utils.distance(currentCenterCoordinate.latitude,it.latitude
+                    ,currentCenterCoordinate.longitude,it.longitude) >1000){
+                mMainViewModel.isReSearchable.value = true
+            }
+        }
+
+        Timber.d("The camera has stopped moving.")
+    }
+
+    @SuppressLint("CheckResult")
+    override fun onClick(v: View?) {
+        mMainViewModel.isReSearchable.value = false
+        mMainViewModel.loc.value = mMap.cameraPosition.target
+        mMainViewModel.isLoading.value = true
+
+        mMainViewModel.loc.value?.let {latlon ->
+            mMainViewModel.getCafeListFromLocation(requireContext(),latlon,false)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .subscribe({
+                    //update cafe list
+                    mMainViewModel.initialLocalCafeData(it, requireContext())
+
+                    mMainViewModel.isLoading.postValue(false)
+                },{error->
+                    Timber.e("ReFetch data error: $error")
+                    mMainViewModel.isLoading.postValue(false)
+                })
         }
     }
 }
