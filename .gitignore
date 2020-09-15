@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 app/src/main/res/values/apikey.xml
+app/release
+key.jks
