@@ -11,7 +11,7 @@
     <dimen name="rate_total_number_text_size">14sp</dimen>
 
     <dimen name="bottom_sheet_anchor_offset">100dp</dimen>
-    <dimen name="bottom_sheet_peek_height">150dp</dimen>
+    <dimen name="bottom_sheet_peek_height">160dp</dimen>
 
     <dimen name="cafelist_title_text_size">17sp</dimen>
     <dimen name="cafelist_subtitle_text_size">13sp</dimen>
@@ -19,6 +19,7 @@
     <dimen name="cafeinfo_v2_card_padding">30dp</dimen>
 
     <dimen name="cafeinfo_padding_top">32dp</dimen>
+    <dimen name="cafeinfo_padding_bottom">26dp</dimen>
     <dimen name="cafeinfo_padding_side">30dp</dimen>
 
     <dimen name="cafeinfo_favorite_btn_size">30dp</dimen>

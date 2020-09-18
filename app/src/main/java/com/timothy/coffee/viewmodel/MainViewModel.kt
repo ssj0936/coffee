@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
 
                 if(lonlat != loc.value || isForce){
 //                    Timber.d("different lon && lat:${lonlat.latitude},${lonlat.longitude}")
-                    Timber.d("loc:${loc.value}")
+//                    Timber.d("loc:${loc.value}")
                     loc.postValue(lonlat)
                     getCafeListFromLocation(context,lonlat,false)
                 }else{
@@ -154,20 +154,22 @@ class MainViewModel @Inject constructor(
         //for favorite showing
         //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
         //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
-        val currentCafe = chosenCafe.value
-        if(currentCafe != null){
-            val newCafe = list.stream()
-                .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
-                .findAny()
-                .orElse(null)
-
-            if(currentCafe != newCafe)
-                chosenCafe.postValue(newCafe)
-        }
-        else{
-            if(sortedConditionalCafeList.isNotEmpty())
-                chosenCafe.postValue(sortedConditionalCafeList.first())
-        }
+//        val currentCafe = chosenCafe.value
+//        if(currentCafe != null){
+//            val newCafe = list.stream()
+//                .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
+//                .findAny()
+//                .orElse(null)
+//
+//            if(currentCafe != newCafe)
+//                chosenCafe.postValue(newCafe)
+//        }
+//        else{
+//            if(sortedConditionalCafeList.isNotEmpty())
+//                chosenCafe.postValue(sortedConditionalCafeList.first())
+//        }
+        if(sortedConditionalCafeList.isNotEmpty())
+            chosenCafe.postValue(sortedConditionalCafeList.first())
     }
 
     @SuppressLint("CheckResult")
@@ -307,7 +309,6 @@ class MainViewModel @Inject constructor(
             .observeOn(Schedulers.io())
             .doOnSuccess {deleteCnt->
                 if(deleteCnt>0) {
-
                     //cafeList update
                     cafeListAll.value?.let {
                         val updatedItem = it.stream().filter { cafe ->
@@ -322,26 +323,30 @@ class MainViewModel @Inject constructor(
 
                     //cafeDisplay update
                     var currentIndex = 0
+                    lateinit var newCafeListDisplay:List<CafenomadDisplay>
 
                     cafeListDisplay.value?.let {
                         val updatedItem = it.stream().filter { cafe ->
                             cafe.cafenomad.id == cafeId
                         }.findAny().orElse(null)
                         currentIndex = it.indexOf(updatedItem)
+
                         if (updatedItem != null) {
                             updatedItem.isFavorite = false
 
                             // 更改完內容後，依據目前的display type決定是否需要做刪減
                             if (lastSortType != null){
-                                cafeListDisplay.postValue(
-                                    getSortedCafeList(
-                                        it,
-                                        lastSortType!!,
-                                        context
-                                    )
+                                val sortedlist = getSortedCafeList(
+                                    it,
+                                    lastSortType!!,
+                                    context
                                 )
+
+                                newCafeListDisplay = sortedlist
+                                cafeListDisplay.postValue(sortedlist)
                             }
                             else {
+                                newCafeListDisplay = it
                                 cafeListDisplay.postValue(it)
                             }
                         }
@@ -354,26 +359,28 @@ class MainViewModel @Inject constructor(
 
                             //if current chosenCafe is inappropriate to be shown on cafeListDisplay
                             //then set chosenCafe to cafeListDisplay[0]
-                            if(cafeListDisplay.value != null
-                                && cafeListDisplay.value!!
+                            if(newCafeListDisplay
                                     .stream()
                                     .filter { cafe -> cafe.cafenomad.id == it.cafenomad.id }
                                     .count() == 0L){
 
-                                if(cafeListDisplay.value!!.isNotEmpty()){
-                                    if(currentIndex<0 || currentIndex >= cafeListDisplay.value!!.size)
-                                        chosenCafe.postValue(cafeListDisplay.value!![0].copy())
-                                    else
-                                        chosenCafe.postValue(cafeListDisplay.value!![currentIndex].copy())
+                                if(newCafeListDisplay.isNotEmpty()){
+                                    if(currentIndex<0 || currentIndex >= newCafeListDisplay.size) {
+                                        val t = newCafeListDisplay[0].copy()
+                                        chosenCafe.postValue(t)
+                                    }else {
+                                        val t = newCafeListDisplay[currentIndex].copy()
+                                        chosenCafe.postValue(t)
+                                    }
                                 }else{
                                     chosenCafe.postValue(null)
+
                                 }
                             }else{
                                 chosenCafe.postValue(it)
                             }
                         }
                     }
-
                 }
             }
     }

@@ -356,7 +356,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             }
         }
 
-        Timber.d("The camera has stopped moving.")
+//        Timber.d("The camera has stopped moving.")
     }
 
     @SuppressLint("CheckResult")
