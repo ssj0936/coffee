@@ -8,6 +8,7 @@ import retrofit2.http.Path
 
 interface CafenomadApiService{
 
+    /* Deprecated */
     @GET("api/v1.2/cafes/{city}")
     fun searchCafes (@Path("city") city:String) : Observable<List<Cafenomad>>
 

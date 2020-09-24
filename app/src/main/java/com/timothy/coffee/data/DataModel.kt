@@ -16,6 +16,7 @@ import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.Locationiq
 import io.reactivex.Maybe
 import io.reactivex.Observable
+import io.reactivex.Single
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +35,7 @@ class DataModel
         return fusedLocationClient
     }
 
-    private fun getLastKnownLocation(context: Context):Observable<LatLng>{
+    fun getLastKnownLocation(context: Context):Single<LatLng>{
         return Maybe.create<LatLng> { emitter ->
             getFusedLocationClient(context).lastLocation
                 .addOnSuccessListener {
@@ -52,7 +53,7 @@ class DataModel
 //                    Timber.d("getLastKnownLocation error")
                     emitter.onComplete()
                 }
-        }.toObservable()
+        }.toSingle()
 
     }
 
@@ -85,31 +86,4 @@ class DataModel
 
         }
     }
-
-    private val testLonLat = listOf(LatLng(25.0392,121.525),//Taipei
-        LatLng(24.123206,120.675679)//TaiChung
-        )
-
-    //get last location first and show it
-    //then fetch current location
-    fun getLocationObservable(context: Context):Observable<LatLng>{
-        return Observable.concatArray(
-            getLastKnownLocation(context)
-//            getCurrentLocation(context)
-        )
-    }
-
-    fun getLocationObservableTest(context: Context): Observable<LatLng> {
-//        return Observable.interval(5, TimeUnit.SECONDS)
-//            .flatMap {
-//                Timber.d(""+testLonLat[it.toInt() % testLonLat.size].toString())
-//                Observable.just(testLonLat[it.toInt() % testLonLat.size])
-//            }
-
-        return Observable.just(testLonLat[0])
-    }
-
-    fun getLocationiqObservable(lat:Double, lon: Double):Observable<Locationiq> = locationiqApiService.reverseGeocoding(lat,lon)
-
-    fun getCafenomadObservable(city:String):Observable<List<Cafenomad>> = cafenomadApiService.searchCafes(city)
 }

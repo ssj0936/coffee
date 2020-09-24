@@ -54,14 +54,14 @@ class MainViewModel @Inject constructor(
     var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context, isForce:Boolean):Observable<List<CafenomadDisplay>> {
-        return Observable.just("")
+    fun getCafeList(context: Context, isForce:Boolean):Single<List<CafenomadDisplay>> {
+        return Single.just("")
             .flatMap {
                 if (loc.value == null) {
                     getLocationObservable(context)
                 }
                 else{
-                    Observable.just(loc.value)
+                    Single.just(loc.value)
                 }
             }
             .subscribeOn(Schedulers.io())
@@ -70,21 +70,14 @@ class MainViewModel @Inject constructor(
 //                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
 //                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
 
-                if(lonlat != loc.value || isForce){
-//                    Timber.d("different lon && lat:${lonlat.latitude},${lonlat.longitude}")
-//                    Timber.d("loc:${loc.value}")
-                    loc.postValue(lonlat)
-                    getCafeListFromLocation(context,lonlat,false)
-                }else{
-//                    Timber.d("same lon && lat")
-                    Observable.empty<List<CafenomadDisplay>>()
-                }
+                loc.postValue(lonlat)
+                getCafeListFromLocation(context,lonlat,false)
             }
     }
 
     @SuppressLint("ResourceType")
-    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForce:Boolean):Observable<List<CafenomadDisplay>> {
-        return Observable.just(latLng)
+    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForce:Boolean):Single<List<CafenomadDisplay>> {
+        return Single.just(latLng)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .flatMap {lonlat->
@@ -115,36 +108,16 @@ class MainViewModel @Inject constructor(
     }
 
     @SuppressLint("ResourceType")
-    fun refetchCafeData(context: Context):Observable<List<CafenomadDisplay>>{
+    fun refetchCafeData(context: Context):Single<List<CafenomadDisplay>>{
         loc.value?.let {
             return@refetchCafeData getCafeListFromLocation(context,it,true)
         }
-        return Observable.empty<List<CafenomadDisplay>>()
+        return getCafeList(context,false)
     }
 
-    private fun getLocationObservable(context: Context): Observable<LatLng> {
+    private fun getLocationObservable(context: Context): Single<LatLng> {
 //        Timber.d("get Test Location")
-        return dataModel.getLocationObservable(context)
-    }
-
-    @SuppressLint("ResourceType")
-    fun setCafeViaSortType(type:String, context: Context){
-        if(cafeListAll.value == null || type == lastSortType) return
-        Timber.d("SORT TYPE:${type}")
-
-        cafeListAll.value?.let {
-            val sortedConditionalCafeList = getSortedCafeList(it,type,context)
-
-            //cafeListDisplay
-            cafeListDisplay.value = sortedConditionalCafeList
-
-            //chosenCafe
-            chosenCafe.postValue(
-                if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
-                else null
-            )
-        }
-        lastSortType = type
+        return dataModel.getLastKnownLocation(context)
     }
 
     //refetch button on map
@@ -168,21 +141,35 @@ class MainViewModel @Inject constructor(
         //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
         //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
         val currentCafe = chosenCafe.value
+        Timber.d("currentCafe:${currentCafe}")
         if(currentCafe != null){
-            val newCafe = list.stream()
+            val newCafe = sortedConditionalCafeList.stream()
                 .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
                 .findAny()
                 .orElse(null)
 
-            if(currentCafe != newCafe)
-                chosenCafe.postValue(newCafe)
-            else if(sortedConditionalCafeList.isNotEmpty())
+            //new displayCafeList doesn't contain chosenCafe -> assign to sortedConditionalCafeList.first
+            if(newCafe == null && sortedConditionalCafeList.isNotEmpty()){
                 chosenCafe.postValue(sortedConditionalCafeList.first())
+            }
+            //new displayCafeList contains chosenCafe, but different value(ex. favorite) -> re-assign
+            else if(currentCafe != newCafe) {
+                chosenCafe.postValue(newCafe)
+            }
+            else {
+                chosenCafe.postValue(currentCafe)
+            }
         }
+        //first time launch
+        //chosenCafe == value
         else{
             chosenCafe.postValue(
-                if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
-                else null
+                if(sortedConditionalCafeList.isNotEmpty()){
+                    sortedConditionalCafeList.first()
+                }
+                else{
+                    null
+                }
             )
         }
     }

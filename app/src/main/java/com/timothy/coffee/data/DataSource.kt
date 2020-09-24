@@ -21,34 +21,19 @@ class DataSource @Inject constructor(
    private val cafenomadApiService: CafenomadApiService
 ) {
 
-//    fun queryTest(city:String):Observable<List<CafenomadDisplay>>{
-//        return cafeDao.queryCafeByCityTest(city).toObservable().subscribeOn(Schedulers.io())
-//    }
-
-    fun query(city:String):Observable<List<CafenomadDisplay>>{
-        return Observable.concatArray(
-            queryFromDB(city),
-            queryFromApi(city))
-            .subscribeOn(Schedulers.io())
-    }
-
-    fun queryV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
-        return queryV2(latitude, longitude, range, false)
-    }
-
     @SuppressLint("CheckResult")
-    fun queryV2(latitude:Double, longitude:Double, range:Int, isForce:Boolean):Observable<List<CafenomadDisplay>>{
-        return Observable.just("")
+    fun queryV2(latitude:Double, longitude:Double, range:Int, isForce:Boolean):Single<List<CafenomadDisplay>>{
+        return Single.just("")
             .flatMap {
-                cafeDao.getRowNum().toObservable()
+                cafeDao.getRowNum()
             }.flatMap {
                 if(it<=0 || isForce){
                     cafenomadApiService.searchAllCafes()
                         .doOnNext {list->
                             insertToDBV2(list)
-                        }
+                        }.single(emptyList())
                 }else{
-                    Observable.just(emptyList())
+                    Single.just(emptyList())
                 }
             }.flatMap {
                 queryFromDBV2(latitude, longitude, range)
@@ -66,15 +51,8 @@ class DataSource @Inject constructor(
     (https://blog.nex3z.com/2017/10/31/android-room-rxjava-%E6%9F%A5%E8%AF%A2%E8%AE%B0%E5%BD%95%E4%B8%8D%E5%AD%98%E5%9C%A8%E7%9A%84%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95/)
     (https://medium.com/androiddevelopers/room-rxjava-acb0cd4f3757)
     (https://code.tutsplus.com/zh-hant/tutorials/reactive-programming-operators-in-rxjava-20--cms-28396)*/
-    private fun queryFromDB(city: String):Observable<List<CafenomadDisplay>>{
-        return cafeDao.queryCafeByCity(city)
-            .toObservable()
-            .subscribeOn(Schedulers.io())
-    }
-
-    private fun queryFromDBV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
+    private fun queryFromDBV2(latitude:Double, longitude:Double, range:Int):Single<List<CafenomadDisplay>>{
         return queryFromDBV2Convert(latitude,longitude,range)
-            .toObservable()
             .subscribeOn(Schedulers.io())
     }
 
@@ -83,57 +61,15 @@ class DataSource @Inject constructor(
             longitude+0.01*range,longitude-0.01*range)
     }
 
-    private fun insertToDB(list: List<Cafenomad>, city: String){
-        var tmpList = list
-        tmpList.forEach {it.cityname = city}
-        cafeDao.insertCafe(tmpList)
-    }
-
     private fun insertToDBV2(list: List<Cafenomad>){
         var tmpList = list
         tmpList.forEach {it.cityname = null}
         cafeDao.insertCafe(tmpList)
     }
 
-    private fun queryFromApi(city: String):Observable<List<CafenomadDisplay>>{
-        return Observable.just("")
-            .observeOn(Schedulers.io())
-            .flatMap {
-                cafenomadApiService.searchCafes(city)
-                    .doOnNext {list->
-                        insertToDB(list,city)
-                    }
-            }.flatMap {
-                queryFromDB(city)
-            }
-    }
-
-    private fun queryFromApiV2(latitude:Double, longitude:Double, range:Int):Observable<List<CafenomadDisplay>>{
-        return Observable.just("")
-            .observeOn(Schedulers.io())
-            .flatMap {
-                cafenomadApiService.searchAllCafes()
-                    .doOnNext {list->
-                        insertToDBV2(list)
-                    }
-            }.flatMap {
-                queryFromDBV2(latitude, longitude, range)
-            }
-    }
-
-    fun insertFavorite(cafeId:String):Long{
-        //return ID for success, return -1 for conflict replace
-        return cafeDao.insertFavoriteId(FavoriteID(cafeId))
-    }
-
     fun insertFavoriteV2(cafeId:String):Single<Long>{
         //return ID for success, return -1 for conflict replace
         return cafeDao.insertFavoriteIdV2(FavoriteID(cafeId))
-    }
-
-    fun deleteFavorite(cafeId:String):Int{
-        //return num of delete item
-        return cafeDao.deleteFavoriteId(cafeId)
     }
 
     fun deleteFavoriteV2(cafeId:String):Single<Int>{

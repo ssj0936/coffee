@@ -53,7 +53,7 @@ class MainFragment: Fragment()
 //    private lateinit var cafeAdapter: CafeViewPagerAdapter
     private lateinit var cafeAdapter: CafeViewPagerAdapterV2
     private lateinit var binding: FragmentMainBinding
-    private val compositeDisposable = CompositeDisposable()
+//    private val compositeDisposable = CompositeDisposable()
     private lateinit var behavior: AnchorBottomSheetBehavior<View>
 
     companion object{
@@ -120,14 +120,8 @@ class MainFragment: Fragment()
                 cafeAdapter.setCardList(it)
         })
 
-//        mMainViewModel.sortType.observe(viewLifecycleOwner,
-//            Observer<String>{
-//                mMainViewModel.setCafeViaSortType(it,requireContext())
-//        })
-
         // setting button
         binding.settingBtn.setOnClickListener(this)
-//        binding.sortBtn.setOnClickListener(this)
         binding.filterBtn.setOnClickListener(this)
 
         //check network
@@ -239,34 +233,11 @@ class MainFragment: Fragment()
 
     //return false for event propagation
     fun onBackPressed():Boolean {
-//        if(viewpager.currentItem == 0) {
-//            when(behavior.state){
-//                AnchorBottomSheetBehavior.STATE_ANCHORED -> {
-//                    behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
-//                    return true
-//                }
-//                AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
-//                    viewpager.currentItem = -1
-//                    return false
-//                }
-//            }
-//        }
-//        else if(viewpager.currentItem == 1) {
-//            if(mMainViewModel.lastMove.isClickList) {
-//                viewpager.currentItem = viewpager.currentItem - 1
-//            }
-//            else if (mMainViewModel.lastMove.isClickMap){
-//                when(behavior.state){
-//                    AnchorBottomSheetBehavior.STATE_ANCHORED ->
-//                        behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
-//                    AnchorBottomSheetBehavior.STATE_COLLAPSED -> {
-//                        viewpager.currentItem = viewpager.currentItem - 1
-//                        behavior.state = AnchorBottomSheetBehavior.STATE_ANCHORED
-//                    }
-//                }
-//            }
-//            return true
-//        }
+        if(behavior.state == AnchorBottomSheetBehavior.STATE_ANCHORED) {
+            behavior.state = AnchorBottomSheetBehavior.STATE_COLLAPSED
+            return true
+        }
+
         return false
     }
 
@@ -300,27 +271,11 @@ class MainFragment: Fragment()
             .show()
     }
 
-    override fun onStart() {
-        super.onStart()
-        //get Cafe info when network available && permission granted
-        if(compositeDisposable.size() == 0 && (Utils.isNetworkAvailable(requireContext()) && isPermissionGranted())) {
-            requestCafe(true)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if(compositeDisposable.size() != 0)
-            compositeDisposable.clear()
-    }
-
     private fun requestCafe() = requestCafe(false)
 
     @SuppressLint("CheckResult")
     private fun requestCafe(force:Boolean){
-        compositeDisposable.add(
-            queryCafeList(force)
-        )
+        queryCafeList(force)
     }
 
     @SuppressLint("ResourceType")
@@ -358,12 +313,6 @@ class MainFragment: Fragment()
         requestPermissions(Utils.needPermissions, RESULT_PERMISSION_LOCATION)
     }
 
-//    private fun showSortDialog(){
-//        requireActivity().supportFragmentManager.let{
-//            SortDialogFragment().show(it,"")
-//        }
-//    }
-
     private fun showFilterDialog(){
         requireActivity().supportFragmentManager.let{
             FilterDialogFragment().show(it,"")
@@ -375,9 +324,6 @@ class MainFragment: Fragment()
             setting_btn ->{
                 (requireActivity() as? MainActivity)?.switchToSettingPreference()
             }
-//            sort_btn->{
-//                showSortDialog()
-//            }
             filter_btn->{
                 showFilterDialog()
             }
