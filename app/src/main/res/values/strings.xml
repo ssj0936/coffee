@@ -96,6 +96,24 @@
     <string name="snackbar_refetch_done">Refetch Cafe data Finish.</string>
     <string name="snackbar_refetch_fail">Refetch Cafe data fail, please retry later.</string>
 
-    <string name="button_text_search_this_area">Serach this Area</string>
+    <string name="button_text_search_this_area">Search this Area</string>
+
+    <string name="filter_group_title_tasty_rate">Tasty rate</string>
+    <string name="filter_group_title_environment_option">Environment option</string>
+    <string name="filter_group_title_favorite">My favorite</string>
+
+    <string name="filter_group_environment_option_is_time_limit">No Time Limit</string>
+    <string name="filter_group_environment_option_has_socket">Socket provided</string>
+    <string name="filter_group_environment_option_has_standing_desk">Standing desk provided</string>
+
+    <string name="filter_tasty_button_0">no information</string>
+    <string name="filter_tasty_button_1">1 star</string>
+    <string name="filter_tasty_button_2">2 stars</string>
+    <string name="filter_tasty_button_3">3 stars</string>
+    <string name="filter_tasty_button_4">4 stars</string>
+    <string name="filter_tasty_button_5">5 stars</string>
+
+    <string name="filter_group_favorite">Show my favorite only</string>
+
 
 </resources>

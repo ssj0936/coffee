@@ -21,18 +21,35 @@
                 android:id="@+id/mapContainer"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
+            <LinearLayout
+                android:id="@+id/button_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_behavior=".view.behavior.FilterButtonBehavior">
+<!--                <androidx.appcompat.widget.AppCompatImageButton-->
+<!--                    android:id="@+id/sort_btn"-->
+<!--                    android:layout_width="48dp"-->
+<!--                    android:layout_height="48dp"-->
+<!--                    android:layout_marginStart="8dp"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    app:srcCompat="@drawable/ic_swap_vert_black_24dp"-->
+<!--                    android:backgroundTint="@android:color/white"-->
+<!--                    android:alpha=".85"-->
+<!--                    style="@style/Widget.AppCompat.Button.Colored"/>-->
 
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/sort_btn"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                app:srcCompat="@drawable/ic_swap_vert_black_24dp"
-                android:backgroundTint="@android:color/white"
-                android:alpha=".85"
-                style="@style/Widget.AppCompat.Button.Colored"
-                app:layout_behavior=".view.behavior.FilterButtonBehavior"/>
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/filter_btn"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    app:srcCompat="@drawable/ic_sort_black_24dp"
+                    android:backgroundTint="@android:color/white"
+                    android:alpha=".85"
+                    style="@style/Widget.AppCompat.Button.Colored"/>
+            </LinearLayout>
+
 <!--            <androidx.viewpager.widget.ViewPager-->
 <!--                android:id="@+id/viewpager"-->
 <!--                android:layout_width="match_parent"-->

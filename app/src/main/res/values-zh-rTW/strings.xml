@@ -57,4 +57,21 @@
     <string name="snackbar_refetch_fail">資料更新失敗，請等等再重試一次</string>
 
     <string name="button_text_search_this_area">搜尋這個區域</string>
+
+    <string name="filter_group_title_tasty_rate">好吃程度</string>
+    <string name="filter_group_title_environment_option">用餐環境</string>
+    <string name="filter_group_title_favorite">我的最愛</string>
+
+    <string name="filter_group_environment_option_is_time_limit">無限時</string>
+    <string name="filter_group_environment_option_has_socket">提供插座</string>
+    <string name="filter_group_environment_option_has_standing_desk">可站立工作</string>
+
+    <string name="filter_tasty_button_0">無資訊</string>
+    <string name="filter_tasty_button_1">1星</string>
+    <string name="filter_tasty_button_2">2星</string>
+    <string name="filter_tasty_button_3">3星</string>
+    <string name="filter_tasty_button_4">4星</string>
+    <string name="filter_tasty_button_5">5星</string>
+
+    <string name="filter_group_favorite">只顯示我的最愛</string>
 </resources>

@@ -24,6 +24,7 @@ import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapterV2
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.view.CafeInfoV2Fragment
+import com.timothy.coffee.view.FilterDialogFragment
 import com.timothy.coffee.view.MapFragment
 import com.timothy.coffee.view.SortDialogFragment
 import com.timothy.coffee.viewmodel.MainViewModel
@@ -119,14 +120,15 @@ class MainFragment: Fragment()
                 cafeAdapter.setCardList(it)
         })
 
-        mMainViewModel.sortType.observe(viewLifecycleOwner,
-            Observer<String>{
-                mMainViewModel.setCafeViaSortType(it,requireContext())
-        })
+//        mMainViewModel.sortType.observe(viewLifecycleOwner,
+//            Observer<String>{
+//                mMainViewModel.setCafeViaSortType(it,requireContext())
+//        })
 
         // setting button
         binding.settingBtn.setOnClickListener(this)
-        binding.sortBtn.setOnClickListener(this)
+//        binding.sortBtn.setOnClickListener(this)
+        binding.filterBtn.setOnClickListener(this)
 
         //check network
         if(!Utils.isNetworkAvailable(requireContext()))
@@ -356,9 +358,15 @@ class MainFragment: Fragment()
         requestPermissions(Utils.needPermissions, RESULT_PERMISSION_LOCATION)
     }
 
+//    private fun showSortDialog(){
+//        requireActivity().supportFragmentManager.let{
+//            SortDialogFragment().show(it,"")
+//        }
+//    }
+
     private fun showFilterDialog(){
-        requireActivity().supportFragmentManager?.let{
-            SortDialogFragment().show(it,"")
+        requireActivity().supportFragmentManager.let{
+            FilterDialogFragment().show(it,"")
         }
     }
 
@@ -367,7 +375,10 @@ class MainFragment: Fragment()
             setting_btn ->{
                 (requireActivity() as? MainActivity)?.switchToSettingPreference()
             }
-            sort_btn->{
+//            sort_btn->{
+//                showSortDialog()
+//            }
+            filter_btn->{
                 showFilterDialog()
             }
         }

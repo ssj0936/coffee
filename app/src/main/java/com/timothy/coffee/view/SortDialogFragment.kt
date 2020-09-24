@@ -50,7 +50,7 @@ class SortDialogFragment: DialogFragment(){
 
         val mListener = object :SortingListAdapter.OnSortItemSelectListener{
             override fun onSortItemClick(mSortType: String) {
-                mMainViewModel.sortType.value = mSortType
+//                mMainViewModel.sortType.value = mSortType
                 dismiss()
             }
         }

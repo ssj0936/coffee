@@ -30,6 +30,9 @@ abstract class BuildersModule {
     abstract fun contributeSortDialogFragment(): SortDialogFragment
 
     @ContributesAndroidInjector
+    abstract fun contributeFilterDialogFragment(): FilterDialogFragment
+
+    @ContributesAndroidInjector
     abstract fun contributeSettingsPreferenceFragment(): SettingsPreferenceFragment
 
 }

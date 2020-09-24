@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import com.timothy.coffee.view.FilterDialogFragment
 import com.timothy.coffee.view.SettingsPreferenceFragment
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
@@ -24,6 +25,9 @@ class MainActivity: AppCompatActivity(), HasAndroidInjector {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //reset filter
+        FilterDialogFragment.resetFilter(this)
 
         switchToMainFragment()
 
