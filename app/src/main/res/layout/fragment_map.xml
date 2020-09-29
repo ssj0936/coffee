@@ -19,7 +19,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/button_text_search_this_area"
         android:layout_gravity="center_horizontal"
-        android:visibility="@{viewmodel.isReSearchable ? View.VISIBLE : View.INVISIBLE}"
+        android:visibility="@{viewmodel.isFavoriteOnly ? View.INVISIBLE : viewmodel.isReSearchable ? View.VISIBLE : View.INVISIBLE}"
         android:theme="@style/CommonButtonStyle"/>
     <com.google.android.gms.maps.MapView
         android:id="@+id/mapView"

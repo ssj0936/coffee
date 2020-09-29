@@ -4,7 +4,9 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
@@ -21,9 +23,25 @@ import kotlin.math.*
 //    val touchSlop = touchSlopField.get(recyclerView) as Int
 //    touchSlopField.set(recyclerView, touchSlop*4)       // "8" was obtained experimentally
 //}
+val FILTER_TASTY_RATE_0 = 0
+val FILTER_TASTY_RATE_1 = 1
+val FILTER_TASTY_RATE_2 = 2
+val FILTER_TASTY_RATE_3 = 3
+val FILTER_TASTY_RATE_4 = 4
+val FILTER_TASTY_RATE_5 = 5
+val FILTER_NO_TIME_LIMIT = 6
+val FILTER_SOCKET = 7
+val FILTER_STANDING_DESK = 8
+
+val Int.toPx: Int
+    get() = (this * Resources.getSystem().displayMetrics.density).toInt()
+
 
 class Utils {
     companion object{
+        private val SP_FILTER_OPTION_TYPE = "SP_FILTER_OPTION_TYPE"
+        private val SP_FILTER_OPTION_VALUE = "SP_FILTER_OPTION_VALUE"
+
         val needPermissions =
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
 
@@ -94,6 +112,31 @@ class Utils {
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
                 else ->false
             }
+        }
+
+        fun resetFilter(context: Context){
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+                SP_FILTER_OPTION_TYPE,
+                Context.MODE_PRIVATE
+            )
+            sharedPreferences.edit().putInt(SP_FILTER_OPTION_VALUE,0).apply()
+        }
+
+        fun getFilterSetting(context: Context):Int{
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+                SP_FILTER_OPTION_TYPE,
+                Context.MODE_PRIVATE
+            )
+
+            return sharedPreferences.getInt(SP_FILTER_OPTION_VALUE, 0)
+        }
+
+        fun setFilterSetting(context: Context, filter:Int){
+            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+                SP_FILTER_OPTION_TYPE,
+                Context.MODE_PRIVATE
+            )
+            sharedPreferences.edit().putInt(SP_FILTER_OPTION_VALUE,filter).apply()
         }
 
     }

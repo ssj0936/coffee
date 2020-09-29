@@ -10,18 +10,10 @@ import com.timothy.coffee.R
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
 import com.timothy.coffee.data.model.CafenomadDisplay
+import com.timothy.coffee.util.FILTER_NO_TIME_LIMIT
 import com.timothy.coffee.util.Movement
-import com.timothy.coffee.util.Utils
-import com.timothy.coffee.view.FilterDialogFragment
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_SOCKET
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_STANDING_DESK
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_NO_TIME_LIMIT
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_0
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_1
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_2
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_3
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_4
-import com.timothy.coffee.view.FilterDialogFragment.Companion.FILTER_TASTY_RATE_5
+import com.timothy.coffee.util.*
+import com.timothy.coffee.util.Utils.Companion.getFilterSetting
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -45,8 +37,8 @@ class MainViewModel @Inject constructor(
     val cafeListDisplay:MutableLiveData<List<CafenomadDisplay>> = MutableLiveData()
     //紀錄目前使用的顯示模式(sort/filter)
 //    val sortType:MutableLiveData<String> = MutableLiveData()
-    var isFavoriteOnly = false
 
+    var isFavoriteOnly:MutableLiveData<Boolean> = MutableLiveData(false)
     val isReSearchable:MutableLiveData<Boolean> = MutableLiveData()
 
     var lastSortType:String? = null
@@ -54,7 +46,7 @@ class MainViewModel @Inject constructor(
     var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context, isForce:Boolean):Single<List<CafenomadDisplay>> {
+    fun getCafeList(context: Context):Single<List<CafenomadDisplay>> {
         return Single.just("")
             .flatMap {
                 if (loc.value == null) {
@@ -107,16 +99,27 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    @SuppressLint("ResourceType")
-    fun refetchCafeData(context: Context):Single<List<CafenomadDisplay>>{
-        loc.value?.let {
-            return@refetchCafeData getCafeListFromLocation(context,it,true)
-        }
-        return getCafeList(context,false)
+    @SuppressLint("CheckResult")
+    fun getCafeListFromFavorite():Single<List<CafenomadDisplay>> {
+        return dataSource.queryFromDBV2AllFavorite()
+            .observeOn(Schedulers.computation())
+            .map { cafes ->
+                //distance assignment
+                cafes.stream().forEach { cafe ->
+                    loc.value?.let {
+                        cafe.cafenomad.distance = Utils.distance(
+                            it.latitude, cafe.cafenomad.latitude.toDouble(),
+                            it.longitude, cafe.cafenomad.longitude.toDouble()
+                        ).toInt()
+
+                        Timber.d("$cafe")
+                    }
+                }
+                cafes
+            }
     }
 
     private fun getLocationObservable(context: Context): Single<LatLng> {
-//        Timber.d("get Test Location")
         return dataModel.getLastKnownLocation(context)
     }
 
@@ -132,7 +135,7 @@ class MainViewModel @Inject constructor(
         //update cafelist for display
         val sortedConditionalCafeList = getSortedCafeList(
             list,
-            if(isFavoriteOnly) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
+            if(isFavoriteOnly.value!!) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
             context
         )
         cafeListDisplay.postValue(sortedConditionalCafeList)
@@ -141,7 +144,6 @@ class MainViewModel @Inject constructor(
         //若chosenCafe有賦值的狀況下，一併更新。以ID為基準在cafelist中找出該object
         //理論上cafelist是被綁在RX流程上已經被更新了，但ChosenCafe是只有在click的時候才會去更新
         val currentCafe = chosenCafe.value
-        Timber.d("currentCafe:${currentCafe}")
         if(currentCafe != null){
             val newCafe = sortedConditionalCafeList.stream()
                 .filter { cafe -> cafe.cafenomad.id == currentCafe.cafenomad.id}
@@ -164,12 +166,8 @@ class MainViewModel @Inject constructor(
         //chosenCafe == value
         else{
             chosenCafe.postValue(
-                if(sortedConditionalCafeList.isNotEmpty()){
-                    sortedConditionalCafeList.first()
-                }
-                else{
-                    null
-                }
+                if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
+                else null
             )
         }
     }
@@ -189,7 +187,7 @@ class MainViewModel @Inject constructor(
                     //update cafelist for display
                     val sortedConditionalCafeList = getSortedCafeList(
                         it,
-                        if(isFavoriteOnly) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
+                        if(isFavoriteOnly.value!!) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
                         context
                     )
                     cafeListDisplay.postValue(sortedConditionalCafeList)
@@ -202,21 +200,25 @@ class MainViewModel @Inject constructor(
                             .findAny()
                             .orElse(null)
 
-                        if(currentCafe != newCafe)
-                            chosenCafe.postValue(newCafe)
-                        else if(sortedConditionalCafeList.isNotEmpty())
+                        //new displayCafeList doesn't contain chosenCafe -> assign to sortedConditionalCafeList.first
+                        if(newCafe == null && sortedConditionalCafeList.isNotEmpty()){
                             chosenCafe.postValue(sortedConditionalCafeList.first())
+                        }
+                        //new displayCafeList contains chosenCafe, but different value(ex. favorite) -> re-assign
+                        else if(currentCafe != newCafe) {
+                            chosenCafe.postValue(newCafe)
+                        }
+                        else {
+                            chosenCafe.postValue(currentCafe)
+                        }
 
                     }
                     else{
-                        if(sortedConditionalCafeList.isNotEmpty())
-                            chosenCafe.postValue(sortedConditionalCafeList.first())
+                        chosenCafe.postValue(
+                            if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
+                            else null
+                        )
                     }
-                    //chosenCafe
-                    chosenCafe.postValue(
-                        if(sortedConditionalCafeList.isNotEmpty()) sortedConditionalCafeList.first()
-                        else null
-                    )
                 }
                 isLoading.postValue(false)
             },{error ->
@@ -232,7 +234,9 @@ class MainViewModel @Inject constructor(
             context.getString(R.string.preference_key_max_cafe_return_number),
             context.resources.getStringArray(R.array.preference_cafe_number_option)[0])!!.toLong()
 
-        val filter = FilterDialogFragment.getFilterSetting(context)
+        val isFullRange = isFavoriteOnly.value!!
+
+        val filter = getFilterSetting(context)
         val isFilterNoTimeLimit = (1 and (filter shr FILTER_NO_TIME_LIMIT)) == 1
         val isFilterSocket = (1 and (filter shr FILTER_SOCKET)) == 1
         val isFilterStandingDesk = (1 and (filter shr FILTER_STANDING_DESK)) == 1
@@ -246,10 +250,13 @@ class MainViewModel @Inject constructor(
 
         return list.stream()
             .filter { cafe ->
-                val range = context.resources.getInteger(R.dimen.range_cafe_nearby_min) * 1000
-
-                val isSetFavoriteOnly = (type == context.resources.getString(R.string.filter_label_favorite_only))
-                (cafe.cafenomad.distance < range) && (if(isSetFavoriteOnly) cafe.isFavorite else true)
+                if(isFullRange) true
+                else {
+                    val range = context.resources.getInteger(R.dimen.range_cafe_nearby_min) * 1000
+                    val isSetFavoriteOnly =
+                        (type == context.resources.getString(R.string.filter_label_favorite_only))
+                    (cafe.cafenomad.distance < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
+                }
             }.sorted{cafe1,cafe2 ->
                 when(type){
                     context.resources.getString(R.string.filter_label_distance_farthest) ->{

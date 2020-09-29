@@ -61,6 +61,8 @@ class DataSource @Inject constructor(
             longitude+0.01*range,longitude-0.01*range)
     }
 
+    fun queryFromDBV2AllFavorite():Single<List<CafenomadDisplay>> = cafeDao.queryAllFavorite()
+
     private fun insertToDBV2(list: List<Cafenomad>){
         var tmpList = list
         tmpList.forEach {it.cityname = null}

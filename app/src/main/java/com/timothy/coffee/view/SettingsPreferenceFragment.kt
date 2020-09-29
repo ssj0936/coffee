@@ -69,8 +69,9 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
             if(mMainViewModel.isLoading.value == true) return@setOnPreferenceClickListener true
 
             mMainViewModel.isLoading.value = true
+            mMainViewModel.isFavoriteOnly.value = false
 
-            mMainViewModel.refetchCafeData(requireContext())
+            mMainViewModel.getCafeList(requireContext())
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe({

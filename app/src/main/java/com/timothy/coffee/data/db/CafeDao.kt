@@ -35,6 +35,9 @@ abstract class CafeDao {
     @Query("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM (SELECT * FROM Cafenomad Where latitude BETWEEN :latitudeMin AND :latitudeMax AND longitude BETWEEN :longitudeMin AND :longitudeMax) AS T1 LEFT JOIN FavoriteID ON T1.id = FavoriteID.cafeId ")
     abstract fun queryCafeByCoordinateV2(latitudeMax:Double, latitudeMin:Double, longitudeMax:Double, longitudeMin:Double):Single<List<CafenomadDisplay>>
 
+    @Query("select T1.*,(FavoriteID.cafeId IS NOT NULL) AS isFavorite FROM FavoriteID LEFT JOIN Cafenomad AS T1 ON T1.id = FavoriteID.cafeId")
+    abstract fun queryAllFavorite():Single<List<CafenomadDisplay>>
+
     @Query("SELECT COUNT(id) FROM Cafenomad")
     abstract fun getRowNum():Single<Int>
 

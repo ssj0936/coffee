@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -23,16 +22,15 @@ import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
 import com.timothy.coffee.ui.CafeViewPagerAdapterV2
 import com.timothy.coffee.util.Utils
+import com.timothy.coffee.util.toPx
 import com.timothy.coffee.view.CafeInfoV2Fragment
 import com.timothy.coffee.view.FilterDialogFragment
 import com.timothy.coffee.view.MapFragment
-import com.timothy.coffee.view.SortDialogFragment
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -40,11 +38,7 @@ import timber.log.Timber
 import java.util.stream.IntStream
 import javax.inject.Inject
 
-val Int.toPx: Int
-    get() = (this * Resources.getSystem().displayMetrics.density).toInt()
-
-class MainFragment: Fragment()
-    , View.OnClickListener
+class MainFragment: Fragment(), View.OnClickListener
 {
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
@@ -136,7 +130,7 @@ class MainFragment: Fragment()
 
         //get Cafe info when network available && permission granted
         if(Utils.isNetworkAvailable(requireContext()) && isPermissionGranted()) {
-            requestCafe()
+            queryCafeList()
         }
         initMap()
     }
@@ -182,7 +176,7 @@ class MainFragment: Fragment()
         when(requestCode){
             RESULT_PERMISSION_LOCATION->{
                 if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    requestCafe()
+                    queryCafeList()
 
                     requireActivity().supportFragmentManager
                         .findFragmentByTag(MapFragment.TAG)
@@ -202,7 +196,7 @@ class MainFragment: Fragment()
             RESULT_CODE_WIFI-> {
                 if (Utils.isNetworkAvailable(requireContext())) {
                     if (isPermissionGranted()) {
-                        requestCafe()
+                        queryCafeList()
                     } else {
                         permissionRequest()
                     }
@@ -212,8 +206,7 @@ class MainFragment: Fragment()
             }
             RESULT_PERMISSION_LOCATION->{
                 if(isPermissionGranted()){
-                    requestCafe()
-                    //TODO propagation permission granted event to MapFragment
+                    queryCafeList()
                 }else{
                     permissionRequest()
                 }
@@ -221,8 +214,7 @@ class MainFragment: Fragment()
 
             RESULT_MANUAL_ENABLE->{
                 if(isPermissionGranted()){
-                    requestCafe()
-                    //TODO propagation permission granted event to MapFragment
+                    queryCafeList()
                 }else{
                     showManualPermissionSettingsDialog()
                 }
@@ -271,16 +263,9 @@ class MainFragment: Fragment()
             .show()
     }
 
-    private fun requestCafe() = requestCafe(false)
-
-    @SuppressLint("CheckResult")
-    private fun requestCafe(force:Boolean){
-        queryCafeList(force)
-    }
-
     @SuppressLint("ResourceType")
-    private fun queryCafeList(force:Boolean):Disposable{
-        return mMainViewModel.getCafeList(requireContext(),force)
+    private fun queryCafeList():Disposable{
+        return mMainViewModel.getCafeList(requireContext())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

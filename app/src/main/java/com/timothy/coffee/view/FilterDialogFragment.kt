@@ -1,5 +1,6 @@
 package com.timothy.coffee.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
@@ -11,9 +12,14 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.button.MaterialButton
 import com.timothy.coffee.R
+import com.timothy.coffee.util.*
+import com.timothy.coffee.util.Utils.Companion.getFilterSetting
+import com.timothy.coffee.util.Utils.Companion.setFilterSetting
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
+import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_filter_dialog_layout.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -31,35 +37,7 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     private val mListNumberView = mutableListOf<Pair<Int,Int>>()
 
     companion object{
-        private val SP_FILTER_OPTION_TYPE = "SP_FILTER_OPTION_TYPE"
-        private val SP_FILTER_OPTION_VALUE = "SP_FILTER_OPTION_VALUE"
 
-        val FILTER_TASTY_RATE_0 = 0
-        val FILTER_TASTY_RATE_1 = 1
-        val FILTER_TASTY_RATE_2 = 2
-        val FILTER_TASTY_RATE_3 = 3
-        val FILTER_TASTY_RATE_4 = 4
-        val FILTER_TASTY_RATE_5 = 5
-        val FILTER_NO_TIME_LIMIT = 6
-        val FILTER_SOCKET = 7
-        val FILTER_STANDING_DESK = 8
-
-        fun resetFilter(context: Context){
-            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-                SP_FILTER_OPTION_TYPE,
-                Context.MODE_PRIVATE
-            )
-            sharedPreferences.edit().putInt(SP_FILTER_OPTION_VALUE,0).apply()
-        }
-
-        fun getFilterSetting(context: Context):Int{
-            val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-                SP_FILTER_OPTION_TYPE,
-                Context.MODE_PRIVATE
-            )
-
-            return sharedPreferences.getInt(SP_FILTER_OPTION_VALUE, 0)
-        }
     }
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this);
@@ -128,7 +106,7 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
         var tmp = filterSetting
 
         //favorite btn
-        val isFavoriteOnly = mMainViewModel.isFavoriteOnly
+        val isFavoriteOnly = mMainViewModel.isFavoriteOnly.value!!
         favorite_show_favorite.tag = isFavoriteOnly
         setButtonPressed(favorite_show_favorite,isFavoriteOnly)
 
@@ -158,12 +136,35 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
+
         if(v == confirm_button){
             val newFilterSetting = getTempFilterSetting()
             setFilterSetting(newFilterSetting)
-            mMainViewModel.updateDisplayCafeData(requireContext())
-            dismiss()
+
+            Single.just(mMainViewModel.isFavoriteOnly.value!!)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .flatMap { isFavoriteOnly->
+                    Timber.d("isFavoriteOnly: $isFavoriteOnly")
+                    if(isFavoriteOnly)
+                        mMainViewModel.getCafeListFromFavorite()
+                    else
+                        mMainViewModel.getCafeList(requireContext())
+                }.subscribe ({
+                    Timber.d("mMainViewModel.isFavoriteOnly: ${mMainViewModel.isFavoriteOnly}")
+                    if (mMainViewModel.isFavoriteOnly.value!!){
+                        mMainViewModel.initialLocalCafeData(it,requireActivity())
+                    }else{
+                        mMainViewModel.initialLocalCafeData(it,requireActivity())
+                    }
+                    dismiss()
+                },{error->
+                    Timber.e("filter settings error: $error")
+                    mMainViewModel.isLoading.postValue(false)
+                    dismiss()
+                })
             return
         }else if(v is MaterialButton){
             val result = !(v.tag as Boolean)
@@ -196,14 +197,9 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     }
 
     private fun setFilterSetting(filter:Int){
-        //filter
-        val sharedPreferences: SharedPreferences = requireContext().getSharedPreferences(
-            SP_FILTER_OPTION_TYPE,
-            Context.MODE_PRIVATE
-        )
-        sharedPreferences.edit().putInt(SP_FILTER_OPTION_VALUE,filter).apply()
+        setFilterSetting(requireContext(),filter)
 
         //favorite filter
-        mMainViewModel.isFavoriteOnly = favorite_show_favorite.tag as Boolean
+        mMainViewModel.isFavoriteOnly.value = favorite_show_favorite.tag as Boolean
     }
 }
