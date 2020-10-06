@@ -32,76 +32,86 @@
                 android:paddingStart="@dimen/cafeinfo_padding_side"
                 android:paddingEnd="@dimen/cafeinfo_padding_side">
 
-                <TextView
-                    android:id="@+id/cafe_name"
-                    android:layout_width="wrap_content"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/info_block"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:autoSizeMaxTextSize="@dimen/common_title_text_size"
-                    android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
-                    android:autoSizeTextType="uniform"
-                    android:text="@{cafe.cafenomad.name}"
-                    android:textAppearance="@style/CommonTitleStyle"
-                    android:layout_marginTop="16dp"
-                    app:layout_constrainedWidth="true"
-                    app:layout_constraintBottom_toTopOf="@+id/address"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:minHeight="@dimen/bottom_sheet_peek_height"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed"/>
-
-                <ImageView
-                    android:id="@+id/favorite_btn"
-                    android:layout_width="@dimen/cafeinfo_favorite_btn_size"
-                    android:layout_height="@dimen/cafeinfo_favorite_btn_size"
-                    android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
-                    android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
-                    android:padding="5dp"
-                    android:src="@{cafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
-                    android:tint="@{cafe.isFavorite ? @color/rate_red : @color/light_gray}"
-                    app:layout_constraintBottom_toBottomOf="@id/cafe_name"
-                    app:layout_constraintStart_toEndOf="@id/cafe_name"
-                    app:layout_constraintTop_toTopOf="@id/cafe_name" />
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/address"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/common_context_text_size"
-                    android:text="@{String.valueOf(cafe.cafenomad.address)}"
-                    android:textAppearance="@style/CommonSubtitleStyle"
-                    app:layout_constraintBottom_toTopOf="@+id/distance"
-                    app:layout_constraintTop_toBottomOf="@+id/cafe_name"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="@id/divider_1">
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/distance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@{String.valueOf(cafe.cafenomad.distance)}"
-                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
-                    app:layout_constraintBottom_toBottomOf="@id/divider_1"
-                    app:layout_constraintTop_toBottomOf="@+id/address"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    <TextView
+                        android:id="@+id/cafe_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:autoSizeMaxTextSize="@dimen/common_title_text_size"
+                        android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
+                        android:autoSizeTextType="uniform"
+                        android:text="@{cafe.cafenomad.name}"
+                        android:textAppearance="@style/CommonTitleStyle"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBottom_toTopOf="@+id/address"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_chainStyle="packed" />
 
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/M"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:text="M"
-                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
-                    app:layout_constraintBottom_toBottomOf="@+id/distance"
-                    app:layout_constraintStart_toEndOf="@id/distance"
-                    app:layout_constraintTop_toTopOf="@+id/distance" />
+                    <ImageView
+                        android:id="@+id/favorite_btn"
+                        android:layout_width="@dimen/cafeinfo_favorite_btn_size"
+                        android:layout_height="@dimen/cafeinfo_favorite_btn_size"
+                        android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
+                        android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
+                        android:padding="5dp"
+                        android:src="@{cafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
+                        android:tint="@{cafe.isFavorite ? @color/rate_red : @color/light_gray}"
+                        app:layout_constraintBottom_toBottomOf="@id/cafe_name"
+                        app:layout_constraintStart_toEndOf="@id/cafe_name"
+                        app:layout_constraintTop_toTopOf="@id/cafe_name" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/address"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@{String.valueOf(cafe.cafenomad.address)}"
+                        android:textAppearance="@style/CommonSubtitleStyle"
+                        app:layout_constraintBottom_toTopOf="@+id/distance"
+                        app:layout_constraintTop_toBottomOf="@+id/cafe_name"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{String.valueOf(cafe.cafenomad.distance)}"
+                        android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/address"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/M"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="M"
+                        android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                        app:layout_constraintBottom_toBottomOf="@+id/distance"
+                        app:layout_constraintStart_toEndOf="@id/distance"
+                        app:layout_constraintTop_toTopOf="@+id/distance" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <View
                     android:id="@+id/divider_1"
                     style="@style/divider"
                     android:layout_marginStart="-18dp"
-                    android:layout_marginTop="@dimen/bottom_sheet_peek_height"
                     android:layout_marginEnd="-18dp"
+
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/info_block" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/cafe_info_recyclerview"
@@ -175,18 +185,38 @@
                     android:layout_marginTop="32dp"
                     android:layout_marginEnd="-18dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/content_standing_desk" />
+                    app:layout_constraintTop_toBottomOf="@id/content_standing_desk"
+                    android:visibility="@{cafe.cafenomad.openTime.empty ? View.GONE : View.VISIBLE}"/>
 
-                <!--            <androidx.appcompat.widget.AppCompatTextView-->
-                <!--                android:id="@+id/label_intro"-->
-                <!--                android:layout_width="wrap_content"-->
-                <!--                android:layout_height="wrap_content"-->
-                <!--                android:layout_marginTop="@dimen/common_title_text_size"-->
-                <!--                android:text="@string/label_intro"-->
-                <!--                android:textAppearance="@style/CommonPrimaryContextTextStyle"-->
-                <!--                app:layout_constraintStart_toStartOf="parent"-->
-                <!--                app:layout_constraintEnd_toEndOf="parent"-->
-                <!--                app:layout_constraintTop_toBottomOf="@id/divider_2" />-->
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/label_open_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/common_title_text_size"
+                    android:text="@string/label_open_time"
+                    android:textAppearance="@style/CommonPrimaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider_2"
+                    android:visibility="@{cafe.cafenomad.openTime.empty ? View.GONE : View.VISIBLE}"/>
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/content_open_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/CommonSecondaryContextTextStyle"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/label_open_time"
+                    android:text="@{cafe.cafenomad.openTime}"
+                    android:visibility="@{cafe.cafenomad.openTime.empty ? View.GONE : View.VISIBLE}"/>
+
+                <View
+                    android:id="@+id/divider_3"
+                    style="@style/divider"
+                    android:layout_marginStart="-18dp"
+                    android:layout_marginTop="32dp"
+                    android:layout_marginEnd="-18dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/content_open_time" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_cafenomad_intro"
@@ -203,7 +233,7 @@
                     android:theme="@style/CommonButtonStyle"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider_2" />
+                    app:layout_constraintTop_toBottomOf="@id/divider_3" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_official"
