@@ -20,7 +20,6 @@ import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -123,10 +122,10 @@ class CafeInfoFragment: Fragment(),CafeBaseFragment ,View.OnClickListener{
     override fun onClick(v: View?) {
         when(v) {
             binding.btnNavigate -> {
-                if (mMainViewModel.loc.value != null && mMainViewModel.chosenCafe.value != null) {
+                if (mMainViewModel.screenCenterLoc.value != null && mMainViewModel.chosenCafe.value != null) {
                     val intent = Utils.getGoogleMapDirectionIntent(
-                        mMainViewModel.loc.value!!.latitude,
-                        mMainViewModel.loc.value!!.longitude,
+                        mMainViewModel.screenCenterLoc.value!!.latitude,
+                        mMainViewModel.screenCenterLoc.value!!.longitude,
                         "${mMainViewModel.chosenCafe.value!!.cafenomad.name} ${getString(R.string.postfix_navigation_keyword)}"
                     )
                     startActivity(intent)

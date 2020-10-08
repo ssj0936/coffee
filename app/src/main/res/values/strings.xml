@@ -115,5 +115,10 @@
 
     <string name="filter_group_favorite">Show my favorite only</string>
 
+    <string name="distance_unit_km" translatable="false">KM</string>
+    <string name="distance_unit_m" translatable="false">M</string>
+
+
+
 
 </resources>

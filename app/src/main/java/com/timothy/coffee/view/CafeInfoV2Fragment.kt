@@ -7,22 +7,16 @@ import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import com.timothy.coffee.R
-import com.timothy.coffee.data.model.CafenomadDisplay
-import com.timothy.coffee.databinding.FragmentCafeInfoBinding
 import com.timothy.coffee.databinding.FragmentCafeInfoV2Binding
 import com.timothy.coffee.ui.CafeInfoRecyclerViewAdapter
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.fragment_cafe_info_v2.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -134,10 +128,10 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         if(cafe != null){
             when(v) {
                 binding.btnNavigate -> {
-                    if (mMainViewModel.loc.value != null && mMainViewModel.chosenCafe.value != null) {
+                    if (mMainViewModel.screenCenterLoc.value != null && mMainViewModel.chosenCafe.value != null) {
                         val intent = Utils.getGoogleMapDirectionIntent(
-                            mMainViewModel.loc.value!!.latitude,
-                            mMainViewModel.loc.value!!.longitude,
+                            mMainViewModel.screenCenterLoc.value!!.latitude,
+                            mMainViewModel.screenCenterLoc.value!!.longitude,
                             "${mMainViewModel.chosenCafe.value!!.cafenomad.name} ${getString(R.string.postfix_navigation_keyword)}"
                         )
                         startActivity(intent)

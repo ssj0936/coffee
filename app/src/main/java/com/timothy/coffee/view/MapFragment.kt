@@ -16,14 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.maps.CameraUpdate
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
-import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMapBinding
 import com.timothy.coffee.util.Utils
@@ -104,10 +102,10 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this)
         enableMyLocation()
 
-        mMainViewModel.loc.observe(viewLifecycleOwner,
+        mMainViewModel.screenCenterLoc.observe(viewLifecycleOwner,
             Observer<LatLng>{
                 moveCamera()
-                mMainViewModel.loc.removeObservers(viewLifecycleOwner)
+                mMainViewModel.screenCenterLoc.removeObservers(viewLifecycleOwner)
             })
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
@@ -228,7 +226,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     private fun moveCamera(){
-        mMainViewModel.loc.value?.let {
+        mMainViewModel.screenCenterLoc.value?.let {
             val cameraPosition = CameraPosition.builder()
                 .target(LatLng(it.latitude,it.longitude))
                 .zoom(
@@ -297,8 +295,8 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             //Invoked if the animation goes to completion without interruption.
             override fun onFinish() {
                 mMap.cameraPosition.target?.let {
-                    if(it != mMainViewModel.loc.value) {
-                        mMainViewModel.loc.value = it
+                    if(it != mMainViewModel.screenCenterLoc.value) {
+                        mMainViewModel.screenCenterLoc.value = it
                         mMainViewModel.isReSearchable.value = false
                     }
                 }
@@ -307,8 +305,8 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             //Invoked if the animation is interrupted by calling stopAnimation() or starting a new camera movement.
             override fun onCancel() {
                 mMap.cameraPosition.target?.let {
-                    if(it != mMainViewModel.loc.value) {
-                        mMainViewModel.loc.value = it
+                    if(it != mMainViewModel.screenCenterLoc.value) {
+                        mMainViewModel.screenCenterLoc.value = it
                         mMainViewModel.isReSearchable.value = false
                     }
                 }
@@ -349,7 +347,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     override fun onCameraIdle() {
         val currentCenterCoordinate = mMap.cameraPosition.target
 
-        mMainViewModel.loc.value?.let {
+        mMainViewModel.screenCenterLoc.value?.let {
             if(Utils.distance(currentCenterCoordinate.latitude,it.latitude
                     ,currentCenterCoordinate.longitude,it.longitude) >1000){
                 mMainViewModel.isReSearchable.value = true
@@ -362,10 +360,10 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
         mMainViewModel.isReSearchable.value = false
-        mMainViewModel.loc.value = mMap.cameraPosition.target
+        mMainViewModel.screenCenterLoc.value = mMap.cameraPosition.target
         mMainViewModel.isLoading.value = true
 
-        mMainViewModel.loc.value?.let {latlon ->
+        mMainViewModel.screenCenterLoc.value?.let { latlon ->
             mMainViewModel.getCafeListFromLocation(requireContext(),latlon,false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())

@@ -14,7 +14,6 @@ import com.timothy.coffee.util.FILTER_NO_TIME_LIMIT
 import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.*
 import com.timothy.coffee.util.Utils.Companion.getFilterSetting
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -28,7 +27,8 @@ class MainViewModel @Inject constructor(
 ): ViewModel(){
 
     //目前user所在
-    var loc : MutableLiveData<LatLng> = MutableLiveData()
+    var screenCenterLoc : MutableLiveData<LatLng> = MutableLiveData()
+    private var userLoc : LatLng? = null
     //用來控制目前顯示的cafe頁面所binding的cafenomad data
     val chosenCafe: MutableLiveData<CafenomadDisplay> = MutableLiveData()
     //抓下來的所以cafenomad資料
@@ -49,11 +49,14 @@ class MainViewModel @Inject constructor(
     fun getCafeList(context: Context):Single<List<CafenomadDisplay>> {
         return Single.just("")
             .flatMap {
-                if (loc.value == null) {
+                if (userLoc == null) {
                     getLocationObservable(context)
+                        .doOnSuccess {
+                            userLoc = it
+                        }
                 }
                 else{
-                    Single.just(loc.value)
+                    Single.just(screenCenterLoc.value)
                 }
             }
             .subscribeOn(Schedulers.io())
@@ -62,7 +65,7 @@ class MainViewModel @Inject constructor(
 //                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
 //                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
 
-                loc.postValue(lonlat)
+                screenCenterLoc.postValue(lonlat)
                 getCafeListFromLocation(context,lonlat,false)
             }
     }
@@ -79,20 +82,26 @@ class MainViewModel @Inject constructor(
                     .map { cafes ->
                         //distance assignment
                         cafes.stream().forEach {cafe->
-                            loc.value?.let{
-                                cafe.cafenomad.distance = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
+                            screenCenterLoc.value?.let{
+                                cafe.cafenomad.distanceFromCenterOfScreen = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
                                     it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
                             }
+
+                            cafe.cafenomad.distanceFromCurrentLoc =
+                                if(userLoc != null) Utils.distance(
+                                    userLoc!!.latitude,cafe.cafenomad.latitude.toDouble(),
+                                    userLoc!!.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
+                                else 0
                         }
 
                         cafes.stream()
                             //double filtering cafe out of range
                             .filter{cafe->
-                                cafe.cafenomad.distance < range*1000
+                                cafe.cafenomad.distanceFromCenterOfScreen < range*1000
                             }
                             //sort by distance from nearest to farest
                             .sorted{
-                                    cafe1,cafe2->cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                                    cafe1,cafe2->cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)
                             }
                             .collect(Collectors.toList())
                     }
@@ -106,8 +115,8 @@ class MainViewModel @Inject constructor(
             .map { cafes ->
                 //distance assignment
                 cafes.stream().forEach { cafe ->
-                    loc.value?.let {
-                        cafe.cafenomad.distance = Utils.distance(
+                    screenCenterLoc.value?.let {
+                        cafe.cafenomad.distanceFromCenterOfScreen = Utils.distance(
                             it.latitude, cafe.cafenomad.latitude.toDouble(),
                             it.longitude, cafe.cafenomad.longitude.toDouble()
                         ).toInt()
@@ -255,13 +264,13 @@ class MainViewModel @Inject constructor(
                     val range = context.resources.getInteger(R.dimen.range_cafe_nearby_min) * 1000
                     val isSetFavoriteOnly =
                         (type == context.resources.getString(R.string.filter_label_favorite_only))
-                    (cafe.cafenomad.distance < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
+                    (cafe.cafenomad.distanceFromCenterOfScreen < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
                 }
             }.sorted{cafe1,cafe2 ->
                 when(type){
                     context.resources.getString(R.string.filter_label_distance_farthest) ->{
-                        if(cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance) != 0)
-                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)*-1
+                        if(cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen) != 0)
+                            cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)*-1
                         else
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                     }
@@ -269,11 +278,11 @@ class MainViewModel @Inject constructor(
                         if(cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel) != 0)
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                         else
-                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                            cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)
                     }
                     else -> {
-                        if(cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance) !=0)
-                            cafe1.cafenomad.distance.compareTo(cafe2.cafenomad.distance)
+                        if(cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen) !=0)
+                            cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)
                         else
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                     }
