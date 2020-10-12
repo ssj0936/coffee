@@ -71,7 +71,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
             mMainViewModel.isLoading.value = true
             mMainViewModel.isFavoriteOnly.value = false
 
-            mMainViewModel.getCafeList(requireContext())
+            mMainViewModel.getCafeList(requireContext(),isForce = true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe({

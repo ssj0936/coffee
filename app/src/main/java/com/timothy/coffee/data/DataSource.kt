@@ -27,7 +27,11 @@ class DataSource @Inject constructor(
             .flatMap {
                 cafeDao.getRowNum()
             }.flatMap {
+                //no data in DB or is forced,
                 if(it<=0 || isForce){
+                    if(it<=0) Timber.d("No data in DB")
+                    if(isForce) Timber.d("isForce = true, need to refetch data from API")
+                    
                     cafenomadApiService.searchAllCafes()
                         .doOnNext {list->
                             insertToDBV2(list)

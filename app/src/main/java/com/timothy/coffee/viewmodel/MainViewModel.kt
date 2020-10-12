@@ -45,8 +45,11 @@ class MainViewModel @Inject constructor(
     var lastMove = Movement(isClickMap = false, isClickList = false)
     var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
+    fun getCafeList(context: Context):Single<List<CafenomadDisplay>>
+            = getCafeList(context,false)
+
     @SuppressLint("ResourceType")
-    fun getCafeList(context: Context):Single<List<CafenomadDisplay>> {
+    fun getCafeList(context: Context, isForce:Boolean):Single<List<CafenomadDisplay>> {
         return Single.just("")
             .flatMap {
                 if (userLoc == null) {
@@ -66,7 +69,7 @@ class MainViewModel @Inject constructor(
 //                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
 
                 screenCenterLoc.postValue(lonlat)
-                getCafeListFromLocation(context,lonlat,false)
+                getCafeListFromLocation(context,lonlat,isForce)
             }
     }
 
