@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal|center_vertical"
+    android:foreground="?attr/selectableItemBackground">
+    <View
+        style="@style/divider"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_info_black_24dp"
+            android:tint="@color/rate_blue"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:textAppearance="@style/CommonPrimaryContextTextStyle"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/common_secondary_context_text_color"
+            android:text="@string/about_this_app_text"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            tools:ignore="RtlCompat" />
+    </LinearLayout>
+</LinearLayout>

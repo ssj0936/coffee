@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="15dp"
+    android:padding="0dp"
+    app:contentPaddingBottom="16dp"
+    app:contentPaddingTop="32dp"
+    app:contentPaddingLeft="18dp"
+    app:contentPaddingRight="18dp"
+    app:cardBackgroundColor="@color/background_color"
+    app:cardPreventCornerOverlap="false"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/about_pic_container"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            app:cardCornerRadius="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/myface"
+                android:contentDescription="TODO" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/name"
+            style="@style/CafelistTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/my_name_zhTW"
+            android:textAllCaps="false"
+            android:textAppearance="?attr/textAppearanceButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/about_pic_container" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/name_en"
+            style="@style/CafelistTitleStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/my_name"
+            android:textAllCaps="false"
+            android:textAppearance="?attr/textAppearanceButton"
+            android:fontFamily="sans-serif-light"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name" />
+
+        <View
+            android:id="@+id/divider_1"
+            style="@style/divider"
+            android:layout_width="0dp"
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name_en" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_facebook"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="140dp"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/about_btn_facebook_text"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_icon_facebook"
+            app:iconGravity="start"
+            app:iconSize="@dimen/about_btn_icon_size"
+            app:iconTint="@null"
+            app:layout_constraintEnd_toEndOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/divider_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_github"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="140dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="18dp"
+            android:text="@string/about_btn_github_text"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_icon_github"
+            app:iconGravity="start"
+            app:iconSize="@dimen/about_btn_icon_size"
+            app:iconTint="@null"
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/divider_1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_linkedin"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="140dp"
+            android:layout_marginEnd="5dp"
+            android:text="@string/about_btn_linkedin_text"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_icon_linkedin"
+            app:iconGravity="start"
+            app:iconSize="@dimen/about_btn_icon_size"
+            app:iconTint="@null"
+            app:layout_constraintEnd_toEndOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/btn_facebook" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_ig"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="140dp"
+            android:layout_marginStart="5dp"
+            android:text="@string/about_btn_instagram_text"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_icon_instagram"
+            app:iconGravity="start"
+            app:iconSize="@dimen/about_btn_icon_size"
+            app:iconTint="@null"
+            app:layout_constraintStart_toStartOf="@id/guideline"
+            app:layout_constraintTop_toBottomOf="@id/btn_github" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="btn_linkedin, btn_ig" />
+
+        <View
+            android:id="@+id/divider_2"
+            style="@style/divider"
+            android:layout_width="0dp"
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier" />
+
+        <TextView
+            android:id="@+id/api_intro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="@string/about_text_cafenomad_intro"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:textAlignment="center"
+            style="@style/CommonPrimaryContextTextStyle"
+            app:layout_constraintTop_toBottomOf="@id/divider_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cafenomad"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="@string/about_btn_cafenomad_api_text"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/api_intro" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

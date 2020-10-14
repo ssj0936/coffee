@@ -38,4 +38,6 @@
         <item>50</item>
     </string-array>
 
+    <dimen name="about_btn_icon_size">24dp</dimen>
+
 </resources>

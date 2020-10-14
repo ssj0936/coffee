@@ -4,6 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -56,6 +62,27 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
     override fun onResume() {
         super.onResume()
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+
+    //in order to
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val v = super.onCreateView(inflater, container, savedInstanceState) as LinearLayout
+
+        val btn = LinearLayout.inflate(requireContext(),R.layout.about_section_preference_layout,null)
+        btn.setOnClickListener {
+            requireActivity().supportFragmentManager.let {
+                AboutFragment().show(it,AboutFragment.TAG)
+            }
+        }
+
+        v.addView(btn)
+
+        return v
     }
 
     @SuppressLint("ResourceType")

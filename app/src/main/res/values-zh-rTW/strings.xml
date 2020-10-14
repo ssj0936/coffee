@@ -74,4 +74,8 @@
     <string name="filter_tasty_button_5">5星</string>
 
     <string name="filter_group_favorite">只顯示我的最愛</string>
+
+    <string name="about_this_app_text">關於這個APP</string>
+    <string name="about_text_cafenomad_intro">咖啡廳資訊來源:</string>
+
 </resources>

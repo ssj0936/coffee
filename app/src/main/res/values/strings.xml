@@ -3,6 +3,14 @@
     <string name="base_url_cafenomad" translatable="false">https://cafenomad.tw/</string>
     <string name="base_url_locationiq" translatable="false">https://us1.locationiq.com/</string>
 
+    <string name="url_facebook" translatable="false">https://www.facebook.com/ssj0936/</string>
+    <string name="url_ig" translatable="false">https://www.instagram.com/ssj0936/</string>
+    <string name="url_linkedin" translatable="false">https://www.linkedin.com/in/chia-hsuan-chung-0691ab161/</string>
+    <string name="url_github" translatable="false">https://github.com/ssj0936</string>
+    <string name="url_cafenomad_api" translatable="false">https://cafenomad.tw/developers/docs/v1.2</string>
+    <string name="my_name_zhTW" translatable="false">鍾嘉軒</string>
+    <string name="my_name" translatable="false">Timothy Chung</string>
+
     <string name="btn_text_navigate">Navigate</string>
     <string name="btn_text_cafenomad_url">Intro in Cafenomad</string>
     <string name="btn_text_official_url">URL</string>
@@ -118,7 +126,13 @@
     <string name="distance_unit_km" translatable="false">KM</string>
     <string name="distance_unit_m" translatable="false">M</string>
 
+    <string name="about_this_app_text">About this App</string>
 
+    <string name="about_btn_facebook_text" translatable="false">Facebook</string>
+    <string name="about_btn_instagram_text" translatable="false">Instagram</string>
+    <string name="about_btn_github_text" translatable="false">Github</string>
+    <string name="about_btn_linkedin_text" translatable="false">Linkedin</string>
+    <string name="about_btn_cafenomad_api_text" translatable="false">Cafenomad API</string>
 
-
+    <string name="about_text_cafenomad_intro">Information of coffee shops is provided by:</string>
 </resources>
