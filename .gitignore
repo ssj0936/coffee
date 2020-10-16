@@ -7,6 +7,8 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/kotlinScripting.xml
+/.idea/gradle.xml
 .DS_Store
 /build
 /captures
@@ -15,3 +17,5 @@
 app/src/main/res/values/apikey.xml
 app/release
 key.jks
+buildSrc/.gradle
+buildSrc/build/
