@@ -11,4 +11,6 @@ coffee finder，透過地圖找到附近最符合你需求的咖啡廳
 <img src="https://user-images.githubusercontent.com/3841546/126431734-87317102-86dc-4c98-a50b-8b21909b3a65.jpg" width="270" height="540">
 </p>
 
-\#MVVM \#ArchitectureComponenets \#Room \#Retrofit2 \#RxJava \#Dagger2
+咖啡廳資訊來源：https://cafenomad.tw/developers/docs/v1.2
+
+\#MVVM \#ArchitectureComponenets \#Room \#Retrofit2 \#RxJava \#Dagger2 \#GoogleMapSDK
