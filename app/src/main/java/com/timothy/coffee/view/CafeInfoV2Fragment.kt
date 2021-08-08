@@ -151,7 +151,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                 binding.favoriteBtn -> {
                     mMainViewModel.chosenCafe.value?.let {
                         if (it.isFavorite)
-                            mMainViewModel.deleteFavorite(it.cafenomad.id,requireContext())
+                            mMainViewModel.deleteFavorite(it.cafenomad.id)
                                 .subscribe({
 //                                    setFavoriteBtn(false)
                                     Timber.d("delete favorite success")
@@ -160,7 +160,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                                     error.printStackTrace()
                                 })
                         else
-                            mMainViewModel.setFavorite(it.cafenomad.id,requireContext())
+                            mMainViewModel.setFavorite(it.cafenomad.id)
                                 .subscribe({
 //                                    setFavoriteBtn(true)
                                     Timber.d("adding favorite success")

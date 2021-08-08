@@ -2,10 +2,14 @@ package com.timothy.coffee.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.animation.AnimationUtils
+import android.view.animation.OvershootInterpolator
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.snackbar.Snackbar
+import com.timothy.coffee.CafeApp.Companion.cafeApplicationContext
 import com.timothy.coffee.R
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
@@ -15,16 +19,27 @@ import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.*
 import com.timothy.coffee.util.Utils.Companion.getFilterSetting
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.internal.disposables.DisposableHelper.dispose
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
 import java.util.stream.Collectors
 import javax.inject.Inject
 import kotlin.math.floor
 
+const val FILTER_FAVORITE_ONLY = 0
+const val FILTER_ALL = 1
+const val FILTER_DISTANCE_FARTHEST = 2
+const val FILTER_STAR = 3
+
 class MainViewModel @Inject constructor(
     private val dataModel:DataModel,
     private val dataSource: DataSource
 ): ViewModel(){
+
+    lateinit var disposable:Disposable
 
     //目前user所在
     var screenCenterLoc : MutableLiveData<LatLng> = MutableLiveData()
@@ -41,76 +56,26 @@ class MainViewModel @Inject constructor(
     var isFavoriteOnly:MutableLiveData<Boolean> = MutableLiveData(false)
     val isReSearchable:MutableLiveData<Boolean> = MutableLiveData()
 
-    var lastSortType:String? = null
+    var lastSortType:Int? = null
     var lastMove = Movement(isClickMap = false, isClickList = false)
     var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun getCafeList(context: Context):Single<List<CafenomadDisplay>>
-            = getCafeList(context,false)
-
-    @SuppressLint("ResourceType")
-    fun getCafeList(context: Context, isForce:Boolean):Single<List<CafenomadDisplay>> {
-        return Single.just("")
-            .flatMap {
-                if (userLoc == null) {
-                    getLocationObservable(context)
-                        .doOnSuccess {
-                            userLoc = it
-                        }
-                }
-                else{
-                    Single.just(screenCenterLoc.value)
-                }
-            }
+    fun onMainFragmentReady(){
+        //starting fetching data
+        disposable = getCafeList()
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
-            .flatMap{lonlat ->
-//                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
-//                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
-
-                screenCenterLoc.postValue(lonlat)
-                getCafeListFromLocation(context,lonlat,isForce)
-            }
+            .subscribe({
+                initialLocalCafeData(it)
+            },{error-> Timber.e(error)})
     }
 
-    @SuppressLint("ResourceType")
-    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForce:Boolean):Single<List<CafenomadDisplay>> {
-        return Single.just(latLng)
-            .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
-            .flatMap {lonlat->
-                val range = context.resources.getInteger(R.dimen.range_cafe_nearby_max)
-                dataSource.queryV2(lonlat.latitude,lonlat.longitude,range,isForce)
-                    .observeOn(Schedulers.computation())
-                    .map { cafes ->
-                        //distance assignment
-                        cafes.stream().forEach {cafe->
-                            screenCenterLoc.value?.let{
-                                cafe.cafenomad.distanceFromCenterOfScreen = Utils.distance(it.latitude,cafe.cafenomad.latitude.toDouble(),
-                                    it.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
-                            }
-
-                            cafe.cafenomad.distanceFromCurrentLoc =
-                                if(userLoc != null) Utils.distance(
-                                    userLoc!!.latitude,cafe.cafenomad.latitude.toDouble(),
-                                    userLoc!!.longitude,cafe.cafenomad.longitude.toDouble()).toInt()
-                                else 0
-                        }
-
-                        cafes.stream()
-                            //double filtering cafe out of range
-                            .filter{cafe->
-                                cafe.cafenomad.distanceFromCenterOfScreen < range*1000
-                            }
-                            //sort by distance from nearest to farest
-                            .sorted{
-                                    cafe1,cafe2->cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)
-                            }
-                            .collect(Collectors.toList())
-                    }
-            }
+    fun getCafeList(isForceFromApi:Boolean = false, isFetchFavOnly:Boolean = false):Single<List<CafenomadDisplay>> {
+        return when(isFetchFavOnly) {
+            true -> getCafeListFromFavorite()
+            false -> getCafeList(isForceFromApi)
+        }
     }
-
     @SuppressLint("CheckResult")
     fun getCafeListFromFavorite():Single<List<CafenomadDisplay>> {
         return dataSource.queryFromDBV2AllFavorite()
@@ -131,6 +96,75 @@ class MainViewModel @Inject constructor(
             }
     }
 
+    fun getCafeList(isForceFromApi:Boolean = false):Single<List<CafenomadDisplay>> {
+        val context = cafeApplicationContext
+        return Single.just("")
+            .subscribeOn(Schedulers.io())
+            //get current location
+            .flatMap {
+                if (userLoc == null) {
+                    getLocationObservable(context)
+                        .doOnSuccess {
+                            userLoc = it
+                        }
+                }
+                else{
+                    Single.just(screenCenterLoc.value)
+                }
+            }
+            //get cafeList in currentLocation
+            .flatMap{lonlat ->
+                Timber.d("first flatmap : ${Thread.currentThread().name} : ${Thread.currentThread().id}")
+                Timber.d("longitude:${lonlat.longitude},latitude:${lonlat.latitude}")
+
+                screenCenterLoc.postValue(lonlat)
+                getCafeListFromLocation(context,lonlat,isForceFromApi)
+            }
+    }
+
+    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForceFromApi:Boolean):Single<List<CafenomadDisplay>> {
+        return Single.just(latLng)
+            .subscribeOn(Schedulers.io())
+            .flatMap {lonlat->
+                val range = context.resources.getInteger(R.integer.range_cafe_nearby_max)
+                dataSource.queryV2(lonlat.latitude,lonlat.longitude,range,isForceFromApi)
+                    .observeOn(Schedulers.computation())
+                    .map { cafes ->
+                        //distance assignment
+                        cafes.stream().forEach {cafe->
+                            //calculation of distance from cafe to screen center
+                            screenCenterLoc.value?.let{
+                                cafe.cafenomad.distanceFromCenterOfScreen =
+                                    Utils.distance(
+                                        it.latitude,cafe.cafenomad.latitude.toDouble(),
+                                        it.longitude,cafe.cafenomad.longitude.toDouble()
+                                    ).toInt()
+                            }
+
+                            //calculation of distance from cafe to current location
+                            cafe.cafenomad.distanceFromCurrentLoc =
+                                if(userLoc != null)
+                                    Utils.distance(
+                                        userLoc!!.latitude,cafe.cafenomad.latitude.toDouble(),
+                                        userLoc!!.longitude,cafe.cafenomad.longitude.toDouble()
+                                    ).toInt()
+                                else 0
+                        }
+
+                        cafes.stream()
+                            //double filtering cafe out of range
+                            .filter{cafe->
+                                cafe.cafenomad.distanceFromCenterOfScreen < range*1000
+                            }
+                            //sort by distance from nearest to farest
+                            .sorted{
+                                    cafe1,cafe2->cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)
+                            }
+                            .collect(Collectors.toList())
+                    }
+            }
+    }
+
     private fun getLocationObservable(context: Context): Single<LatLng> {
         return dataModel.getLastKnownLocation(context)
     }
@@ -138,7 +172,7 @@ class MainViewModel @Inject constructor(
     //refetch button on map
     //refetch button on settings preference
     //mainFragment request cafe(first time fetch)
-    fun initialLocalCafeData(list: List<CafenomadDisplay>, context: Context){
+    fun initialLocalCafeData(list: List<CafenomadDisplay>){
         //update cafe list
         if(cafeListAll.value == null || cafeListAll.value != list) {
             cafeListAll.postValue(list)
@@ -147,8 +181,7 @@ class MainViewModel @Inject constructor(
         //update cafelist for display
         val sortedConditionalCafeList = getSortedCafeList(
             list,
-            if(isFavoriteOnly.value!!) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
-            context
+            if(isFavoriteOnly.value!!) FILTER_FAVORITE_ONLY else FILTER_ALL
         )
         cafeListDisplay.postValue(sortedConditionalCafeList)
 
@@ -187,7 +220,7 @@ class MainViewModel @Inject constructor(
     //filter apply
     //max cafe display on settings preference
     @SuppressLint("CheckResult")
-    fun updateDisplayCafeData(context: Context){
+    fun updateDisplayCafeData(){
         Single.just("")
             .observeOn(Schedulers.computation())
             .subscribe({
@@ -199,8 +232,7 @@ class MainViewModel @Inject constructor(
                     //update cafelist for display
                     val sortedConditionalCafeList = getSortedCafeList(
                         it,
-                        if(isFavoriteOnly.value!!) context.getString(R.string.filter_label_favorite_only) else context.getString(R.string.filter_label_all),
-                        context
+                        if(isFavoriteOnly.value!!) FILTER_FAVORITE_ONLY else FILTER_ALL
                     )
                     cafeListDisplay.postValue(sortedConditionalCafeList)
 
@@ -239,16 +271,15 @@ class MainViewModel @Inject constructor(
             })
     }
 
-    @SuppressLint("ResourceType")
-    fun getSortedCafeList(list:List<CafenomadDisplay>, type:String, context: Context):List<CafenomadDisplay> {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private fun getSortedCafeList(list:List<CafenomadDisplay>, type:Int):List<CafenomadDisplay> {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(cafeApplicationContext)
         val maxCafeNumShowing = sharedPreferences.getString(
-            context.getString(R.string.preference_key_max_cafe_return_number),
-            context.resources.getStringArray(R.array.preference_cafe_number_option)[0])!!.toLong()
+            cafeApplicationContext.getString(R.string.preference_key_max_cafe_return_number),
+            cafeApplicationContext.resources.getStringArray(R.array.preference_cafe_number_option)[0])!!.toLong()
 
         val isFullRange = isFavoriteOnly.value!!
 
-        val filter = getFilterSetting(context)
+        val filter = getFilterSetting(cafeApplicationContext)
         val isFilterNoTimeLimit = (1 and (filter shr FILTER_NO_TIME_LIMIT)) == 1
         val isFilterSocket = (1 and (filter shr FILTER_SOCKET)) == 1
         val isFilterStandingDesk = (1 and (filter shr FILTER_STANDING_DESK)) == 1
@@ -264,20 +295,20 @@ class MainViewModel @Inject constructor(
             .filter { cafe ->
                 if(isFullRange) true
                 else {
-                    val range = context.resources.getInteger(R.dimen.range_cafe_nearby_min) * 1000
+                    val range = cafeApplicationContext.resources.getInteger(R.integer.range_cafe_nearby_min) * 1000
                     val isSetFavoriteOnly =
-                        (type == context.resources.getString(R.string.filter_label_favorite_only))
+                        (type == FILTER_FAVORITE_ONLY)
                     (cafe.cafenomad.distanceFromCenterOfScreen < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
                 }
             }.sorted{cafe1,cafe2 ->
                 when(type){
-                    context.resources.getString(R.string.filter_label_distance_farthest) ->{
+                    FILTER_DISTANCE_FARTHEST ->{
                         if(cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen) != 0)
                             cafe1.cafenomad.distanceFromCenterOfScreen.compareTo(cafe2.cafenomad.distanceFromCenterOfScreen)*-1
                         else
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                     }
-                    context.resources.getString(R.string.filter_label_star) ->{
+                    FILTER_STAR ->{
                         if(cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel) != 0)
                             cafe1.cafenomad.tastyLevel.compareTo(cafe2.cafenomad.tastyLevel)*-1
                         else
@@ -297,9 +328,9 @@ class MainViewModel @Inject constructor(
                 if(!isFilterNoTimeLimit && !isFilterSocket && !isFilterStandingDesk) true
                 //
                 else {
-                    (if(isFilterNoTimeLimit) it.cafenomad.isTimeLimited == context.getString(R.string.info_value_no) else true)
-                            && (if(isFilterSocket) it.cafenomad.isSocketProvided == context.getString(R.string.info_value_yes) else true)
-                            && (if(isFilterStandingDesk) it.cafenomad.isStandingDeskAvailable == context.getString(R.string.info_value_yes) else true)
+                    (if(isFilterNoTimeLimit) it.cafenomad.isTimeLimited == cafeApplicationContext.getString(R.string.info_value_no) else true)
+                            && (if(isFilterSocket) it.cafenomad.isSocketProvided == cafeApplicationContext.getString(R.string.info_value_yes) else true)
+                            && (if(isFilterStandingDesk) it.cafenomad.isStandingDeskAvailable == cafeApplicationContext.getString(R.string.info_value_yes) else true)
                 }
             }
             .filter {
@@ -317,8 +348,8 @@ class MainViewModel @Inject constructor(
     }
 
     @SuppressLint("CheckResult")
-    fun setFavorite(cafeId:String, context: Context):Single<Long>{
-        return dataSource.insertFavoriteV2(cafeId)
+    fun setFavorite(cafeId:String):Single<Long> =
+        dataSource.insertFavoriteV2(cafeId)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .doOnSuccess {inserID ->
@@ -348,8 +379,7 @@ class MainViewModel @Inject constructor(
                                 cafeListDisplay.postValue(
                                     getSortedCafeList(
                                         it,
-                                        lastSortType!!,
-                                        context
+                                        lastSortType!!
                                     )
                                 )
                             else
@@ -366,11 +396,11 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
-    }
+
 
     @SuppressLint("CheckResult")
-    fun deleteFavorite(cafeId:String, context: Context):Single<Int>{
-        return dataSource.deleteFavoriteV2(cafeId)
+    fun deleteFavorite(cafeId:String):Single<Int> =
+        dataSource.deleteFavoriteV2(cafeId)
             .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.io())
             .doOnSuccess {deleteCnt->
@@ -404,8 +434,7 @@ class MainViewModel @Inject constructor(
                             if (lastSortType != null){
                                 val sortedlist = getSortedCafeList(
                                     it,
-                                    lastSortType!!,
-                                    context
+                                    lastSortType!!
                                 )
 
                                 newCafeListDisplay = sortedlist
@@ -449,5 +478,13 @@ class MainViewModel @Inject constructor(
                     }
                 }
             }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        if(::disposable.isInitialized){
+            disposable.dispose()
+        }
     }
+
 }

@@ -143,22 +143,12 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
             val newFilterSetting = getTempFilterSetting()
             setFilterSetting(newFilterSetting)
 
-            Single.just(mMainViewModel.isFavoriteOnly.value!!)
+            mMainViewModel.getCafeList(isFetchFavOnly = mMainViewModel.isFavoriteOnly.value!!)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
-                .flatMap { isFavoriteOnly->
-                    Timber.d("isFavoriteOnly: $isFavoriteOnly")
-                    if(isFavoriteOnly)
-                        mMainViewModel.getCafeListFromFavorite()
-                    else
-                        mMainViewModel.getCafeList(requireContext())
-                }.subscribe ({
+                .subscribe ({
                     Timber.d("mMainViewModel.isFavoriteOnly: ${mMainViewModel.isFavoriteOnly}")
-                    if (mMainViewModel.isFavoriteOnly.value!!){
-                        mMainViewModel.initialLocalCafeData(it,requireActivity())
-                    }else{
-                        mMainViewModel.initialLocalCafeData(it,requireActivity())
-                    }
+                    mMainViewModel.initialLocalCafeData(it)
                     dismiss()
                 },{error->
                     Timber.e("filter settings error: $error")

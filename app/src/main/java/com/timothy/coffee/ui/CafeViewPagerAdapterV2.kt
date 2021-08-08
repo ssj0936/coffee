@@ -29,7 +29,7 @@ class CafeViewPagerAdapterV2 constructor(
             fragmentList.add(CafeInfoV2NoDataFragment.getInstance())
         }else {
             cafeListCurrent = list
-            for ((index, cafe) in list.withIndex()) {
+            for (index in list.indices) {
                 fragmentList.add(CafeInfoV2Fragment.newInstance(index))
             }
         }

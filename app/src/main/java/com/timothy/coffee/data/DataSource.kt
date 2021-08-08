@@ -22,15 +22,15 @@ class DataSource @Inject constructor(
 ) {
 
     @SuppressLint("CheckResult")
-    fun queryV2(latitude:Double, longitude:Double, range:Int, isForce:Boolean):Single<List<CafenomadDisplay>>{
+    fun queryV2(latitude:Double, longitude:Double, range:Int, isForceFromApi:Boolean):Single<List<CafenomadDisplay>>{
         return Single.just("")
             .flatMap {
                 cafeDao.getRowNum()
             }.flatMap {
                 //no data in DB or is forced,
-                if(it<=0 || isForce){
+                if(it<=0 || isForceFromApi){
                     if(it<=0) Timber.d("No data in DB")
-                    if(isForce) Timber.d("isForce = true, need to refetch data from API")
+                    if(isForceFromApi) Timber.d("isForceFromApi = true, need to refetch data from API")
 
                     cafenomadApiService.searchAllCafes()
                         .doOnNext {list->

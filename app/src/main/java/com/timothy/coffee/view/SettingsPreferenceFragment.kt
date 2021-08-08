@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -50,7 +51,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
 
         //viewmodel setup
         mMainViewModel = activity?.run {
-            ViewModelProviders.of(this, mViewModelFactory).get(MainViewModel::class.java)
+            ViewModelProvider(this, mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
 
@@ -63,7 +64,6 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
         super.onResume()
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
-
 
     //in order to
     override fun onCreateView(
@@ -89,8 +89,6 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preference,rootKey)
 
-//        mRangeSeekbar = this.findPreference(getString(R.string.preference_key_search_range))!!
-
         mRefetchButton = findPreference(getString(R.string.preference_key_refetch_data))!!
         mRefetchButton.setOnPreferenceClickListener {
             if(mMainViewModel.isLoading.value == true) return@setOnPreferenceClickListener true
@@ -98,7 +96,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
             mMainViewModel.isLoading.value = true
             mMainViewModel.isFavoriteOnly.value = false
 
-            mMainViewModel.getCafeList(requireContext(),isForce = true)
+            mMainViewModel.getCafeList(isForceFromApi = true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe({
@@ -109,7 +107,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
                     ).setAction("Action", null).show()
 
                     //update cafe list
-                    mMainViewModel.initialLocalCafeData(it, requireContext())
+                    mMainViewModel.initialLocalCafeData(it)
 
                     mMainViewModel.isLoading.postValue(false)
                 },{error->
@@ -129,7 +127,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when(key){
             getString(R.string.preference_key_max_cafe_return_number)->{
-                mMainViewModel.updateDisplayCafeData(requireContext())
+                mMainViewModel.updateDisplayCafeData()
             }
         }
     }

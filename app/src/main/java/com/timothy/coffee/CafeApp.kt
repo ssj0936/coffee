@@ -1,6 +1,7 @@
 package com.timothy.coffee
 
 import android.app.Application
+import android.content.Context
 import com.timothy.coffee.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -15,6 +16,10 @@ class CafeApp:Application(),HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector:DispatchingAndroidInjector<Any>
 
+    companion object {
+        lateinit var cafeApplicationContext: Context
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -27,6 +32,7 @@ class CafeApp:Application(),HasAndroidInjector {
             .build()
             .inject(this)
 
+        cafeApplicationContext = applicationContext
     }
 
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector

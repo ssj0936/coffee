@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -64,7 +65,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainViewModel = activity?.run{
-            ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
+            ViewModelProvider(this,mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
 
@@ -140,8 +141,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     private fun updateMarkersIcon(){
-        IntStream.range(0,markerList.size).forEach {index ->
-            val item = markerList[index]
+        for((index,item) in markerList.withIndex()){
             val cafeIndexDisplay = 1+index
 
             when {
@@ -230,9 +230,9 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             val cameraPosition = CameraPosition.builder()
                 .target(LatLng(it.latitude,it.longitude))
                 .zoom(
-                    kotlin.run {
-                    val outValue = TypedValue()
-                    resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
+                    run {
+                        val outValue = TypedValue()
+                        resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
                         outValue.float
                 })
                 .build()
@@ -250,7 +250,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             val cameraPosition = CameraPosition.builder()
                 .target(latlng)
                 .zoom(
-                    kotlin.run {
+                    run {
                         val outValue = TypedValue()
                         resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
                         outValue.float
@@ -369,7 +369,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 .observeOn(Schedulers.computation())
                 .subscribe({
                     //update cafe list
-                    mMainViewModel.initialLocalCafeData(it, requireContext())
+                    mMainViewModel.initialLocalCafeData(it)
 
                     mMainViewModel.isLoading.postValue(false)
                 },{error->

@@ -1,6 +1,5 @@
 package com.timothy.coffee
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,7 +16,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMainBinding
@@ -31,9 +29,6 @@ import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import com.trafi.anchorbottomsheetbehavior.AnchorBottomSheetBehavior
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_main.*
 import timber.log.Timber
 import java.util.stream.IntStream
@@ -76,7 +71,7 @@ class MainFragment: Fragment(), View.OnClickListener
         Timber.d("onViewCreated")
         //viewpager
         cafeAdapter = CafeViewPagerAdapterV2(requireActivity().supportFragmentManager)
-        binding.viewpager?.apply {
+        binding.viewpager.apply {
             adapter = cafeAdapter
             pageMargin = 10.toPx
             addOnPageChangeListener(mPageChangeListener)
@@ -105,6 +100,13 @@ class MainFragment: Fragment(), View.OnClickListener
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>>{
+                //play animation first time
+                if(it == null) {
+                    val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.translate)
+                    anim.interpolator = OvershootInterpolator()
+                    viewpager.startAnimation(anim)
+                }
+
                 //"no data" fragment no need to be able to drag
                 behavior.allowUserDragging = it.isNotEmpty()
                 cafeAdapter.setCardList(it)
@@ -259,21 +261,8 @@ class MainFragment: Fragment(), View.OnClickListener
             .show()
     }
 
-    private fun queryCafeList():Disposable{
-        return mMainViewModel.getCafeList(requireContext())
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
-
-                //play animation first time
-                if(mMainViewModel.cafeListAll.value == null) {
-                    val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.translate)
-                    anim.interpolator = OvershootInterpolator()
-                    viewpager.startAnimation(anim)
-                }
-                mMainViewModel.initialLocalCafeData(it, requireContext())
-
-            },{error-> Timber.e(error)})
+    private fun queryCafeList(){
+        return mMainViewModel.onMainFragmentReady()
     }
 
     private fun isPermissionGranted():Boolean{
