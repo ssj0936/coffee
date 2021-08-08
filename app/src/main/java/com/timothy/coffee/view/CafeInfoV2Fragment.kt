@@ -49,9 +49,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
-        arguments?.getInt(ARGUMENT_KEY,0)?.let {
-            ARGUMENT_DATA_CAFE_INDEX = it
-        }
+        ARGUMENT_DATA_CAFE_INDEX = arguments?.getInt(ARGUMENT_KEY,0) ?: 0
 
         super.onAttach(context)
     }
@@ -118,7 +116,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         super.onActivityCreated(savedInstanceState)
         mMainViewModel.cafeListDisplay.value?.let {
             binding.cafe = it[ARGUMENT_DATA_CAFE_INDEX]
-            binding.lifecycleOwner = this@CafeInfoV2Fragment
+            binding.lifecycleOwner = viewLifecycleOwner
         }
     }
 

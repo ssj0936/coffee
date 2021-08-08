@@ -84,7 +84,7 @@ class CafeListFragment:Fragment(),CafeBaseFragment,CafeAdapter.OnCafeAdapterClic
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.viewmodel = mMainViewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
     }
 
     override fun onItemClick(cafe: CafenomadDisplay) {

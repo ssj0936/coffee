@@ -43,9 +43,9 @@ class AboutFragment: DialogFragment(),View.OnClickListener {
     override fun onStart() {
         super.onStart()
 
-        dialog?.let{
-            it.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            it.window?.setBackgroundDrawableResource(R.drawable.background_filter_dialog)
+        dialog?.apply{
+            window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            window?.setBackgroundDrawableResource(R.drawable.background_filter_dialog)
         }
     }
 

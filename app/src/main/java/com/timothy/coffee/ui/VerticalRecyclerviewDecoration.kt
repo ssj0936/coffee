@@ -11,17 +11,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.timothy.coffee.R
 import timber.log.Timber
 import kotlin.math.roundToInt
+const val HORIZONTAL_LIST: Int = LinearLayoutManager.HORIZONTAL
+const val VERTICAL_LIST: Int = LinearLayoutManager.VERTICAL
 
 class VerticalRecyclerviewDecoration(
     mContext: Context,
     orientation:Int
 ): RecyclerView.ItemDecoration() {
-
-    private val HORIZONTAL_LIST: Int = LinearLayoutManager.HORIZONTAL
-    private val VERTICAL_LIST: Int = LinearLayoutManager.VERTICAL
-
-    private var mOrientation:Int
-    private var mDivider: Drawable
+    private var mOrientation:Int = if(orientation == VERTICAL_LIST || orientation == HORIZONTAL_LIST) orientation
+        else throw IllegalArgumentException("invalid orientation")
+    private var mDivider: Drawable = ContextCompat.getDrawable(mContext, R.drawable.divider)
+        ?: throw IllegalArgumentException("error divider resource")
     private var isDrawFirstDivider: Boolean = true
     private var isDrawLastDivider: Boolean = true
     private val mBounds = Rect()
@@ -32,15 +32,6 @@ class VerticalRecyclerviewDecoration(
                 isDrawLastDivider:Boolean):this(mContext,orientation){
         this.isDrawFirstDivider = isDrawFirstDivider
         this.isDrawLastDivider = isDrawLastDivider
-    }
-
-    init {
-        mOrientation =
-            if(orientation == VERTICAL_LIST || orientation == HORIZONTAL_LIST) orientation
-            else throw IllegalArgumentException("invalid orientation")
-
-        mDivider = ContextCompat.getDrawable(mContext, R.drawable.divider)
-            ?: throw IllegalArgumentException("error divider resource")
     }
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -54,8 +45,8 @@ class VerticalRecyclerviewDecoration(
     }
 
     private fun drawHorizontal(c: Canvas, parent: RecyclerView){
-        var left:Int
-        var right:Int
+        val left:Int
+        val right:Int
 
         if (parent.clipToPadding) {
             left = parent.paddingLeft

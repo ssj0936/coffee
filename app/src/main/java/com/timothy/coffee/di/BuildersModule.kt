@@ -18,16 +18,10 @@ abstract class BuildersModule {
     abstract fun contributeCafeListFragment(): CafeListFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeCafeInfoFragment(): CafeInfoFragment
-
-    @ContributesAndroidInjector
     abstract fun contributeCafeInfoV2Fragment(): CafeInfoV2Fragment
 
     @ContributesAndroidInjector
     abstract fun contributeMapFragment(): MapFragment
-
-    @ContributesAndroidInjector
-    abstract fun contributeSortDialogFragment(): SortDialogFragment
 
     @ContributesAndroidInjector
     abstract fun contributeFilterDialogFragment(): FilterDialogFragment

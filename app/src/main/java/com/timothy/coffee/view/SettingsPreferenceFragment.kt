@@ -76,7 +76,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
         val btn = LinearLayout.inflate(requireContext(),R.layout.about_section_preference_layout,null)
         btn.setOnClickListener {
             requireActivity().supportFragmentManager.let {
-                AboutFragment().show(it,AboutFragment.TAG)
+                AboutFragment.getInstance().show(it,AboutFragment.TAG)
             }
         }
 

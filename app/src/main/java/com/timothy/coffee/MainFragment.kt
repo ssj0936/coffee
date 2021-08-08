@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.timothy.coffee.data.model.CafenomadDisplay
@@ -74,7 +75,6 @@ class MainFragment: Fragment(), View.OnClickListener
         super.onViewCreated(view, savedInstanceState)
         Timber.d("onViewCreated")
         //viewpager
-//        cafeAdapter = CafeViewPagerAdapter(requireActivity().supportFragmentManager)
         cafeAdapter = CafeViewPagerAdapterV2(requireActivity().supportFragmentManager)
         binding.viewpager?.apply {
             adapter = cafeAdapter
@@ -86,10 +86,6 @@ class MainFragment: Fragment(), View.OnClickListener
         //when user clicked item of cafe list
         mMainViewModel.chosenCafe.observe (viewLifecycleOwner,
             Observer<CafenomadDisplay> {
-//                Timber.d("chosen: $it")
-//                //nav to second page
-//                binding.viewpager.currentItem = mPageNum-1
-
                 //nav to chosen cafe position or index0
                 if(it == null){
                     binding.viewpager.currentItem = 0
@@ -149,14 +145,14 @@ class MainFragment: Fragment(), View.OnClickListener
 
         //viewmodel setup
         mMainViewModel = activity?.run {
-            ViewModelProviders.of(this, mViewModelFactory).get(MainViewModel::class.java)
+            ViewModelProvider(this, mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.viewmodel = mMainViewModel
-        binding.lifecycleOwner=this
+        binding.lifecycleOwner = viewLifecycleOwner
 
     }
 
@@ -263,7 +259,6 @@ class MainFragment: Fragment(), View.OnClickListener
             .show()
     }
 
-    @SuppressLint("ResourceType")
     private fun queryCafeList():Disposable{
         return mMainViewModel.getCafeList(requireContext())
             .subscribeOn(Schedulers.io())
@@ -288,8 +283,6 @@ class MainFragment: Fragment(), View.OnClickListener
             if(ContextCompat.checkSelfPermission(requireContext(), p) != PackageManager.PERMISSION_GRANTED)
                 permissionMissingList.add(p)
         }
-
-//        Timber.d("isPermissionGranted:${permissionMissingList.size == 0}")
 
         return permissionMissingList.size == 0
     }

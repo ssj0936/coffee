@@ -28,8 +28,8 @@ class CafeViewPagerAdapterV2 constructor(
         if(list.isEmpty()){
             fragmentList.add(CafeInfoV2NoDataFragment.getInstance())
         }else {
-            cafeListCurrent = list.map { item -> item.copy() }
-            for ((index, cafe) in cafeListCurrent.withIndex()) {
+            cafeListCurrent = list
+            for ((index, cafe) in list.withIndex()) {
                 fragmentList.add(CafeInfoV2Fragment.newInstance(index))
             }
         }

@@ -85,7 +85,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.viewmodel = mMainViewModel
-        binding.lifecycleOwner=this
+        binding.lifecycleOwner = viewLifecycleOwner
 
         mapView?.run {
             onCreate(savedInstanceState)

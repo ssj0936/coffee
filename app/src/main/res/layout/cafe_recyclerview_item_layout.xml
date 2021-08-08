@@ -50,8 +50,8 @@
                     android:layout_height="12dp"
                     android:layout_marginStart="5dp"
                     android:src="@drawable/ic_favorite_black_24dp"
-                    android:tint="@color/rate_red"
-                    android:visibility="@{cafeinfo.isFavorite ? View.VISIBLE : View.GONE}"/>
+                    android:visibility="@{cafeinfo.isFavorite ? View.VISIBLE : View.GONE}"
+                    app:tint="@color/rate_red" />
             </LinearLayout>
 
         </LinearLayout>
