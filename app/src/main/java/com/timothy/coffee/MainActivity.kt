@@ -19,7 +19,10 @@ class MainActivity: AppCompatActivity(), HasAndroidInjector {
     @Inject
     lateinit var dispatchingAndroidInjector:DispatchingAndroidInjector<Any>
     override fun androidInjector(): AndroidInjector<Any> = dispatchingAndroidInjector
-    private val mFragmentList:List<Fragment> = listOf(MainFragment.getInstance(),SettingsPreferenceFragment.getInstance())
+    private val mFragmentList:List<Fragment> = listOf(
+        MainFragment.getInstance(),
+        SettingsPreferenceFragment.getInstance()
+    )
 
     @SuppressLint("RestrictedApi")
     override fun onCreate(savedInstanceState: Bundle?) {

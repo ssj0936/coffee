@@ -15,9 +15,6 @@ abstract class BuildersModule {
     abstract fun contributeMainFragment(): MainFragment
 
     @ContributesAndroidInjector
-    abstract fun contributeCafeListFragment(): CafeListFragment
-
-    @ContributesAndroidInjector
     abstract fun contributeCafeInfoV2Fragment(): CafeInfoV2Fragment
 
     @ContributesAndroidInjector

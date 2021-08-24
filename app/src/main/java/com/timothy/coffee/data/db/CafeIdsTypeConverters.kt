@@ -8,17 +8,11 @@ class CafeIdsTypeConverters {
 
     @TypeConverter
     fun idStringToStringList(ids:String?):List<String>{
-        return if (ids==null)
-            emptyList()
-        else
-            ids.split(",")
+        return ids?.split(",") ?: emptyList()
     }
 
     @TypeConverter
     fun idStringListToString(ids:List<String>?):String{
-        return if(ids==null)
-            ""
-        else
-            ids.joinToString(",")
+        return ids?.joinToString(",") ?: ""
     }
 }

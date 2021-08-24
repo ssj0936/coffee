@@ -7,11 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.LinearLayout
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.snackbar.Snackbar
@@ -127,7 +124,7 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when(key){
             getString(R.string.preference_key_max_cafe_return_number)->{
-                mMainViewModel.updateDisplayCafeData()
+                mMainViewModel.onDisplayNumberChange()
             }
         }
     }

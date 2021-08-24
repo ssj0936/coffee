@@ -1,11 +1,9 @@
 package com.timothy.coffee.data.db
 
 import androidx.room.*
-import com.timothy.coffee.data.model.CafeSearchResult
 import com.timothy.coffee.data.model.Cafenomad
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.data.model.FavoriteID
-import io.reactivex.Observable
 import io.reactivex.Single
 
 @Dao

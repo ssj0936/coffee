@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
 import com.timothy.coffee.R
 import com.timothy.coffee.util.*
@@ -18,7 +18,6 @@ import com.timothy.coffee.util.Utils.Companion.setFilterSetting
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_filter_dialog_layout.*
 import timber.log.Timber
@@ -29,8 +28,6 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
     private lateinit var mMainViewModel: MainViewModel
-
-
 
     private lateinit var pressedColorStateList: ColorStateList
     private lateinit var unpressedColorStateList: ColorStateList
@@ -47,7 +44,7 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainViewModel = activity?.run {
-            ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
+            ViewModelProvider(this,mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
 
@@ -147,7 +144,7 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.computation())
                 .subscribe ({
-                    Timber.d("mMainViewModel.isFavoriteOnly: ${mMainViewModel.isFavoriteOnly}")
+                    Timber.d("mMainViewModel.isFavoriteOnly: ${mMainViewModel.isFavoriteOnly.value}")
                     mMainViewModel.initialLocalCafeData(it)
                     dismiss()
                 },{error->

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.timothy.coffee.data.DataModel
 import com.timothy.coffee.data.DataSource
-import com.timothy.coffee.data.db.CafeDao
 import javax.inject.Inject
 
 //為了要把datamodel帶進viewmodel，只好實作factory

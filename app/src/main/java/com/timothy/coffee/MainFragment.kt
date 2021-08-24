@@ -34,23 +34,21 @@ import timber.log.Timber
 import java.util.stream.IntStream
 import javax.inject.Inject
 
+const val RESULT_PERMISSION_LOCATION = 0
+const val RESULT_CODE_WIFI = 1
+const val RESULT_MANUAL_ENABLE = 2
+
 class MainFragment: Fragment(), View.OnClickListener
 {
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory
 
     private lateinit var mMainViewModel: MainViewModel
-//    private lateinit var cafeAdapter: CafeViewPagerAdapter
     private lateinit var cafeAdapter: CafeViewPagerAdapterV2
     private lateinit var binding: FragmentMainBinding
-//    private val compositeDisposable = CompositeDisposable()
     private lateinit var behavior: AnchorBottomSheetBehavior<View>
 
     companion object{
-        const val RESULT_PERMISSION_LOCATION = 0
-        const val RESULT_CODE_WIFI = 1
-        const val RESULT_MANUAL_ENABLE = 2
-
         const val TAG = "MainFragment"
         private lateinit var INSTANCE:MainFragment
         fun getInstance():MainFragment{
@@ -85,15 +83,14 @@ class MainFragment: Fragment(), View.OnClickListener
                 if(it == null){
                     binding.viewpager.currentItem = 0
                 }else {
-                    val findIndex: Int = IntStream.range(0, cafeAdapter.cafeListCurrent.size)
-                        .filter { i -> cafeAdapter.cafeListCurrent[i].cafenomad.id == it.cafenomad.id }
-                        .findFirst().orElse(0)
-
+                    val findIndex: Int = cafeAdapter.cafeListCurrent.indexOfFirst { listItem ->
+                        listItem.cafenomad.id == it.cafenomad.id
+                    }
                     binding.viewpager.currentItem = findIndex
                 }
 
                 //scroll to top
-                (cafeAdapter.getItem(binding.viewpager.currentItem) as? CafeInfoV2Fragment)?.scrollToTop()
+                    (cafeAdapter.getItem(binding.viewpager.currentItem) as? CafeInfoV2Fragment)?.scrollToTop()
 
             }
         )
@@ -246,16 +243,15 @@ class MainFragment: Fragment(), View.OnClickListener
     private fun showManualPermissionSettingsDialog(){
         AlertDialog.Builder(requireContext())
             .setMessage(R.string.dialog_permission_require_message)
-            .setPositiveButton("Permission setting"
-            ) { _, _ ->
+            .setPositiveButton("Permission setting") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 val uri = Uri.fromParts("package", requireActivity().packageName, null)
                 intent.data = uri
                 startActivityForResult(intent, RESULT_MANUAL_ENABLE)
-
             }
-            .setNegativeButton("Finish"
-            ) { _, _ ->requireActivity().finish()}
+            .setNegativeButton("Finish") { _, _ ->
+                requireActivity().finish()
+            }
             .setCancelable(false)
             .create()
             .show()

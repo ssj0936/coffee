@@ -42,7 +42,6 @@
                     android:id="@+id/cafe_distance"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@{cafeinfo.cafenomad.distanceFromCenterOfScreen+` M`}"
                     android:textAppearance="@style/CafelistSubTitleStyle"/>
                 <ImageView
                     android:id="@+id/favorite_btn"

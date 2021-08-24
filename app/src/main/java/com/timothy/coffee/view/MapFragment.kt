@@ -16,13 +16,13 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
 import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
+import com.timothy.coffee.RESULT_PERMISSION_LOCATION
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMapBinding
 import com.timothy.coffee.util.Utils
@@ -94,15 +94,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             getMapAsync(this@MapFragment)
         }
 
-        binding.researchThisAreaBtn.setOnClickListener(this)
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-//        Timber.d("onMapReady")
-        mMap = googleMap
-        mMap.setOnMarkerClickListener(this)
-        enableMyLocation()
-
         mMainViewModel.screenCenterLoc.observe(viewLifecycleOwner,
             Observer<LatLng>{
                 moveCamera()
@@ -127,6 +118,15 @@ class MapFragment : Fragment(),OnMapReadyCallback,
 //                moveCameraTo(it)
                 updateMarkersIcon()
             })
+
+        binding.researchThisAreaBtn.setOnClickListener(this)
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+//        Timber.d("onMapReady")
+        mMap = googleMap
+        mMap.setOnMarkerClickListener(this)
+        enableMyLocation()
 
         mMap.setOnCameraIdleListener(this)
     }
@@ -165,11 +165,12 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     private fun addMarkers(cafes:List<CafenomadDisplay>){
+        //clear first
         markerList.clear()
 
-        IntStream.range(0,cafes.size).forEach { cafeIndex ->
-            val cafe = cafes[cafeIndex]
+        for((cafeIndex,cafe) in cafes.withIndex()){
             val cafeIndexDisplay = 1+cafeIndex
+
             mMap.run {
                 val marker = addMarker(MarkerOptions()
                     .position(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
@@ -186,8 +187,8 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                     .title(cafe.cafenomad.name)
                     .draggable(false)
                     .zIndex(
-                        when {
-                            cafe.cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id -> Z_INDEX_CURRENT
+                        when (cafe.cafenomad.id) {
+                            mMainViewModel.chosenCafe.value?.cafenomad?.id -> Z_INDEX_CURRENT
                             else -> Z_INDEX_NORMAL
                         }
                     )
@@ -277,14 +278,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         val builder = LatLngBounds.Builder()
         val bounds = builder.createBoundsForAllMarkers(markerList) ?: return  //Updated bounds.
 
-//        Timber.d("bounds:$bounds")
-//
-//        markerList.stream().forEach {
-//            (it.tag as CafenomadDisplay).run{
-//                Timber.d("name:${this.cafenomad.name}/lat:${this.cafenomad.latitude}/lng:${this.cafenomad.longitude}")
-//            }
-//        }
-
         val width = resources.displayMetrics.widthPixels
         val height = resources.displayMetrics.heightPixels -
                 resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height)*2
@@ -296,7 +289,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             override fun onFinish() {
                 mMap.cameraPosition.target?.let {
                     if(it != mMainViewModel.screenCenterLoc.value) {
-                        mMainViewModel.screenCenterLoc.value = it
+                        mMainViewModel.updateScreenCenterLoc(it)
                         mMainViewModel.isReSearchable.value = false
                     }
                 }
@@ -306,7 +299,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             override fun onCancel() {
                 mMap.cameraPosition.target?.let {
                     if(it != mMainViewModel.screenCenterLoc.value) {
-                        mMainViewModel.screenCenterLoc.value = it
+                        mMainViewModel.updateScreenCenterLoc(it)
                         mMainViewModel.isReSearchable.value = false
                     }
                 }
@@ -336,7 +329,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         grantResults: IntArray
     ) {
         when(requestCode) {
-            MainFragment.RESULT_PERMISSION_LOCATION -> {
+            RESULT_PERMISSION_LOCATION -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     enableMyLocation()
                 }
@@ -360,8 +353,8 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
         mMainViewModel.isReSearchable.value = false
-        mMainViewModel.screenCenterLoc.value = mMap.cameraPosition.target
         mMainViewModel.isLoading.value = true
+        mMainViewModel.updateScreenCenterLoc(mMap.cameraPosition.target)
 
         mMainViewModel.screenCenterLoc.value?.let { latlon ->
             mMainViewModel.getCafeListFromLocation(requireContext(),latlon,false)

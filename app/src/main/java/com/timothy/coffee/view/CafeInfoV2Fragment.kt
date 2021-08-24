@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.timothy.coffee.R
 import com.timothy.coffee.databinding.FragmentCafeInfoV2Binding
@@ -43,7 +43,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mMainViewModel = activity?.run {
-            ViewModelProviders.of(this,mViewModelFactory).get(MainViewModel::class.java)
+            ViewModelProvider(this,mViewModelFactory).get(MainViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
     }
 
