@@ -18,6 +18,7 @@ import com.timothy.coffee.util.Movement
 import com.timothy.coffee.util.*
 import com.timothy.coffee.util.Utils.Companion.getFilterSetting
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
@@ -33,8 +34,7 @@ class MainViewModel @Inject constructor(
     private val dataModel:DataModel,
     private val dataSource: DataSource
 ): ViewModel(){
-
-    private lateinit var disposable:Disposable
+    private val compositeDisposable = CompositeDisposable()
 
     //目前user所在
     val screenCenterLoc : LiveData<LatLng>
@@ -56,14 +56,44 @@ class MainViewModel @Inject constructor(
     var lastMove = Movement(isClickMap = false, isClickList = false)
     var isLoading:MutableLiveData<Boolean> = MutableLiveData(false)
 
+    //get location -> get cafe list on that location -> postProcedure(sort, livedata setting)
     fun onMainFragmentReady(){
         //starting fetching data
-        disposable = getCafeList()
+        getLocation()
             .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.io())
+            .observeOn(Schedulers.computation())
+            .flatMap { latlng ->
+                getCafeListFromLocation(latlng)
+            }
             .subscribe({
                 initialLocalCafeData(it)
             },{error-> Timber.e(error)})
+            .let {
+                compositeDisposable.add(it)
+            }
+    }
+
+    fun onFilterChanged(){
+
+    }
+
+    fun onMapResearch(){
+        isReSearchable.value = false
+        isLoading.value = true
+
+        screenCenterLoc.value?.let { latlon ->
+            getCafeListFromLocation(latlon,false)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())
+                .subscribe({
+                    //update cafe list
+                    initialLocalCafeData(it)
+                    isLoading.postValue(false)
+                },{error->
+                    Timber.e("ReFetch data error: $error")
+                    isLoading.postValue(false)
+                })
+        }
     }
 
     fun getCafeList(
@@ -79,11 +109,10 @@ class MainViewModel @Inject constructor(
     fun getCafeList(
         isForceFromApi:Boolean = false
     ):Single<List<CafenomadDisplay>> {
-        val context = cafeApplicationContext
         return getLocation()
             .subscribeOn(Schedulers.io())
             .flatMap { lonlat ->
-                getCafeListFromLocation(context,lonlat,isForceFromApi)
+                getCafeListFromLocation(lonlat,isForceFromApi)
             }
     }
 
@@ -105,29 +134,42 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    fun getCafeListFromLocation(context: Context, latLng: LatLng, isForceFromApi:Boolean):Single<List<CafenomadDisplay>> {
+    fun getCafeListFromLocation(
+        latLng: LatLng,
+        isForceFromApi:Boolean = false
+    ):Single<List<CafenomadDisplay>> {
         return Single.just(latLng)
             .subscribeOn(Schedulers.io())
             .flatMap {lonlat->
-                val range = context.resources.getInteger(R.integer.range_cafe_nearby_max)
+                val range = cafeApplicationContext.resources.getInteger(R.integer.range_cafe_nearby_max)
                 dataSource.queryV2(lonlat.latitude,lonlat.longitude,range,isForceFromApi)
                     .observeOn(Schedulers.computation())
                     .map { cafes ->
                         //distance assignment
-                        cafes.onEach {cafe->
+                        cafes.onEach { cafe ->
+                            //calculation of distance from cafe to screen center
+                            cafe.cafenomad.distanceFromCenterOfScreen =
+                                screenCenterLoc.value?.let {
+                                    Utils.distance(
+                                        it.latitude, cafe.cafenomad.latitude.toDouble(),
+                                        it.longitude, cafe.cafenomad.longitude.toDouble()
+                                    ).toInt()
+                                }?:Int.MAX_VALUE
+
                             //calculation of distance from cafe to current location
                             cafe.cafenomad.distanceFromCurrentLoc =
-                                if(userLoc != null)
+                                userLoc?.let {
                                     Utils.distance(
-                                        userLoc!!.latitude,cafe.cafenomad.latitude.toDouble(),
-                                        userLoc!!.longitude,cafe.cafenomad.longitude.toDouble()
+                                        it.latitude,cafe.cafenomad.latitude.toDouble(),
+                                        it.longitude,cafe.cafenomad.longitude.toDouble()
                                     ).toInt()
-                                else 0
-                        }.filter{cafe->
-                            cafe.cafenomad.distanceFromCurrentLoc < range*1000
+                                }?:0
                         }
-                        //sort by distance from nearest to farest
-                        .sortedBy{it.cafenomad.distanceFromCurrentLoc}
+//                        .filter{cafe->
+//                            cafe.cafenomad.distanceFromCenterOfScreen < range*1000
+//                        }
+//                        //sort by distance from nearest to farest
+//                        .sortedBy{it.cafenomad.distanceFromCenterOfScreen}
                     }
             }
     }
@@ -222,6 +264,8 @@ class MainViewModel @Inject constructor(
             })
     }
 
+
+
     private fun getSortedCafeList(list:List<CafenomadDisplay>, type:Int):List<CafenomadDisplay> {
         val maxCafeNumShowing = PreferenceManager
             .getDefaultSharedPreferences(cafeApplicationContext)
@@ -246,19 +290,19 @@ class MainViewModel @Inject constructor(
 
         return list
             .asSequence()
-            .sortedWith(
-                compareBy<CafenomadDisplay>{it.cafenomad.distanceFromCurrentLoc}
-                    .thenBy{it.cafenomad.tastyLevel*-1}
-            )
             .filter { cafe ->
                 if(isFullRange) true
                 else {
                     val range = cafeApplicationContext.resources.getInteger(R.integer.range_cafe_nearby_min) * 1000
                     val isSetFavoriteOnly =
                         (type == FILTER_FAVORITE_ONLY)
-                    (cafe.cafenomad.distanceFromCurrentLoc < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
+                    (cafe.cafenomad.distanceFromCenterOfScreen < range) && (if (isSetFavoriteOnly) cafe.isFavorite else true)
                 }
             }
+            .sortedWith(
+                compareBy<CafenomadDisplay>{it.cafenomad.distanceFromCenterOfScreen}
+                    .thenBy{it.cafenomad.tastyLevel*-1}
+            )
             .filter {
                 //filter都沒勾選 -> 無限制 全部顯示
                 if(!isFilterNoTimeLimit && !isFilterSocket && !isFilterStandingDesk) true
@@ -415,10 +459,15 @@ class MainViewModel @Inject constructor(
             _screenCenterLoc.postValue(latlng)
     }
 
+    fun updateMapResearchState(isResearch: Boolean){
+        if(Looper.myLooper() == Looper.getMainLooper())
+            isReSearchable.value = isResearch
+        else
+            isReSearchable.postValue(isResearch)
+    }
+
     override fun onCleared() {
         super.onCleared()
-        if(::disposable.isInitialized){
-            disposable.dispose()
-        }
+        compositeDisposable.dispose()
     }
 }

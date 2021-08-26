@@ -61,7 +61,7 @@ data class Cafenomad (
     val openTime:String
 
 ): Serializable {
-//    @Ignore var distanceFromCenterOfScreen:Int = Int.MAX_VALUE
+    @Ignore var distanceFromCenterOfScreen:Int = Int.MAX_VALUE
     @Ignore var distanceFromCurrentLoc:Int = Int.MAX_VALUE
 }
 data class CafenomadDisplay(@Embedded var cafenomad: Cafenomad, var isFavorite: Boolean = false): Serializable

@@ -8,7 +8,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,19 +19,17 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
-import com.timothy.coffee.MainFragment
 import com.timothy.coffee.R
 import com.timothy.coffee.RESULT_PERMISSION_LOCATION
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMapBinding
+import com.timothy.coffee.util.Constants.GOOGLE_MAP_ZOOM_LEVEL
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_map.*
 import timber.log.Timber
-import java.util.stream.IntStream
 import javax.inject.Inject
 
 
@@ -59,7 +56,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             if(!::INSTANCE.isInitialized) INSTANCE = MapFragment()
             return INSTANCE
         }
-        val TAG = "MapFragment"
+        const val TAG = "MapFragment"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,21 +91,36 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             getMapAsync(this@MapFragment)
         }
 
+        //one-time observer
         mMainViewModel.screenCenterLoc.observe(viewLifecycleOwner,
             Observer<LatLng>{
-                moveCamera()
+                moveCameraTo(mMainViewModel.screenCenterLoc.value ?: return@Observer)
                 mMainViewModel.screenCenterLoc.removeObservers(viewLifecycleOwner)
             })
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
             Observer<List<CafenomadDisplay>> { cafes ->
                 mMap.let{
+
+                    //check whether is same dataset or not
+                    var needToMoveCamera = true
+
+                    if(cafes == null)
+                        needToMoveCamera = true
+                    else if(cafes.size == markerList.size) {
+                        var areSameContent = true
+
+                        markerList.zip(cafes).forEach{pair ->
+                            areSameContent = areSameContent && (pair.first.tag as CafenomadDisplay == (pair.second))
+                        }
+                        needToMoveCamera = !areSameContent
+                    }
+
                     //remove all markers first
                     mMap.clear()
                     addMarkers(cafes)
 
-                    //only move camera when scrolling too far from group of marker
-//                    if(!isThereMarkerInMap())
+                    if(needToMoveCamera)
                         moveCameraToShowAllMarkers()
                 }
             })
@@ -123,12 +135,11 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-//        Timber.d("onMapReady")
-        mMap = googleMap
-        mMap.setOnMarkerClickListener(this)
+        mMap = googleMap.apply {
+            setOnMarkerClickListener(this@MapFragment)
+            setOnCameraIdleListener(this@MapFragment)
+        }
         enableMyLocation()
-
-        mMap.setOnCameraIdleListener(this)
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
@@ -198,6 +209,10 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 markerList.add(marker)
             }
         }
+
+        markerList.forEach {
+
+        }
     }
 
     private fun getBitmapMapPin(number:Int, resId:Int): BitmapDescriptor?{
@@ -226,39 +241,29 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         }
     }
 
-    private fun moveCamera(){
-        mMainViewModel.screenCenterLoc.value?.let {
-            val cameraPosition = CameraPosition.builder()
-                .target(LatLng(it.latitude,it.longitude))
-                .zoom(
-                    run {
-                        val outValue = TypedValue()
-                        resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
-                        outValue.float
-                })
-                .build()
-
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-        }
-    }
-
-    private fun moveCameraTo(cafe:CafenomadDisplay) {
-        moveCameraTo(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
-    }
+//    private fun moveCamera(){
+//        mMainViewModel.screenCenterLoc.value?.let {
+//            val cameraPosition = CameraPosition.builder()
+//                .target(LatLng(it.latitude,it.longitude))
+//                .zoom(GOOGLE_MAP_ZOOM_LEVEL)
+//                .build()
+//
+//            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+//        }
+//    }
+//
+//    private fun moveCameraTo(cafe:CafenomadDisplay) {
+//        moveCameraTo(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
+//    }
 
     private fun moveCameraTo(latlng:LatLng){
         mMap?.run{
             val cameraPosition = CameraPosition.builder()
                 .target(latlng)
-                .zoom(
-                    run {
-                        val outValue = TypedValue()
-                        resources.getValue(R.dimen.google_map_zoom_level,outValue,true)
-                        outValue.float
-                    })
+                .zoom(GOOGLE_MAP_ZOOM_LEVEL)
                 .build()
 
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
         }
     }
 
@@ -275,8 +280,8 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     private fun moveCameraToShowAllMarkers(){
-        val builder = LatLngBounds.Builder()
-        val bounds = builder.createBoundsForAllMarkers(markerList) ?: return  //Updated bounds.
+        val bounds = LatLngBounds.Builder()
+            .createBoundsForAllMarkers(markerList) ?: return  //Updated bounds.
 
         val width = resources.displayMetrics.widthPixels
         val height = resources.displayMetrics.heightPixels -
@@ -290,7 +295,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 mMap.cameraPosition.target?.let {
                     if(it != mMainViewModel.screenCenterLoc.value) {
                         mMainViewModel.updateScreenCenterLoc(it)
-                        mMainViewModel.isReSearchable.value = false
+//                        mMainViewModel.isReSearchable.value = false
                     }
                 }
             }
@@ -300,7 +305,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 mMap.cameraPosition.target?.let {
                     if(it != mMainViewModel.screenCenterLoc.value) {
                         mMainViewModel.updateScreenCenterLoc(it)
-                        mMainViewModel.isReSearchable.value = false
+//                        mMainViewModel.isReSearchable.value = false
                     }
                 }
             }
@@ -347,28 +352,14 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             }
         }
 
-//        Timber.d("The camera has stopped moving.")
+        Timber.d("The camera has stopped moving.")
     }
 
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
-        mMainViewModel.isReSearchable.value = false
-        mMainViewModel.isLoading.value = true
-        mMainViewModel.updateScreenCenterLoc(mMap.cameraPosition.target)
-
-        mMainViewModel.screenCenterLoc.value?.let { latlon ->
-            mMainViewModel.getCafeListFromLocation(requireContext(),latlon,false)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
-                .subscribe({
-                    //update cafe list
-                    mMainViewModel.initialLocalCafeData(it)
-
-                    mMainViewModel.isLoading.postValue(false)
-                },{error->
-                    Timber.e("ReFetch data error: $error")
-                    mMainViewModel.isLoading.postValue(false)
-                })
+        with(mMainViewModel){
+            updateScreenCenterLoc(mMap.cameraPosition.target)
+            onMapResearch()
         }
     }
 }
