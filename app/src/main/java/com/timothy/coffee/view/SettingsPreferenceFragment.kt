@@ -82,42 +82,31 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
         return v
     }
 
+    private val refetchCallback = object :MainViewModel.RefetchCallback{
+        override fun onRefetchSuccess() {
+            Snackbar.make(
+                requireView(),
+                R.string.snackbar_refetch_done,
+                Snackbar.LENGTH_LONG
+            ).setAction("Action", null).show()
+        }
+
+        override fun onRefetchFail() {
+            Snackbar.make(
+                requireView(),
+                R.string.snackbar_refetch_fail,
+                Snackbar.LENGTH_LONG
+            ).setAction("Action", null).show()
+        }
+    }
     @SuppressLint("ResourceType")
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_preference,rootKey)
 
         mRefetchButton = findPreference(getString(R.string.preference_key_refetch_data))!!
         mRefetchButton.setOnPreferenceClickListener {
-            if(mMainViewModel.isLoading.value == true) return@setOnPreferenceClickListener true
-
-            mMainViewModel.isLoading.value = true
-            mMainViewModel.isFavoriteOnly.value = false
-
-            mMainViewModel.getCafeList(isForceFromApi = true)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
-                .subscribe({
-                    Snackbar.make(
-                        requireView(),
-                        R.string.snackbar_refetch_done,
-                        Snackbar.LENGTH_LONG
-                    ).setAction("Action", null).show()
-
-                    //update cafe list
-                    mMainViewModel.initialLocalCafeData(it)
-
-                    mMainViewModel.isLoading.postValue(false)
-                },{error->
-                    Timber.e("ReFetch data error: $error")
-                    Snackbar.make(
-                        requireView(),
-                        R.string.snackbar_refetch_fail,
-                        Snackbar.LENGTH_LONG
-                    ).setAction("Action", null).show()
-                    mMainViewModel.isLoading.postValue(false)
-                })
-
-                true
+            mMainViewModel.onRefetchData(refetchCallback)
+            true
         }
     }
 

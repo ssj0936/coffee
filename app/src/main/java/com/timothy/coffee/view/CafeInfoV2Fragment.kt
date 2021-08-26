@@ -17,7 +17,6 @@ import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -152,22 +151,8 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                     mMainViewModel.chosenCafe.value?.let {
                         if (it.isFavorite)
                             mMainViewModel.deleteFavorite(it.cafenomad.id)
-                                .subscribe({
-//                                    setFavoriteBtn(false)
-                                    Timber.d("delete favorite success")
-                                },{error ->
-                                    Timber.d("delete favorite fail: $error")
-                                    error.printStackTrace()
-                                })
                         else
                             mMainViewModel.setFavorite(it.cafenomad.id)
-                                .subscribe({
-//                                    setFavoriteBtn(true)
-                                    Timber.d("adding favorite success")
-                                },{error ->
-                                    Timber.d("adding favorite fail: $error")
-                                    error.printStackTrace()
-                                })
                     }
                 }
             }

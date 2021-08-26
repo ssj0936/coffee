@@ -13,25 +13,15 @@ import android.net.Uri
 import androidx.core.app.ActivityCompat
 import kotlin.math.*
 
-//fun ViewPager2.reduceDragSensitivity() {
-//    val recyclerViewField = ViewPager2::class.java.getDeclaredField("mRecyclerView")
-//    recyclerViewField.isAccessible = true
-//    val recyclerView = recyclerViewField.get(this) as RecyclerView
-//
-//    val touchSlopField = RecyclerView::class.java.getDeclaredField("mTouchSlop")
-//    touchSlopField.isAccessible = true
-//    val touchSlop = touchSlopField.get(recyclerView) as Int
-//    touchSlopField.set(recyclerView, touchSlop*4)       // "8" was obtained experimentally
-//}
-val FILTER_TASTY_RATE_0 = 0
-val FILTER_TASTY_RATE_1 = 1
-val FILTER_TASTY_RATE_2 = 2
-val FILTER_TASTY_RATE_3 = 3
-val FILTER_TASTY_RATE_4 = 4
-val FILTER_TASTY_RATE_5 = 5
-val FILTER_NO_TIME_LIMIT = 6
-val FILTER_SOCKET = 7
-val FILTER_STANDING_DESK = 8
+const val FILTER_TASTY_RATE_0 = 0
+const val FILTER_TASTY_RATE_1 = 1
+const val FILTER_TASTY_RATE_2 = 2
+const val FILTER_TASTY_RATE_3 = 3
+const val FILTER_TASTY_RATE_4 = 4
+const val FILTER_TASTY_RATE_5 = 5
+const val FILTER_NO_TIME_LIMIT = 6
+const val FILTER_SOCKET = 7
+const val FILTER_STANDING_DESK = 8
 
 val Int.toPx: Int
     get() = (this * Resources.getSystem().displayMetrics.density).toInt()
@@ -135,9 +125,9 @@ class Utils {
             val sharedPreferences: SharedPreferences = context.getSharedPreferences(
                 SP_FILTER_OPTION_TYPE,
                 Context.MODE_PRIVATE
-            )
-            sharedPreferences.edit().putInt(SP_FILTER_OPTION_VALUE,filter).apply()
+            ).apply {
+                edit().putInt(SP_FILTER_OPTION_VALUE,filter).apply()
+            }
         }
-
     }
 }

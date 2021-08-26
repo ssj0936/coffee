@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/coffee/app/src/main/res/drawable/ic_location_pin_favorite.xml" value="0.45" />
         <entry key="..\:/coffee/app/src/main/res/layout/fragment_map.xml" value="0.43385416666666665" />
         <entry key="app/src/main/res/layout/cafe_recyclerview_item_layout.xml" value="0.25226449275362317" />
       </map>

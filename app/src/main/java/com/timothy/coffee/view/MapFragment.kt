@@ -144,8 +144,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
 
     override fun onMarkerClick(marker: Marker): Boolean {
         mMainViewModel.chosenCafe.value = marker.tag as CafenomadDisplay
-        mMainViewModel.lastMove.isClickList = false
-        mMainViewModel.lastMove.isClickMap = true
 
         //return true for not moving camera after marker clicking
         return true

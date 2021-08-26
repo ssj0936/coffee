@@ -111,12 +111,9 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
         mListNumberView.stream().sorted { o1, o2 ->
             o2.first - o1.first
         }.forEach {
-//            Timber.d("$it")
-
             val filter = it.first
             val viewId = it.second
             val button = view?.findViewById<MaterialButton>(viewId)
-//            Timber.d("filter:$filter, $tmp%$filter=$result")
 
             //pressed
             if(tmp/filter>0){
@@ -129,7 +126,6 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
                 setButtonPressed(view?.findViewById<MaterialButton>(viewId),false)
             }
             tmp %= filter
-//            Timber.d("--------------------")
         }
     }
 
@@ -137,21 +133,9 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     override fun onClick(v: View?) {
 
         if(v == confirm_button){
-            val newFilterSetting = getTempFilterSetting()
-            setFilterSetting(newFilterSetting)
-
-            mMainViewModel.getCafeList(isFetchFavOnly = mMainViewModel.isFavoriteOnly.value!!)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.computation())
-                .subscribe ({
-                    Timber.d("mMainViewModel.isFavoriteOnly: ${mMainViewModel.isFavoriteOnly.value}")
-                    mMainViewModel.initialLocalCafeData(it)
-                    dismiss()
-                },{error->
-                    Timber.e("filter settings error: $error")
-                    mMainViewModel.isLoading.postValue(false)
-                    dismiss()
-                })
+            setFilterSetting(getTempFilterSetting())
+            mMainViewModel.onFilterChanged()
+            dismiss()
             return
         }else if(v is MaterialButton){
             val result = !(v.tag as Boolean)
