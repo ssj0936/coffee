@@ -11,6 +11,7 @@ object Versions{
     const val rxjava2_rxandroid = "2.0.1"
     const val timber = "4.7.1"
     const val okhttp = "4.7.2"
+    const val conscrypt = "2.5.2"
     const val paging = "2.1.2"
     const val material = "1.2.1"
     const val play_services_maps = "17.0.0"

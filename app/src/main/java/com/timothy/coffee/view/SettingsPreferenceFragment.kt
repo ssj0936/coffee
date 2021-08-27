@@ -79,8 +79,9 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
 
         return v
     }
-
+    @SuppressLint("ShowToast")
     private val refetchCallback = object :MainViewModel.RefetchCallback{
+
         override fun onRefetchSuccess() {
             Snackbar.make(
                 requireView(),

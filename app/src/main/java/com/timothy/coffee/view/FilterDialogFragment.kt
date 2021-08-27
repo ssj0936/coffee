@@ -2,7 +2,6 @@ package com.timothy.coffee.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,9 +17,7 @@ import com.timothy.coffee.util.Utils.Companion.setFilterSetting
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_filter_dialog_layout.*
-import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.pow
 

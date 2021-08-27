@@ -62,6 +62,7 @@ object Dependencies{
     object Okhttp3{
         const val okhttp3 = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
         const val okhttp3LoggingInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
+        const val conscrypt = "org.conscrypt:conscrypt-android:${Versions.conscrypt}"
     }
 
     object Test{

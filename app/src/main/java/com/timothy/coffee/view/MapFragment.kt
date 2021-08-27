@@ -24,6 +24,7 @@ import com.timothy.coffee.RESULT_PERMISSION_LOCATION
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMapBinding
 import com.timothy.coffee.util.Constants.GOOGLE_MAP_ZOOM_LEVEL
+import com.timothy.coffee.util.Constants.TAIWAN_LAT_LNG
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
@@ -127,7 +128,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
 
         mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
             Observer<CafenomadDisplay> {
-//                moveCameraTo(it)
                 updateMarkersIcon()
             })
 
@@ -138,6 +138,13 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         mMap = googleMap.apply {
             setOnMarkerClickListener(this@MapFragment)
             setOnCameraIdleListener(this@MapFragment)
+
+            CameraPosition.builder()
+                .target(mMainViewModel.screenCenterLoc.value?:return@apply)
+                .build()
+                .let {
+                    moveCamera(CameraUpdateFactory.newCameraPosition(it))
+                }
         }
         enableMyLocation()
     }
@@ -207,10 +214,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 markerList.add(marker)
             }
         }
-
-        markerList.forEach {
-
-        }
     }
 
     private fun getBitmapMapPin(number:Int, resId:Int): BitmapDescriptor?{
@@ -239,14 +242,18 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         }
     }
 
-    private fun moveCameraTo(latlng:LatLng){
+    private fun moveCameraTo(latlng:LatLng, isAnimationCamera:Boolean = true){
         mMap?.run{
             val cameraPosition = CameraPosition.builder()
                 .target(latlng)
                 .zoom(GOOGLE_MAP_ZOOM_LEVEL)
                 .build()
 
-            animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            when(isAnimationCamera){
+                true -> animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+                false -> moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+            }
+
         }
     }
 
@@ -334,8 +341,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                 mMainViewModel.isReSearchable.value = true
             }
         }
-
-        Timber.d("The camera has stopped moving.")
     }
 
     @SuppressLint("CheckResult")

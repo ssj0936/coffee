@@ -102,4 +102,6 @@ dependencies {
     //okhttp3
     implementation(Dependencies.Okhttp3.okhttp3)
     implementation(Dependencies.Okhttp3.okhttp3LoggingInterceptor)
+    implementation(Dependencies.Okhttp3.conscrypt)
+
 }

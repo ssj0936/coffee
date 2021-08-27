@@ -62,10 +62,10 @@ class MainViewModel @Inject constructor(
         //starting fetching data
         getLocation()
             .subscribeOn(Schedulers.io())
-            .observeOn(Schedulers.computation())
             .flatMap { latlng ->
                 getCafeListFromLocation(latlng)
             }
+            .observeOn(Schedulers.computation())
             .subscribe({
                 initialLocalCafeData(it)
             }, { error -> Timber.e(error) })
@@ -173,8 +173,9 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    fun getCafeListFromFavorite(): Single<List<CafenomadDisplay>> {
+    private fun getCafeListFromFavorite(): Single<List<CafenomadDisplay>> {
         return cafeDataSource.queryFromDBV2AllFavorite()
+            .subscribeOn(Schedulers.io())
             .observeOn(Schedulers.computation())
             .map { cafes ->
                 //distance assignment
@@ -195,7 +196,7 @@ class MainViewModel @Inject constructor(
         isForceFromApi: Boolean = false
     ): Single<List<CafenomadDisplay>> {
         return Single.just(latLng)
-            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
             .flatMap { lonlat ->
                 val range = RANGE_CAFE_NEARBY_MAX
                 cafeDataSource.queryV2(lonlat.latitude, lonlat.longitude, range, isForceFromApi)
@@ -228,6 +229,7 @@ class MainViewModel @Inject constructor(
     private fun getLocation(): Single<LatLng> {
         return if (userLoc == null) {
             locationDataSource.getLastKnownLocation(cafeApplicationContext)
+                .subscribeOn(Schedulers.io())
                 .doOnSuccess {
                     userLoc = it
                     if (_screenCenterLoc.value?.equals(it) != true)
@@ -355,7 +357,7 @@ class MainViewModel @Inject constructor(
                 }
             }
             .sortedWith(
-                compareBy<CafenomadDisplay> { it.cafenomad.distanceFromCenterOfScreen }
+                compareBy<CafenomadDisplay> { it.cafenomad.distanceFromCenterOfScreen}
                     .thenBy { it.cafenomad.tastyLevel * -1 }
             )
             .take(maxCafeNumShowing)
@@ -365,8 +367,8 @@ class MainViewModel @Inject constructor(
     @SuppressLint("CheckResult")
     fun setFavorite(cafeId: String) {
         cafeDataSource.insertFavoriteV2(cafeId)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.computation())
             .subscribe({ insertID ->
                 if (insertID > 0) {
                     //find target and set favorite to true then update
@@ -405,8 +407,8 @@ class MainViewModel @Inject constructor(
     @SuppressLint("CheckResult")
     fun deleteFavorite(cafeId: String) {
         cafeDataSource.deleteFavoriteV2(cafeId)
-            .subscribeOn(Schedulers.computation())
-            .observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.computation())
             .subscribe ({ deleteCnt ->
                 if (deleteCnt > 0) {
                     //cafeList update
