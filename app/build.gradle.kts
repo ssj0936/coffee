@@ -30,7 +30,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-
         }
         getByName("debug") {
             isMinifyEnabled = false
@@ -38,9 +37,8 @@ android {
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
-            )        }
-
-
+            )
+        }
     }
     dataBinding {
         isEnabled = true
@@ -52,10 +50,6 @@ android {
 }
 
 dependencies {
-
-//    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.4.10")
-//    implementation("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
-//    implementation("org.glassfish.jaxb:jaxb-runtime:2.3.2")
 
     implementation(fileTree("dir" to "libs", "include" to listOf("*.jar")))
     implementation(project(":anchor-bottom-sheet-behavior"))
@@ -108,12 +102,4 @@ dependencies {
     //okhttp3
     implementation(Dependencies.Okhttp3.okhttp3)
     implementation(Dependencies.Okhttp3.okhttp3LoggingInterceptor)
-
-
-
-    //paging
-    implementation(Dependencies.Paging.paging)
-    testImplementation(Dependencies.Paging.pagingCommon)
-    implementation(Dependencies.Paging.pagingRxjava2)
-
 }

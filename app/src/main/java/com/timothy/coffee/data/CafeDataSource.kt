@@ -16,7 +16,7 @@ import timber.log.Timber
 import java.util.stream.Collectors
 import javax.inject.Inject
 
-class DataSource @Inject constructor(
+class CafeDataSource @Inject constructor(
    private val cafeDao: CafeDao,
    private val cafenomadApiService: CafenomadApiService
 ) {
@@ -24,6 +24,8 @@ class DataSource @Inject constructor(
     @SuppressLint("CheckResult")
     fun queryV2(latitude:Double, longitude:Double, range:Int, isForceFromApi:Boolean):Single<List<CafenomadDisplay>>{
         return Single.just("")
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
             .flatMap {
                 cafeDao.getRowNum()
             }.flatMap {
@@ -42,7 +44,6 @@ class DataSource @Inject constructor(
             }.flatMap {
                 queryFromDBV2(latitude, longitude, range)
             }
-            .subscribeOn(Schedulers.io())
     }
 
     /*有可能Query不到東西，可能像是第一次Query時DB table根本沒建起來，又或是table有了但裡面沒有符合的資料

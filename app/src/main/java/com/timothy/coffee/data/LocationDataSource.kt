@@ -11,8 +11,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DataModel
-@Inject constructor()
+class LocationDataSource @Inject constructor()
 {
     private val locationRequest = LocationRequest.create()
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
@@ -30,6 +29,7 @@ class DataModel
         return Maybe.create<LatLng> { emitter ->
             getFusedLocationClient(context).lastLocation
                 .addOnSuccessListener {
+                    Timber.d("THREAD:${Thread.currentThread().name}")
                     Timber.d("getLastKnownLocation success")
                     if(it!=null){
                         emitter.onSuccess(LatLng(

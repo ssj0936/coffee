@@ -239,21 +239,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         }
     }
 
-//    private fun moveCamera(){
-//        mMainViewModel.screenCenterLoc.value?.let {
-//            val cameraPosition = CameraPosition.builder()
-//                .target(LatLng(it.latitude,it.longitude))
-//                .zoom(GOOGLE_MAP_ZOOM_LEVEL)
-//                .build()
-//
-//            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
-//        }
-//    }
-//
-//    private fun moveCameraTo(cafe:CafenomadDisplay) {
-//        moveCameraTo(LatLng(cafe.cafenomad.latitude.toDouble(),cafe.cafenomad.longitude.toDouble()))
-//    }
-
     private fun moveCameraTo(latlng:LatLng){
         mMap?.run{
             val cameraPosition = CameraPosition.builder()

@@ -27,10 +27,6 @@
 
     <dimen name="map_icon_size">48dp</dimen>
 
-    <!-- value -->
-    <integer name="range_cafe_nearby_min" type="dimen" format="integer">5</integer>
-    <integer name="range_cafe_nearby_max" type="dimen" format="integer">10</integer>
-
     <string-array name="preference_cafe_number_option">
         <item>20</item>
         <item>30</item>
