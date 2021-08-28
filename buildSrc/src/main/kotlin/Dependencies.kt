@@ -71,4 +71,10 @@ object Dependencies{
         const val espresso = "androidx.test.espresso:espresso-core:${Versions.Test.espresso}"
     }
 
+    object FireBase{
+        const val firebaseBom = "com.google.firebase:firebase-bom:${Versions.firebase}"
+        const val firebaseAnalyticsKtx = "com.google.firebase:firebase-analytics-ktx"
+        const val firebaseCrashlyticsKtx = "com.google.firebase:firebase-crashlytics-ktx"
+    }
+
 }

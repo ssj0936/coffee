@@ -3,6 +3,9 @@ plugins{
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-android-extensions")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+
     kotlin("kapt")
 }
 
@@ -103,5 +106,10 @@ dependencies {
     implementation(Dependencies.Okhttp3.okhttp3)
     implementation(Dependencies.Okhttp3.okhttp3LoggingInterceptor)
     implementation(Dependencies.Okhttp3.conscrypt)
+
+    //firebase
+    implementation(platform(Dependencies.FireBase.firebaseBom))
+    implementation(Dependencies.FireBase.firebaseAnalyticsKtx)
+    implementation(Dependencies.FireBase.firebaseCrashlyticsKtx)
 
 }
