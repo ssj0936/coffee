@@ -17,7 +17,9 @@
 .cxx
 app/src/main/res/values/apikey.xml
 app/release
+app/debug
 key.jks
 buildSrc/.gradle
 buildSrc/build/
 app/google-services.json
+
