@@ -64,11 +64,20 @@ class MainFragment: Fragment(), View.OnClickListener
         super.onAttach(context)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        //viewmodel setup
+        mMainViewModel = activity?.run {
+            ViewModelProvider(this, mViewModelFactory).get(MainViewModel::class.java)
+        } ?: throw Exception("Invalid Activity")
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.d("onViewCreated")
         //viewpager
-        cafeAdapter = CafeViewPagerAdapterV2(requireActivity().supportFragmentManager)
+        cafeAdapter = CafeViewPagerAdapterV2(childFragmentManager)
         binding.viewpager.apply {
             adapter = cafeAdapter
             pageMargin = 10.toPx
@@ -78,15 +87,16 @@ class MainFragment: Fragment(), View.OnClickListener
 
         //when user clicked item of cafe list
         mMainViewModel.chosenCafe.observe (viewLifecycleOwner,
-            Observer<CafenomadDisplay> {
+            {
                 //nav to chosen cafe position or index0
                 if(it == null){
                     binding.viewpager.currentItem = 0
                 }else {
-                    val findIndex: Int = cafeAdapter.cafeListCurrent.indexOfFirst { listItem ->
+                    mMainViewModel.cafeListDisplay.value?.indexOfFirst { listItem ->
                         listItem.cafenomad.id == it.cafenomad.id
+                    }?.run {
+                        binding.viewpager.currentItem = this
                     }
-                    binding.viewpager.currentItem = findIndex
                 }
 
                 //scroll to top
@@ -136,28 +146,15 @@ class MainFragment: Fragment(), View.OnClickListener
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentMainBinding.inflate(inflater,container,false)
-        return binding.root
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        //viewmodel setup
-        mMainViewModel = activity?.run {
-            ViewModelProvider(this, mViewModelFactory).get(MainViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
         binding.viewmodel = mMainViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
+        return binding.root
     }
 
     private fun initMap(){
         activity?.run {
-            supportFragmentManager.beginTransaction()
+            childFragmentManager.beginTransaction()
                 .replace(R.id.mapContainer, MapFragment.getInstance(), MapFragment.TAG)
                 .commit()
         }
@@ -173,7 +170,7 @@ class MainFragment: Fragment(), View.OnClickListener
                 if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     queryCafeList()
 
-                    requireActivity().supportFragmentManager
+                    childFragmentManager
                         .findFragmentByTag(MapFragment.TAG)
                         ?.onRequestPermissionsResult(requestCode, permissions, grantResults)
                 }else{
@@ -277,7 +274,7 @@ class MainFragment: Fragment(), View.OnClickListener
     }
 
     private fun showFilterDialog(){
-        requireActivity().supportFragmentManager.let{
+        childFragmentManager.let{
             FilterDialogFragment().show(it,"")
         }
     }
@@ -310,6 +307,9 @@ class MainFragment: Fragment(), View.OnClickListener
     }
 
     fun onPageSelected(position: Int){
-        mMainViewModel.chosenCafe.value = cafeAdapter.cafeListCurrent[position].copy()
+        mMainViewModel.cafeListDisplay.value?.let{
+            if(position < it.size)
+                mMainViewModel.chosenCafe.value = it[position].copy()
+        }
     }
 }

@@ -1,39 +1,27 @@
 package com.timothy.coffee.ui
 
 import android.annotation.SuppressLint
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import com.timothy.coffee.R
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.view.CafeInfoV2Fragment
-import com.timothy.coffee.view.CafeInfoV2NoDataFragment
 
-@SuppressLint("WrongConstant")
 class CafeViewPagerAdapterV2 constructor(
     fm: FragmentManager
 ): FragmentStatePagerAdapter(fm,BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-    private var fragmentList = mutableListOf<Fragment>()
-    var cafeListCurrent = listOf<CafenomadDisplay>()
+    private var count = 0
 
     override fun getItem(position: Int): Fragment {
-        return fragmentList[position]
+        return if(count >0) CafeInfoV2Fragment.newInstance(position) else Fragment(R.layout.fragment_cafe_info_v2_nodata)
     }
 
-    override fun getCount(): Int = fragmentList.size
+    override fun getCount(): Int = if(count==0) 1 else count
 
     fun setCardList(list:List<CafenomadDisplay>){
-        fragmentList.clear()
-
-        //different fragments be added to adapter when list is empty or not
-        if(list.isEmpty()){
-            fragmentList.add(CafeInfoV2NoDataFragment.getInstance())
-        }else {
-            cafeListCurrent = list
-            for (index in list.indices) {
-                fragmentList.add(CafeInfoV2Fragment.newInstance(index))
-            }
-        }
-
+        count = list.size
         notifyDataSetChanged()
     }
 
@@ -49,4 +37,7 @@ class CafeViewPagerAdapterV2 constructor(
         return POSITION_NONE
     }
 
+    override fun saveState(): Parcelable? {
+        return null
+    }
 }

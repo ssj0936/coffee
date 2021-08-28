@@ -59,6 +59,11 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCafeInfoV2Binding.inflate(inflater,container,false)
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        mMainViewModel.cafeListDisplay.value?.let {
+            binding.cafe = it[ARGUMENT_DATA_CAFE_INDEX]
+        }
         return binding.root
     }
 
@@ -86,7 +91,7 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         mMainViewModel.cafeListDisplay.value?.let {
             val cafe = it[ARGUMENT_DATA_CAFE_INDEX]
 
-            adapter.setCafe(cafe, requireActivity())
+            adapter.setCafe(cafe)
             adapter.notifyDataSetChanged()
 
             binding.contentTimeLimit.text = when (cafe.cafenomad.isTimeLimited) {
@@ -108,14 +113,6 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
                 getString(R.string.info_value_no) -> getString(R.string.info_standing_desk_text_no)
                 else -> getString(R.string.no_data)
             }
-        }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        mMainViewModel.cafeListDisplay.value?.let {
-            binding.cafe = it[ARGUMENT_DATA_CAFE_INDEX]
-            binding.lifecycleOwner = viewLifecycleOwner
         }
     }
 
@@ -159,7 +156,10 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         }
     }
 
+
+
     fun scrollToTop(){
-        binding.nestedScrollView.scrollY = 0
+        if(::binding.isInitialized)
+            binding.nestedScrollView.scrollY = 0
     }
 }
