@@ -23,13 +23,6 @@ class SettingsPreferenceFragment: PreferenceFragmentCompat(), SharedPreferences.
     companion object{
         @JvmStatic
         val TAG = "SettingsPreferenceFragment"
-        private lateinit var INSTANCE:SettingsPreferenceFragment
-        fun getInstance():SettingsPreferenceFragment{
-            if(!::INSTANCE.isInitialized){
-                INSTANCE = SettingsPreferenceFragment()
-            }
-            return INSTANCE
-        }
     }
     @Inject
     lateinit var mViewModelFactory: ViewModelFactory

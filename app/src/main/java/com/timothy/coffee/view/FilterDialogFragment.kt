@@ -30,9 +30,6 @@ class FilterDialogFragment:DialogFragment(),View.OnClickListener {
     private lateinit var unpressedColorStateList: ColorStateList
     private val mListNumberView = mutableListOf<Pair<Int,Int>>()
 
-    companion object{
-
-    }
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context)

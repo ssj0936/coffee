@@ -19,12 +19,12 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.*
+import com.timothy.coffee.CafeApp
 import com.timothy.coffee.R
 import com.timothy.coffee.RESULT_PERMISSION_LOCATION
 import com.timothy.coffee.data.model.CafenomadDisplay
 import com.timothy.coffee.databinding.FragmentMapBinding
 import com.timothy.coffee.util.Constants.GOOGLE_MAP_ZOOM_LEVEL
-import com.timothy.coffee.util.Constants.TAIWAN_LAT_LNG
 import com.timothy.coffee.util.Utils
 import com.timothy.coffee.viewmodel.MainViewModel
 import com.timothy.coffee.viewmodel.ViewModelFactory
@@ -51,12 +51,6 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     private val markerList = mutableListOf<Marker>()
 
     companion object {
-        @JvmStatic
-        private lateinit var INSTANCE:MapFragment
-        fun getInstance():MapFragment{
-            if(!::INSTANCE.isInitialized) INSTANCE = MapFragment()
-            return INSTANCE
-        }
         const val TAG = "MapFragment"
     }
 
@@ -86,21 +80,18 @@ class MapFragment : Fragment(),OnMapReadyCallback,
         binding.viewmodel = mMainViewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        mapView?.run {
-            onCreate(savedInstanceState)
-            onResume()
-            getMapAsync(this@MapFragment)
-        }
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync(this)
 
         //one-time observer
         mMainViewModel.screenCenterLoc.observe(viewLifecycleOwner,
-            Observer<LatLng>{
-                moveCameraTo(mMainViewModel.screenCenterLoc.value ?: return@Observer)
+            Observer {
+                moveCameraTo(mMainViewModel.screenCenterLoc.value ?: return@Observer, false)
                 mMainViewModel.screenCenterLoc.removeObservers(viewLifecycleOwner)
             })
 
         mMainViewModel.cafeListDisplay.observe(viewLifecycleOwner,
-            Observer<List<CafenomadDisplay>> { cafes ->
+            { cafes ->
                 mMap.let{
 
                     //check whether is same dataset or not
@@ -112,13 +103,13 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                         var areSameContent = true
 
                         markerList.zip(cafes).forEach{pair ->
-                            areSameContent = areSameContent && (pair.first.tag as CafenomadDisplay == (pair.second))
+                            areSameContent = areSameContent && ((pair.first.tag as Pair<*, *>).first == ((pair.second) as CafenomadDisplay).cafenomad.id)
                         }
                         needToMoveCamera = !areSameContent
                     }
 
                     //remove all markers first
-                    mMap.clear()
+                    it.clear()
                     addMarkers(cafes)
 
                     if(needToMoveCamera)
@@ -127,7 +118,7 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             })
 
         mMainViewModel.chosenCafe.observe(viewLifecycleOwner,
-            Observer<CafenomadDisplay> {
+            {
                 updateMarkersIcon()
             })
 
@@ -150,8 +141,13 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        mMainViewModel.chosenCafe.value = marker.tag as CafenomadDisplay
+        val chosenId:String = (marker.tag as Pair<String,*>).first
 
+        mMainViewModel.cafeListDisplay.value?.find {
+            it.cafenomad.id == chosenId
+        }?.run {
+            mMainViewModel.chosenCafe.value = this
+        }
         //return true for not moving camera after marker clicking
         return true
     }
@@ -161,12 +157,12 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             val cafeIndexDisplay = 1+index
 
             when {
-                (item.tag as CafenomadDisplay).cafenomad.id == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
+                (item.tag as Pair<String, Boolean>).first == mMainViewModel.chosenCafe.value?.cafenomad?.id ->
                     item.apply {
                         setIcon(getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_selected))
                         zIndex = Z_INDEX_CURRENT
                     }
-                (item.tag as CafenomadDisplay).isFavorite ->
+                (item.tag as Pair<String, Boolean>).second ->
                     item.apply {
                         setIcon(getBitmapMapPin(cafeIndexDisplay, R.drawable.ic_location_pin_favorite))
                         zIndex = Z_INDEX_NORMAL
@@ -210,10 +206,22 @@ class MapFragment : Fragment(),OnMapReadyCallback,
                     )
                 )
 
-                marker.tag = cafe
-                markerList.add(marker)
+                marker?.tag = Pair(cafe.cafenomad.id,cafe.isFavorite)
+                markerList.add(marker?:return)
             }
         }
+    }
+
+    override fun onDestroy() {
+        mapView?.onDestroy()
+        super.onDestroy()
+    }
+
+    override fun onDestroyView() {
+        mMap.clear()
+        mapView?.onDestroy()
+        markerList.clear()
+        super.onDestroyView()
     }
 
     private fun getBitmapMapPin(number:Int, resId:Int): BitmapDescriptor?{
@@ -303,13 +311,13 @@ class MapFragment : Fragment(),OnMapReadyCallback,
     }
 
     private fun enableMyLocation(){
-        activity?.let {
-            //permission granted
-            if(ContextCompat.checkSelfPermission(it, android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED){
-                mMap.isMyLocationEnabled = true
-                mMap.uiSettings.isMyLocationButtonEnabled = true
-            }
+        //permission granted
+        Timber.d("Premission grant:${ContextCompat.checkSelfPermission(CafeApp.cafeApplicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED}")
+        if(ContextCompat.checkSelfPermission(CafeApp.cafeApplicationContext, android.Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED){
+            mMap.isMyLocationEnabled = true
+            mMap.uiSettings.isMyLocationButtonEnabled = true
         }
     }
 
@@ -349,5 +357,35 @@ class MapFragment : Fragment(),OnMapReadyCallback,
             updateScreenCenterLoc(mMap.cameraPosition.target)
             onMapResearch()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mapView?.onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapView?.onStop()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        mapView?.onPause()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView?.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
     }
 }

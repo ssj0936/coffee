@@ -1,7 +1,12 @@
 <resources>
+    <string name="app_name">找找咖啡廳</string>
+
     <string name="btn_text_navigate">帶我去</string>
     <string name="btn_text_cafenomad_url">Cafenomad的介紹</string>
     <string name="btn_text_official_url">官方網站</string>
+
+    <string name="btn_permission_settings_pos_btn">去設定權限</string>
+    <string name="btn_permission_settings_neg_btn">離開</string>
 
     <string name="no_data">沒提供資訊</string>
 

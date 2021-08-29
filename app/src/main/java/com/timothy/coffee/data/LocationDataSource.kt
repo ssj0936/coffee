@@ -1,7 +1,10 @@
 package com.timothy.coffee.data
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Looper
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import io.reactivex.Maybe
@@ -27,9 +30,20 @@ class LocationDataSource @Inject constructor()
 
     fun getLastKnownLocation(context: Context):Single<LatLng>{
         return Maybe.create<LatLng> { emitter ->
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                emitter.onError(IllegalArgumentException("Permission not granted"))
+                return@create
+            }
+
             getFusedLocationClient(context).lastLocation
                 .addOnSuccessListener {
-                    Timber.d("THREAD:${Thread.currentThread().name}")
                     Timber.d("getLastKnownLocation success")
                     if(it!=null){
                         emitter.onSuccess(LatLng(

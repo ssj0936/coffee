@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="TastyRatingBarStyle" parent="@android:style/Widget.RatingBar">
-        <item name="android:progressDrawable">@drawable/tasty_rating_bar_stars</item>
-        <item name="android:minHeight">18dp</item>
-        <item name="android:maxHeight">18dp</item>
-        <!-- full icon tint -->
-        <item name="android:progressTint">@color/rate_yellow</item>
-        <!-- unfull icon tint -->
-        <item name="android:secondaryProgressTint">@color/rate_yellow_alpha</item>
-        <!-- stroke tint -->
-        <item name="android:progressBackgroundTint">@color/rate_yellow_alpha</item>
-    </style>
+<!--    <style name="TastyRatingBarStyle" parent="@android:style/Widget.RatingBar">-->
+<!--&lt;!&ndash;        <item name="android:progressDrawable">@drawable/tasty_rating_bar_stars</item>&ndash;&gt;-->
+<!--        <item name="android:minHeight">18dp</item>-->
+<!--        <item name="android:maxHeight">18dp</item>-->
+<!--        &lt;!&ndash; full icon tint &ndash;&gt;-->
+<!--        <item name="android:progressTint">@color/rate_yellow</item>-->
+<!--        &lt;!&ndash; unfull icon tint &ndash;&gt;-->
+<!--        <item name="android:secondaryProgressTint">@color/rate_yellow_alpha</item>-->
+<!--        &lt;!&ndash; stroke tint &ndash;&gt;-->
+<!--        <item name="android:progressBackgroundTint">@color/rate_yellow_alpha</item>-->
+<!--    </style>-->
 
     <style name="CommonButtonStyle" parent="Widget.AppCompat.Button.Colored">
         <item name="android:colorButtonNormal">@color/white</item>

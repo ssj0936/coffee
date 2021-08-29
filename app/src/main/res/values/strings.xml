@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">coffee</string>
+    <string name="app_name">Cafe Finder</string>
     <string name="base_url_cafenomad" translatable="false">https://cafenomad.tw/</string>
     <string name="base_url_locationiq" translatable="false">https://us1.locationiq.com/</string>
 
@@ -15,6 +15,8 @@
     <string name="btn_text_cafenomad_url">Intro in Cafenomad</string>
     <string name="btn_text_official_url">URL</string>
 
+    <string name="btn_permission_settings_pos_btn">Go to Permission setting</string>
+    <string name="btn_permission_settings_neg_btn">Leave</string>
     <string name="no_data">No data</string>
 
     <string name="label_wifi_stability">Wifi Stability</string>

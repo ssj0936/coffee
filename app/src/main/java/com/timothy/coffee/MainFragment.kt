@@ -48,15 +48,9 @@ class MainFragment: Fragment(), View.OnClickListener
     private lateinit var binding: FragmentMainBinding
     private lateinit var behavior: AnchorBottomSheetBehavior<View>
 
+    private var permissionDialog: AlertDialog? = null
     companion object{
         const val TAG = "MainFragment"
-        private lateinit var INSTANCE:MainFragment
-        fun getInstance():MainFragment{
-            if(!::INSTANCE.isInitialized){
-                INSTANCE = MainFragment()
-            }
-            return INSTANCE
-        }
     }
 
     override fun onAttach(context: Context) {
@@ -137,7 +131,6 @@ class MainFragment: Fragment(), View.OnClickListener
         if(Utils.isNetworkAvailable(requireContext()) && isPermissionGranted()) {
             queryCafeList()
         }
-        initMap()
     }
 
     override fun onCreateView(
@@ -150,14 +143,6 @@ class MainFragment: Fragment(), View.OnClickListener
         binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
-    }
-
-    private fun initMap(){
-        activity?.run {
-            childFragmentManager.beginTransaction()
-                .replace(R.id.mapContainer, MapFragment.getInstance(), MapFragment.TAG)
-                .commit()
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -238,20 +223,28 @@ class MainFragment: Fragment(), View.OnClickListener
     }
 
     private fun showManualPermissionSettingsDialog(){
-        AlertDialog.Builder(requireContext())
-            .setMessage(R.string.dialog_permission_require_message)
-            .setPositiveButton("Permission setting") { _, _ ->
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", requireActivity().packageName, null)
-                intent.data = uri
-                startActivityForResult(intent, RESULT_MANUAL_ENABLE)
-            }
-            .setNegativeButton("Finish") { _, _ ->
-                requireActivity().finish()
-            }
-            .setCancelable(false)
-            .create()
-            .show()
+        if(permissionDialog == null){
+            permissionDialog = AlertDialog.Builder(requireContext())
+                .setMessage(R.string.dialog_permission_require_message)
+                .setPositiveButton(R.string.btn_permission_settings_pos_btn) { _, _ ->
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", requireActivity().packageName, null)
+                    intent.data = uri
+                    startActivityForResult(intent, RESULT_MANUAL_ENABLE)
+                }
+                .setNegativeButton(R.string.btn_permission_settings_neg_btn) { _, _ ->
+                    requireActivity().finish()
+                }
+                .setCancelable(false)
+                .create()
+        }
+
+        permissionDialog?.show()
+    }
+
+    override fun onDestroy() {
+        permissionDialog = null
+        super.onDestroy()
     }
 
     private fun queryCafeList(){
