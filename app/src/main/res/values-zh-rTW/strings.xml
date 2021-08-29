@@ -24,6 +24,8 @@
     <string name="label_mrt">捷運站</string>
     <string name="label_intro">詳細資訊</string>
 
+    <string name="progress_bar_loading_text">再一下下，咖啡小精靈快完成了！</string>
+
     <string name="dialog_network_require_message">我們需要網路找咖啡廳的資訊</string>
     <string name="dialog_network_require_pos_btn">前往WI-FI設定!</string>
 

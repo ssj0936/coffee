@@ -74,14 +74,39 @@
             android:alpha=".85"
             style="@style/Widget.AppCompat.Button.Colored"/>
 
-        <ProgressBar
-            android:id="@+id/list_progressbar"
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="@{(viewmodel.cafeListDisplay==null || viewmodel.loading==true) ? View.VISIBLE : View.INVISIBLE}"
-            style="?android:attr/progressBarStyle"
-            />
+            app:cardCornerRadius="10dp"
+            app:cardBackgroundColor="@color/background_color"
+            app:cardElevation="10dp"
+            app:contentPadding="10dp">
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+                <ProgressBar
+                    android:layout_marginTop="16dp"
+                    android:id="@+id/list_progressbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="?android:attr/progressBarStyle"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textAppearance="@style/CommonSubtitleStyle"
+                    android:textColor="@color/common_secondary_context_text_color"
+                    android:textAlignment="center"
+                    android:text="@string/progress_bar_loading_text"/>
+
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+        </androidx.cardview.widget.CardView>
+
 
     </FrameLayout>
 </layout>

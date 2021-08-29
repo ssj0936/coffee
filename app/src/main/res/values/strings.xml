@@ -32,6 +32,9 @@
     <string name="label_mrt">MRT station nearby</string>
     <string name="label_intro">Detail information</string>
 
+    <string name="progress_bar_loading_text">Just a second, Cafe ninja is on the way!</string>
+
+
     <string name="dialog_network_require_message">Network is required for get Cafes information.</string>
     <string name="dialog_network_require_pos_btn">go to Wifi settings!</string>
 

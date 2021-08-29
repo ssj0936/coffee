@@ -77,8 +77,8 @@ class CafeInfoV2Fragment: Fragment() ,View.OnClickListener{
         binding.cafeName.maxWidth =
             width - (resources.getDimensionPixelSize(R.dimen.cafeinfo_padding_side)*2
                     + resources.getDimensionPixelSize(R.dimen.cafeinfo_v2_card_padding)*2
-                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_margin_side)*2
-                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_favorite_btn_size))
+                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_icon_btn_margin_side)*2
+                    + resources.getDimensionPixelSize(R.dimen.cafeinfo_icon_btn_size))
 
         binding.btnNavigate.setOnClickListener(this)
         binding.btnCafenomadIntro.setOnClickListener(this)

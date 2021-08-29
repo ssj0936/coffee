@@ -44,7 +44,7 @@
 
                     <TextView
                         android:id="@+id/cafe_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:autoSizeMaxTextSize="@dimen/common_title_text_size"
                         android:autoSizeMinTextSize="@dimen/common_title_text_size_min"
@@ -59,17 +59,17 @@
 
                     <ImageView
                         android:id="@+id/favorite_btn"
-                        android:layout_width="@dimen/cafeinfo_favorite_btn_size"
-                        android:layout_height="@dimen/cafeinfo_favorite_btn_size"
-                        android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
-                        android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
+                        android:layout_width="@dimen/cafeinfo_icon_btn_size"
+                        android:layout_height="@dimen/cafeinfo_icon_btn_size"
+                        android:layout_marginStart="@dimen/cafeinfo_icon_btn_margin_side"
+                        android:layout_marginEnd="@dimen/cafeinfo_icon_btn_margin_side"
                         android:padding="5dp"
                         android:src="@{cafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
                         app:layout_constraintBottom_toBottomOf="@id/cafe_name"
                         app:layout_constraintStart_toEndOf="@id/cafe_name"
                         app:layout_constraintTop_toTopOf="@id/cafe_name"
                         android:tint="@{cafe.isFavorite ? @color/rate_red : @color/light_gray}" />
-
+                    
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/address"
                         android:layout_width="0dp"
@@ -260,7 +260,7 @@
                     android:drawableStart="@drawable/ic_directions_black_24dp"
                     android:drawablePadding="10dp"
                     android:drawableTint="@color/gray"
-                    android:paddingStart="32dp"
+                    android:paddingStart="16dp"
                     android:paddingEnd="32dp"
                     android:text="@string/btn_text_navigate"
                     android:textAppearance="@style/CommonPrimaryContextTextStyle"

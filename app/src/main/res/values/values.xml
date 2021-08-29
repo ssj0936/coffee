@@ -22,8 +22,8 @@
     <dimen name="cafeinfo_padding_bottom">26dp</dimen>
     <dimen name="cafeinfo_padding_side">30dp</dimen>
 
-    <dimen name="cafeinfo_favorite_btn_size">30dp</dimen>
-    <dimen name="cafeinfo_favorite_btn_margin_side">10dp</dimen>
+    <dimen name="cafeinfo_icon_btn_size">30dp</dimen>
+    <dimen name="cafeinfo_icon_btn_margin_side">10dp</dimen>
 
     <dimen name="map_icon_size">48dp</dimen>
 

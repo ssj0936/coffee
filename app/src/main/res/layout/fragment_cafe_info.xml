@@ -41,14 +41,14 @@
                 app:layout_constraintTop_toTopOf="parent"/>
             <ImageView
                 android:id="@+id/favorite_btn"
-                android:layout_width="@dimen/cafeinfo_favorite_btn_size"
-                android:layout_height="@dimen/cafeinfo_favorite_btn_size"
+                android:layout_width="@dimen/cafeinfo_icon_btn_size"
+                android:layout_height="@dimen/cafeinfo_icon_btn_size"
                 android:padding="5dp"
                 app:layout_constraintStart_toEndOf="@id/cafe_name"
                 app:layout_constraintTop_toTopOf="@id/cafe_name"
                 app:layout_constraintBottom_toBottomOf="@id/cafe_name"
-                android:layout_marginStart="@dimen/cafeinfo_favorite_btn_margin_side"
-                android:layout_marginEnd="@dimen/cafeinfo_favorite_btn_margin_side"
+                android:layout_marginStart="@dimen/cafeinfo_icon_btn_margin_side"
+                android:layout_marginEnd="@dimen/cafeinfo_icon_btn_margin_side"
                 android:src="@{viewmodel.chosenCafe.isFavorite ? @drawable/ic_favorite_black_24dp : @drawable/ic_favorite_border_black_24dp}"
                 android:tint="@{viewmodel.chosenCafe.isFavorite ? @color/rate_red : @color/light_gray}" />
 
